@@ -63,7 +63,7 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular/build:dev-server",         
+          "builder": "@angular/build:dev-server",
           "options": {
             "buildTarget": "mdd-client:build"
           },
@@ -85,5 +85,11 @@
         }
       }
     }
+  },
+  "cli": {
+    "schematicCollections": [
+      "@cypress/schematic",
+      "@schematics/angular"
+    ]
   }
 }
