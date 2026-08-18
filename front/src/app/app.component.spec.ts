@@ -5,11 +5,8 @@ import { TopicComponent } from './topic/topic.component';
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [
-        AppComponent,
-        TopicComponent
-      ],
-    }).compileComponents();
+    imports: [TopicComponent, AppComponent],
+}).compileComponents();
   });
 
   it('should create the app', () => {

@@ -4,8 +4,7 @@ import { Component, ChangeDetectionStrategy } from "@angular/core";
     selector: 'app-topic',
     templateUrl: './topic.component.html',
     styleUrls: ['./topic.component.css'],
-    changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    changeDetection: ChangeDetectionStrategy.Eager
 })
 export class TopicComponent {
 
