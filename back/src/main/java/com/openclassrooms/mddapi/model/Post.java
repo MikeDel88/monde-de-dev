@@ -29,6 +29,6 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
     private User user;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Comment> comments;
 }

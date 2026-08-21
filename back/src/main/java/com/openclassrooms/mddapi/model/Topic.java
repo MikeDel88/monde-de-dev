@@ -17,6 +17,6 @@ public class Topic extends BaseEntity {
 	@Column(nullable = false, updatable = false)
 	private String description;
 
-	@OneToMany(fetch =  FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "topic", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Post> posts;
 }
