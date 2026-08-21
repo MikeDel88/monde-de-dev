@@ -1,10 +1,9 @@
 package com.openclassrooms.mddapi.model;
 
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.Set;
 
 @Entity
 @Table(name = "topics")
@@ -12,10 +11,12 @@ import lombok.Data;
 @Data
 public class Topic extends BaseEntity {
 
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false, unique = true, updatable = false)
 	private String title;
 
-	@Column(nullable = false)
+	@Column(nullable = false, updatable = false)
 	private String description;
 
+	@OneToMany(fetch =  FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<Post> posts;
 }

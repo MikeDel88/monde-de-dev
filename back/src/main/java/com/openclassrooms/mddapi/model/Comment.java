@@ -11,18 +11,18 @@ import java.time.LocalDateTime;
 @Data
 public class Comment extends BaseEntity {
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private String content;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime date;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "post_id", nullable = false, updatable = false)
     private Post post;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "user_id", nullable = false, updatable = false)
     private User user;
 
 }

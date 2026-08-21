@@ -1,14 +1,10 @@
 package com.openclassrooms.mddapi.model;
 
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "posts")
@@ -16,21 +12,23 @@ import java.time.LocalDateTime;
 @Data
 public class Post extends BaseEntity {
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private String content;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime date;
 
-	@ManyToOne
-	@JoinColumn(name = "topic_id", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@JoinColumn(name = "topic_id", nullable = false, updatable = false)
 	private Topic topic;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "user_id", nullable = false, updatable = false)
     private User user;
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Comment> comments;
 }
