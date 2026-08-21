@@ -7,7 +7,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users")
-@AttributeOverride(name = "id", column = @Column(name = "user_id", updatable = false, nullable = false))
+@AttributeOverride(name = "id", column = @Column(name = "user_id"))
 @Data
 public class User extends BaseEntity {
 
