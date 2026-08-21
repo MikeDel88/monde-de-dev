@@ -1,29 +1,28 @@
 package com.openclassrooms.mddapi.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.Data;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "comments")
-public class Comment {
+@AttributeOverride(name = "id", column = @Column(name = "comment_id"))
+@Data
+public class Comment extends BaseEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "comment_id")
-	private Long id;
-	
-	// TODO : to finish...
+    @Column(nullable = false)
+    private String content;
 
-	public Long getId() {
-		return id;
-	}
+    @Column(nullable = false)
+    private LocalDateTime date;
 
-	public void setId(Long id) {
-		this.id = id;
-	}	
-	
+    @ManyToOne
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
 }
