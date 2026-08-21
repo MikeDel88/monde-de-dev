@@ -3,7 +3,7 @@ package com.openclassrooms.mddapi.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -25,5 +25,5 @@ public class User extends BaseEntity {
             name = "subscriptions",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "topic_id"))
-    private List<Topic> topics;
+    private Set<Topic> topics;
 }
