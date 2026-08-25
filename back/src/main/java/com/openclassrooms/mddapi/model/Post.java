@@ -1,7 +1,8 @@
 package com.openclassrooms.mddapi.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -9,7 +10,8 @@ import java.util.Set;
 @Entity
 @Table(name = "posts")
 @AttributeOverride(name = "id", column = @Column(name = "post_id"))
-@Data
+@Getter
+@Setter
 public class Post extends BaseEntity {
 
     @Column(nullable = false, updatable = false)
