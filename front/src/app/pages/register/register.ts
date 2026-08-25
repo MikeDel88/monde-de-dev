@@ -8,11 +8,11 @@ import {
   pattern,
   SchemaPathTree
 } from '@angular/forms/signals';
-import {Location} from "@angular/common";
 import {AuthService} from "../../core/services/auth-service";
 import {RegisterData} from "../../core/models/register-data";
 import {Toast} from "../../components/toasts/toast";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {Auth} from "../../components/auth/auth";
 
 const initialRegisterData: RegisterData = {
   name: "",
@@ -35,22 +35,25 @@ const validationRegisterForm = (schemaPath: SchemaPathTree<RegisterData>) => {
 
 @Component({
   selector: 'app-register',
-  imports: [FormField, Toast],
+  imports: [FormField, Toast, Auth],
   templateUrl: './register.html',
   styleUrl: './register.css',
 })
 export class Register {
+
+  title: string = "Inscription";
+  btnText: string = "S'inscrire";
+  labelName: string = "Nom d'utilisateur";
+  labelEmail: string = "Adresse e-mail";
+  labelPassword: string = "Mot de passe";
+
   private readonly destroyRef = inject(DestroyRef);
-  private readonly location = inject(Location);
   private readonly authService = inject(AuthService);
   error = signal<string | undefined>(undefined);
   showToastSuccessfully = signal(false)
 
   registerForm = form(registerModel, validationRegisterForm);
 
-  onBack() {
-    this.location.back();
-  }
 
   onReset() {
     this.showToastSuccessfully.set(false);

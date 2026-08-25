@@ -22,7 +22,7 @@ export class AuthService {
    login$(datas: LoginData): Observable<boolean> {
     return this.httpClient.post<AuthResponse>("http://localhost:9000/auth/login", datas)
       .pipe(tap((authResponse: AuthResponse) => this.sessionService.logIn(authResponse.token)))
-      .pipe(map(() => true))
+      .pipe(map(() => this.sessionService.isAuthenticated))
       .pipe(catchError((err: HttpErrorResponse) => throwError(() => new Error(this.buildLoginErrorMessage(err)))));
    }
 
