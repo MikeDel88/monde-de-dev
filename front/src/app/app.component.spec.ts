@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
-import { TopicComponent } from './topic/topic.component';
+import { TopicComponent } from './pages/topic/topic.component';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
