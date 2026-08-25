@@ -12,6 +12,10 @@ export class SessionService {
     return this.isLoggedSubject.asObservable();
   }
 
+  public get isAuthenticated(): boolean {
+    return this.isLoggedSubject.value;
+  }
+
   public getToken(): string | null {
     return localStorage.getItem(SessionService.TOKEN_KEY);
   }

@@ -48,9 +48,11 @@ export class Login {
     this.authService.login$(credentials.value())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => {
+        next: (isAuthenticated) => {
           this.loginForm().reset(initialLoginData);
-          this.router.navigate(['/feed']);
+          if(isAuthenticated) {
+            this.router.navigate(['/feed']);
+          }
         },
         error: (error: Error) => this.error.set(error.message),
       });

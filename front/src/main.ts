@@ -6,12 +6,13 @@ import { provideRouter } from '@angular/router';
 import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
+import {AuthGuard} from "./app/core/guards/auth-guard";
 
 if (environment.production) {
   enableProdMode();
 }
 
 bootstrapApplication(AppComponent, {
-  providers: [provideZoneChangeDetection(), provideRouter(routes), provideHttpClient()]
+  providers: [provideZoneChangeDetection(), provideRouter(routes), provideHttpClient(), AuthGuard]
 })
   .catch(err => console.error(err));
