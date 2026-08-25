@@ -1,15 +1,7 @@
-<div class="flex flex-col">
-  <div class="flex flex-col border-b border-b-black">
-    <img src="/assets/logo.png" alt="Logo" height="80" width="140" class="self-start py-4 px-2 not-sm:hidden" />
-  </div>
-  <button class="self-start p-4 m-6 hover:cursor-pointer" (click)="onBack()" data-test="btn-back">
-    <img src="/assets/arrow-back.png" alt="retour" height="23" width="41">
-  </button>
-  <img src="/assets/logo.png" alt="Logo" height="130" width="255" class="mx-auto sm:hidden" />
-  <h2 class="mx-auto text-2xl" data-test="title">Se connecter</h2>
+<app-auth [title]="title">
   <form (submit)="onSubmit($event)" (focusin)="onFocus()" class="flex flex-col gap-2 w-full lg:w-1/2 2xl:w-1/6 mx-auto p-6">
     <label class="flex flex-col gap-1 text-sm font-medium text-gray-700">
-      E-mail ou nom d'utilisateur
+      {{ labelEmailOrName }}
       <input type="text" data-test="name" [formField]="loginForm.emailOrName"
              class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
     </label>
@@ -19,7 +11,7 @@
       }
     }
     <label class="flex flex-col gap-1 text-sm font-medium text-gray-700">
-      Mot de passe
+      {{ labelPassword }}
       <input type="password" data-test="password" [formField]="loginForm.password"
              class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
     </label>
@@ -36,7 +28,7 @@
       data-test="btn-submit"
       class="self-center bg-primary text-white rounded-md px-4 py-2 my-2 font-medium hover:bg-primary-hover"
     >
-      Se connecter
+      {{ btnText }}
     </button>
   </form>
-</div>
+</app-auth>
