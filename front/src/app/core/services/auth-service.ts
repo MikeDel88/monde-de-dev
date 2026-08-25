@@ -6,6 +6,7 @@ import {LoginData} from "../models/login-data";
 import {FieldError} from "../models/field-error";
 import {ApiProblemDetail} from "../models/api-problem-detail";
 import {SessionService} from "./session-service";
+import {AuthResponse} from "../models/auth-response";
 
 @Service()
 export class AuthService {
