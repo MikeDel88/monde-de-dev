@@ -50,7 +50,7 @@ export class Login {
       .subscribe({
         next: () => {
           this.loginForm().reset(initialLoginData);
-          this.router.navigate(['/']);
+          this.router.navigate(['/feed']);
         },
         error: (error: Error) => this.error.set(error.message),
       });
