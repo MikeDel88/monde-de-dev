@@ -31,6 +31,12 @@ public class GlobalExceptionHandler {
         return bpd;
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ProblemDetail handleUserNotFound(UserNotFoundException ex) {
+        log.error("handleUserNotFound : {}", ex.getMessage());
+        return ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ProblemDetail handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         log.error("handleDataIntegrityViolation : {}", ex.getMessage());

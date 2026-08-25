@@ -1,4 +1,4 @@
-interface FieldError {
+export interface FieldError {
   field: string;
   message: string;
 }

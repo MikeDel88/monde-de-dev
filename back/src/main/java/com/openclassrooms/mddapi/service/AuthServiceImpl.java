@@ -1,6 +1,9 @@
 package com.openclassrooms.mddapi.service;
 
+import com.openclassrooms.mddapi.dto.request.LoginRequest;
 import com.openclassrooms.mddapi.dto.request.RegisterRequest;
+import com.openclassrooms.mddapi.dto.response.AuthResponse;
+import com.openclassrooms.mddapi.exception.UserNotFoundException;
 import com.openclassrooms.mddapi.mapper.UserMapper;
 import com.openclassrooms.mddapi.model.User;
 import com.openclassrooms.mddapi.repository.UserRepository;
@@ -18,6 +21,7 @@ public class AuthServiceImpl implements AuthService {
     private UserRepository userRepository;
     private UserMapper userMapper;
     private PasswordEncoder passwordEncoder;
+    private JwtService jwtService;
 
     @Override
     @Transactional
@@ -25,5 +29,21 @@ public class AuthServiceImpl implements AuthService {
         log.info("service : register");
         User user = userMapper.toUser(request, passwordEncoder);
         userRepository.save(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AuthResponse login(LoginRequest request) {
+        log.info("service : login");
+        User user = userRepository
+                .findUsersByEmailOrName(request.emailOrName(), request.emailOrName())
+                .orElseThrow(UserNotFoundException::new);
+
+        if(!passwordEncoder.matches(request.password(), user.getPassword())) {
+            log.error("service : password not matches");
+            throw new UserNotFoundException();
+        }
+
+        return new AuthResponse(jwtService.generateAccessToken(user));
     }
 }

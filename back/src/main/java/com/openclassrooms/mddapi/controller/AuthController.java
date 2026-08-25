@@ -2,8 +2,10 @@ package com.openclassrooms.mddapi.controller;
 
 import com.openclassrooms.mddapi.documentation.database.ApiDabataseConflictResponse;
 import com.openclassrooms.mddapi.documentation.register.ApiRegisterValidResponse;
+import com.openclassrooms.mddapi.dto.request.LoginRequest;
 import com.openclassrooms.mddapi.dto.request.RegisterRequest;
 import com.openclassrooms.mddapi.documentation.register.ApiRegisterValidationErrorResponse;
+import com.openclassrooms.mddapi.dto.response.AuthResponse;
 import com.openclassrooms.mddapi.service.AuthService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
@@ -29,13 +31,18 @@ public class AuthController {
     @ApiDabataseConflictResponse
     @ApiRegisterValidationErrorResponse
     @PostMapping("/register")
-    public ResponseEntity<Void> register(
-            @Valid @RequestBody RegisterRequest registerRequest
-    ) {
+    public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest registerRequest) {
         log.info("call /register");
         authService.register(registerRequest);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .build();
+    }
+
+    @SecurityRequirements()
+    @PostMapping("/login")
+    public AuthResponse login(@Valid @RequestBody LoginRequest loginRequest) {
+        log.info("call /login");
+        return authService.login(loginRequest);
     }
 }
