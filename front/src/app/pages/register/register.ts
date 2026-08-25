@@ -1,4 +1,4 @@
-import {Component, inject, signal} from '@angular/core';
+import {Component, DestroyRef, inject, signal} from '@angular/core';
 import {
   form,
   FormField,
@@ -12,6 +12,7 @@ import {Location} from "@angular/common";
 import {AuthService} from "../../core/services/auth-service";
 import {RegisterData} from "../../core/models/register-data";
 import {Toast} from "../../components/toasts/toast";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 
 const initialRegisterData: RegisterData = {
   name: "",
@@ -39,7 +40,7 @@ const validationRegisterForm = (schemaPath: SchemaPathTree<RegisterData>) => {
   styleUrl: './register.css',
 })
 export class Register {
-
+  private readonly destroyRef = inject(DestroyRef);
   private readonly location = inject(Location);
   private readonly authService = inject(AuthService);
   error = signal<string | undefined>(undefined);
@@ -54,7 +55,6 @@ export class Register {
   onReset() {
     this.showToastSuccessfully.set(false);
     this.error.set(undefined);
-    this.registerForm().reset(initialRegisterData);
   }
 
   onFocus() {
@@ -64,9 +64,13 @@ export class Register {
   onSubmit(event: Event) {
     event.preventDefault();
     const credentials = this.registerForm();
-    this.authService.register(credentials.value())
+    this.authService.register$(credentials.value())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => this.showToastSuccessfully.set(true),
+        next: () => {
+          this.registerForm().reset(initialRegisterData);
+          this.showToastSuccessfully.set(true);
+        },
         error: (error: Error) => this.error.set(error.message),
       });
   }
