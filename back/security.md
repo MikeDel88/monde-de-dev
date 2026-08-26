@@ -4,7 +4,7 @@
 
 L'authentification repose sur un serveur de ressources OAuth2 (`spring-boot-starter-oauth2-resource-server`) validant des JWT signés en RS256.
 
-- **Clés RSA** (`KeyConfig`) : une paire de clés 2048 bits est générée en mémoire au démarrage de l'application. Elle n'est pas persistée : à chaque redémarrage (ou avec plusieurs instances), une nouvelle paire est générée et les tokens émis précédemment deviennent invalides.
+- **Clés RSA** (`KeyConfig`) : une paire de clés 2048 bits fixe est chargée au démarrage depuis les variables d'environnement `RSA_PRIVATE_KEY`/`RSA_PUBLIC_KEY` (via `.env.properties` en local, secret manager en production). Elle est stable entre redémarrages et partageable entre plusieurs instances, les tokens émis restent donc valides après un restart.
 - **Génération du token** (`JwtServiceImpl`) : un seul type de token, l'access token, est généré. Il contient uniquement le `subject` (id de l'utilisateur), une date d'émission et une expiration fixée à **30 jours**. Aucun claim de rôle ou de scope n'est inclus.
 - **Transport du token** : le client envoie le token via le header `Authorization: Bearer <token>`. Aucun cookie n'est utilisé.
 - **Session** : l'API est stateless (`SessionCreationPolicy.STATELESS`), aucune session serveur n'est conservée.
@@ -14,7 +14,7 @@ L'authentification repose sur un serveur de ressources OAuth2 (`spring-boot-star
 - **Routes publiques** : documentation Swagger/OpenAPI, ainsi que `/auth/register` et `/auth/login`.
 - **Gestion des erreurs** : `JwtAuthenticationEntryPoint` renvoie un 401 JSON en cas d'authentification manquante/invalide, `JwtAccessDeniedHandler` renvoie un 403 JSON en cas d'accès refusé.
 
-Ce fonctionnement est volontairement simple et suffisant pour un MVP, mais présente des limites : clé de signature non persistée, absence de révocation ou de renouvellement du token, durée de vie de l'access token beaucoup trop longue pour un usage sécurisé, absence de granularité des droits.
+Ce fonctionnement est volontairement simple et suffisant pour un MVP, mais présente des limites : absence de révocation ou de renouvellement du token, durée de vie de l'access token beaucoup trop longue pour un usage sécurisé, absence de granularité des droits.
 
 ## À prévoir avant une mise en production
 
@@ -31,6 +31,3 @@ Remplacer la configuration CORS par défaut par une configuration explicite (`Co
 
 ### Gestion des rôles
 Ajouter une notion de rôle sur l'utilisateur (ex. enum `USER` / `ADMIN` sur l'entité `User`), la propager dans les claims du JWT (ou via les `GrantedAuthority` de Spring Security), puis sécuriser les endpoints sensibles avec `hasRole(...)` ou `@PreAuthorize` selon le rôle requis.
-
-### Persistance de la clé de signature
-Stocker la paire de clés RSA (ou un secret) de manière durable (variables d'environnement, secret manager/vault) plutôt que de la régénérer aléatoirement à chaque démarrage, afin de permettre redémarrages et scaling horizontal sans invalider les tokens en circulation.
