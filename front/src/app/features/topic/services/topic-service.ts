@@ -12,6 +12,6 @@ export class TopicService {
   topics: HttpResourceRef<Topic[] | undefined> = httpResource<Topic[]>(() => `${environment.apiUrl}/topics`);
 
   subscribe(topicId: number): Observable<void> {
-    return this.httpClient.post<void>(`${environment.apiUrl}/topics/subscribe`, topicId);
+    return this.httpClient.post<void>(`${environment.apiUrl}/topics/subscribe`, { topicId });
   }
 }
