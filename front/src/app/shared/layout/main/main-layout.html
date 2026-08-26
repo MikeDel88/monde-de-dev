@@ -1,0 +1,41 @@
+<div class="flex flex-col">
+  <header class="flex items-center justify-between border-b border-b-black px-4 py-2 sm:px-8">
+    <img src="/assets/logo.png" alt="Logo" [height]="menu.isMobile() ? 53 : 81" [width]="menu.isMobile() ? 92 : 180" />
+    <button
+      type="button"
+      class="sm:hidden hover:cursor-pointer"
+      data-test="btn-burger"
+      [attr.aria-expanded]="menu.open()"
+      (click)="menu.toggle()"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+      </svg>
+    </button>
+    <ng-template #navLinks>
+      <button type="button" class="text-left text-logout hover:cursor-pointer text-sm font-bold" data-test="btn-logout" (click)="onLogout()">{{ logoutText }}</button>
+      <a routerLink="/feed" routerLinkActive="text-primary font-semibold" class="hover:text-primary text-xl" data-test="link-feed" (click)="menu.close()">{{ postsText }}</a>
+      <a routerLink="/topic" routerLinkActive="text-primary font-semibold" class="hover:text-primary text-xl" data-test="link-topic" (click)="menu.close()">{{ topicsText }}</a>
+    </ng-template>
+    <ng-template #navProfil>
+      <a routerLink="/feed" routerLinkActive="text-primary font-semibold" class="hover:text-primary text-xl" data-test="link-feed" (click)="menu.close()">
+        <img src="/assets/user.svg" alt="profile">
+      </a>
+    </ng-template>
+    @if (!menu.isMobile()) {
+      <nav class="flex flex-col gap-4 not-sm:absolute not-sm:top-16 not-sm:right-4 not-sm:bg-white not-sm:border not-sm:border-black not-sm:p-4 sm:flex-row sm:items-center sm:gap-6" data-test="nav-menu">
+        <ng-container [ngTemplateOutlet]="navLinks" />
+        <ng-container [ngTemplateOutlet]="navProfil"/>
+      </nav>
+    } @else if (menu.open()) {
+      <div class="fixed inset-0 z-40 bg-black/40" data-test="menu-backdrop" (click)="menu.close()"></div>
+      <nav class="fixed inset-y-0 right-0 z-50 flex h-full w-64 flex-col items-end flex-auto gap-4 bg-white px-6 py-12 shadow-lg" data-test="nav-menu-mobile">
+          <ng-container [ngTemplateOutlet]="navLinks" />
+          <div class="mt-auto">
+            <ng-container [ngTemplateOutlet]="navProfil"/>
+          </div>
+      </nav>
+    }
+  </header>
+  <router-outlet/>
+</div>
