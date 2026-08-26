@@ -1,6 +1,6 @@
 import {Component, input} from '@angular/core';
-import {PostFeed} from "../../pages/feed/feed";
 import {DatePipe} from "@angular/common";
+import {PostFeed} from "../../../features/feed/models/post-feed";
 
 @Component({
   selector: 'app-post-card',
@@ -11,5 +11,5 @@ import {DatePipe} from "@angular/common";
   styleUrl: './post-card.css',
 })
 export class PostCard {
-    post = input.required<PostFeed >();
+    post = input.required<PostFeed>();
 }

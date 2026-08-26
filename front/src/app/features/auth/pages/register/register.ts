@@ -1,4 +1,4 @@
-import {Component, DestroyRef, inject, signal} from '@angular/core';
+import {Component, DestroyRef, inject, signal, WritableSignal} from '@angular/core';
 import {
   form,
   FormField,
@@ -6,13 +6,12 @@ import {
   email,
   minLength,
   pattern,
-  SchemaPathTree
+  SchemaPathTree, FieldTree, FieldState
 } from '@angular/forms/signals';
-import {AuthService} from "../../core/services/auth-service";
-import {RegisterData} from "../../core/models/register-data";
-import {Toast} from "../../components/toasts/toast";
+import {AuthService} from "../../services/auth-service";
+import {RegisterData} from "../../models/register-data";
+import {Toast} from "../../../../shared/components/toasts/toast";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {Auth} from "../../components/auth/auth";
 
 const initialRegisterData: RegisterData = {
   name: "",
@@ -20,7 +19,7 @@ const initialRegisterData: RegisterData = {
   password: ''
 };
 
-const registerModel = signal<RegisterData>(initialRegisterData);
+const registerModel: WritableSignal<RegisterData> = signal<RegisterData>(initialRegisterData);
 
 const validationRegisterForm = (schemaPath: SchemaPathTree<RegisterData>) => {
   required(schemaPath.name);
@@ -35,38 +34,37 @@ const validationRegisterForm = (schemaPath: SchemaPathTree<RegisterData>) => {
 
 @Component({
   selector: 'app-register',
-  imports: [FormField, Toast, Auth],
+  imports: [FormField, Toast],
   templateUrl: './register.html',
   styleUrl: './register.css',
 })
 export class Register {
 
-  title: string = "Inscription";
-  btnText: string = "S'inscrire";
-  labelName: string = "Nom d'utilisateur";
-  labelEmail: string = "Adresse e-mail";
-  labelPassword: string = "Mot de passe";
+  readonly btnText: string = "S'inscrire";
+  readonly labelName: string = "Nom d'utilisateur";
+  readonly labelEmail: string = "Adresse e-mail";
+  readonly labelPassword: string = "Mot de passe";
 
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly authService = inject(AuthService);
-  error = signal<string | undefined>(undefined);
-  showToastSuccessfully = signal(false)
+  private readonly destroyRef: DestroyRef = inject(DestroyRef);
+  private readonly authService: AuthService = inject(AuthService);
+  error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
+  showToastSuccessfully: WritableSignal<boolean> = signal(false)
 
-  registerForm = form(registerModel, validationRegisterForm);
+  registerForm: FieldTree<RegisterData> = form(registerModel, validationRegisterForm);
 
 
-  onReset() {
+  onReset(): void {
     this.showToastSuccessfully.set(false);
     this.error.set(undefined);
   }
 
-  onFocus() {
+  onFocus(): void {
     this.error.set(undefined);
   }
 
-  onSubmit(event: Event) {
+  onSubmit(event: Event): void {
     event.preventDefault();
-    const credentials = this.registerForm();
+    const credentials: FieldState<RegisterData> = this.registerForm();
     this.authService.register$(credentials.value())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

@@ -3,16 +3,16 @@ import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import {catchError, map, Observable, tap, throwError} from "rxjs";
 import {RegisterData} from "../models/register-data";
 import {LoginData} from "../models/login-data";
-import {FieldError} from "../models/field-error";
-import {ApiProblemDetail} from "../models/api-problem-detail";
-import {SessionService} from "./session-service";
+import {FieldError} from "../../../core/models/field-error";
+import {ApiProblemDetail} from "../../../core/models/api-problem-detail";
+import {SessionService} from "../../../core/services/session-service";
 import {AuthResponse} from "../models/auth-response";
 
 @Service()
 export class AuthService {
 
-  private httpClient = inject(HttpClient);
-  private sessionService = inject(SessionService);
+  private httpClient: HttpClient = inject(HttpClient);
+  private sessionService: SessionService = inject(SessionService);
 
    register$(datas: RegisterData): Observable<void> {
      return this.httpClient.post<void>("http://localhost:9000/auth/register", datas)
@@ -26,7 +26,7 @@ export class AuthService {
       .pipe(catchError((err: HttpErrorResponse) => throwError(() => new Error(this.buildLoginErrorMessage(err)))));
    }
 
-   private buildLoginErrorMessage(err: HttpErrorResponse) {
+   private buildLoginErrorMessage(err: HttpErrorResponse): string {
      switch (err.status) {
        case 404:
          return "Une erreur est survenue. Vérifier le couple email ou nom d'utilisateur et mot de passe";
