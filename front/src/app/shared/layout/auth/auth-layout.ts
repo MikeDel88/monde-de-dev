@@ -1,5 +1,4 @@
 import {Component, inject} from '@angular/core';
-import {Location} from "@angular/common";
 import {ActivatedRoute, NavigationEnd, Router, RouterOutlet} from "@angular/router";
 import {filter, map, startWith} from "rxjs";
 import {toSignal} from "@angular/core/rxjs-interop";
@@ -11,7 +10,6 @@ import {toSignal} from "@angular/core/rxjs-interop";
   styleUrl: './auth-layout.css',
 })
 export class AuthLayout {
-  private readonly location = inject(Location);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
@@ -27,6 +25,6 @@ export class AuthLayout {
   );
 
   onBack() {
-    this.location.back();
+    this.router.navigate(['/']);
   }
 }
