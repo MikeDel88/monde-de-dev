@@ -14,9 +14,9 @@ PUT /profil
 # Liste des thèmes (attention il faudra regarder si l'utilisateur est abonné ou non).
 GET /topics
 # Abonnement d'un utilisateur
-POST /topics/:id/subscription
+POST /topics/subscribe
 # Désabonnement d'un utilisateur
-DELETE /topics/:id/subscription
+DELETE /topics/:id/subscribe
 
 ## FEED
 # Liste du fil d'actualité (user contient la liste des topic abonné et topic contient la liste des posts)

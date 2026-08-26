@@ -52,6 +52,12 @@ public class GlobalExceptionHandler {
         return ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(TopicNotFoundException.class)
+    public ProblemDetail handleTopicNotFound(TopicNotFoundException ex) {
+        log.error("handleTopicNotFound : {}", ex.getMessage());
+        return ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ProblemDetail handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         log.error("handleDataIntegrityViolation : {}", ex.getMessage());

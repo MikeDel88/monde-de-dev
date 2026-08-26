@@ -3,13 +3,17 @@ package com.openclassrooms.mddapi.service;
 import java.util.List;
 
 import com.openclassrooms.mddapi.dto.response.TopicReponse;
+import com.openclassrooms.mddapi.exception.TopicNotFoundException;
+import com.openclassrooms.mddapi.exception.UserNotFoundException;
 import com.openclassrooms.mddapi.mapper.TopicMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import com.openclassrooms.mddapi.model.Topic;
+import com.openclassrooms.mddapi.model.User;
 import com.openclassrooms.mddapi.repository.TopicRepository;
+import com.openclassrooms.mddapi.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -18,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TopicServiceImpl implements TopicService {
 
 	private TopicRepository topicRepository;
+	private UserRepository userRepository;
 	private TopicMapper topicMapper;
 
 	@Override
@@ -30,5 +35,17 @@ public class TopicServiceImpl implements TopicService {
 
         return topicMapper.toTopicResponse(topics, userId);
 	}
-	
+
+	@Override
+	@Transactional
+	public void subscribe(Long topicId, Long userId) {
+		log.info("service: subscribe");
+
+		Topic topic = topicRepository.findById(topicId).orElseThrow(TopicNotFoundException::new);
+		User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+		user.getTopics().add(topic);
+		userRepository.save(user);
+	}
+
 }

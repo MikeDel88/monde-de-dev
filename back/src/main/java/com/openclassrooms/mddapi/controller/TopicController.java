@@ -4,10 +4,10 @@ import java.security.Principal;
 import java.util.List;
 
 import com.openclassrooms.mddapi.dto.response.TopicReponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.openclassrooms.mddapi.service.TopicService;
 
@@ -24,6 +24,9 @@ public class TopicController {
 	) {
 		return topicService.getTopics(Long.valueOf(principal.getName()));
 	}
-	
-	
+
+	@PostMapping("/subscribe")
+	public void subscribe(@Valid @Positive @RequestBody Long topicId, Principal principal) {
+		topicService.subscribe(topicId, Long.valueOf(principal.getName()));
+	}
 }
