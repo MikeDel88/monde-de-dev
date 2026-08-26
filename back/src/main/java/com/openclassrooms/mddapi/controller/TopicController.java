@@ -3,9 +3,9 @@ package com.openclassrooms.mddapi.controller;
 import java.security.Principal;
 import java.util.List;
 
+import com.openclassrooms.mddapi.dto.request.SubscribeRequest;
 import com.openclassrooms.mddapi.dto.response.TopicReponse;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +26,7 @@ public class TopicController {
 	}
 
 	@PostMapping("/subscribe")
-	public void subscribe(@Valid @Positive @RequestBody Long topicId, Principal principal) {
-		topicService.subscribe(topicId, Long.valueOf(principal.getName()));
+	public void subscribe(@Valid @RequestBody SubscribeRequest request, Principal principal) {
+		topicService.subscribe(request.topicId(), Long.valueOf(principal.getName()));
 	}
 }
