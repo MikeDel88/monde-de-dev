@@ -21,4 +21,11 @@ public class Topic extends BaseEntity {
 
 	@OneToMany(mappedBy = "topic", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Post> posts;
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+			name = "subscriptions",
+			joinColumns = @JoinColumn(name = "topic_id"),
+			inverseJoinColumns = @JoinColumn(name = "user_id"))
+	private Set<User> users;
 }
