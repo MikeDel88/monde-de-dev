@@ -4,7 +4,7 @@ import {BehaviorSubject, Observable} from "rxjs";
 @Service()
 export class SessionService {
 
-  private static readonly TOKEN_KEY = 'token';
+  private static readonly TOKEN_KEY: string = 'token';
 
   private isLoggedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(!!localStorage.getItem(SessionService.TOKEN_KEY));
 

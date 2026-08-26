@@ -1,0 +1,32 @@
+<form (submit)="onSubmit($event)" (focusin)="onFocus()" class="flex flex-col gap-2 w-full lg:w-1/2 2xl:w-1/6 mx-auto p-6">
+  <label class="flex flex-col gap-1 text-sm font-medium text-gray-700">
+    {{ labelEmailOrName }}
+    <input type="text" data-test="name" [formField]="loginForm.emailOrName"
+           class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+  </label>
+  @if (loginForm.emailOrName().touched() && loginForm.emailOrName().invalid()) {
+    @for (error of loginForm.emailOrName().errors(); track error) {
+      <p class="text-sm text-error" data-test="error-name">{{ error.message }}</p>
+    }
+  }
+  <label class="flex flex-col gap-1 text-sm font-medium text-gray-700">
+    {{ labelPassword }}
+    <input type="password" data-test="password" [formField]="loginForm.password"
+           class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+  </label>
+  @if (loginForm.password().touched() && loginForm.password().invalid()) {
+    @for (error of loginForm.password().errors(); track error) {
+      <p class="text-sm text-error" data-test="error-password">{{ error.message }}</p>
+    }
+  }
+  @if (error()) {
+    <p class="text-sm text-error" data-test="error">{{ error() }}</p>
+  }
+  <button
+    type="submit"
+    data-test="btn-submit"
+    class="self-center bg-primary text-white rounded-md px-4 py-2 my-2 font-medium hover:bg-primary-hover"
+  >
+    {{ btnText }}
+  </button>
+</form>

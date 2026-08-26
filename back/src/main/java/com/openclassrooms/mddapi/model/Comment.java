@@ -1,14 +1,16 @@
 package com.openclassrooms.mddapi.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "comments")
 @AttributeOverride(name = "id", column = @Column(name = "comment_id"))
-@Data
+@Getter
+@Setter
 public class Comment extends BaseEntity {
 
     @Column(nullable = false, updatable = false)

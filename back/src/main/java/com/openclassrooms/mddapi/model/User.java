@@ -1,14 +1,16 @@
 package com.openclassrooms.mddapi.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Set;
 
 @Entity
 @Table(name = "users")
 @AttributeOverride(name = "id", column = @Column(name = "user_id"))
-@Data
+@Getter
+@Setter
 public class User extends BaseEntity {
 
     @Column(nullable = false, unique = true)
@@ -20,7 +22,7 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "subscriptions",
             joinColumns = @JoinColumn(name = "user_id"),

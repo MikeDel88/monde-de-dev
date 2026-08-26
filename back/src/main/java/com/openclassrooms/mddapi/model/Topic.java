@@ -1,14 +1,16 @@
 package com.openclassrooms.mddapi.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Set;
 
 @Entity
 @Table(name = "topics")
 @AttributeOverride(name = "id", column = @Column(name = "topic_id"))
-@Data
+@Getter
+@Setter
 public class Topic extends BaseEntity {
 
 	@Column(nullable = false, unique = true, updatable = false)
