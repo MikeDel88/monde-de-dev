@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +23,7 @@ public class PostController {
 
     @GetMapping("/feed")
     public List<PostFeedResponse> feed(
+            @Validated
             @RequestParam
             @NotBlank(message = "SORT_REQUIRED")
             @Pattern(regexp = "^(asc|desc)$", message = "SORT_INVALID")
