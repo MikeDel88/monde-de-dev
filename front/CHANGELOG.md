@@ -2,7 +2,7 @@
 
 Toutes les modifications notables de ce projet sont documentées dans ce fichier.
 
-## [0.0.1] - 2026-08-26
+## [0.1.0] - 2026-08-26
 
 ### Ajouté
 - Page d'accueil (non connectée)
