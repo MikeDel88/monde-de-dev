@@ -6,6 +6,7 @@
     <button
       [disabled]="btnUnsubscribed().disabled"
       (click)="onUnsubscribe(topic.id)"
+      [ngClass] = "btnUnsubscribed().disabled ? 'bg-btn-disabled' : 'bg-primary hover:bg-primary-hover hover:cursor-pointer'"
       class="self-center bg-btn-disabled text-white rounded-md px-4 py-2 my-2 font-medium"
     >
       {{ btnUnsubscribed().text }}

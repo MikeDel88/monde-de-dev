@@ -1,5 +1,6 @@
 import {Component, input, output} from '@angular/core';
-import {Topic} from "../../models/topic";
+import {Topic} from "../../../topic/models/topic";
+import {NgClass} from "@angular/common";
 
 type BtnUnsubscribed = {
   disabled: boolean;
@@ -8,7 +9,9 @@ type BtnUnsubscribed = {
 
 @Component({
   selector: 'app-topic-card',
-  imports: [],
+  imports: [
+    NgClass
+  ],
   templateUrl: './topic-card.html',
   styleUrl: './topic-card.css',
 })
