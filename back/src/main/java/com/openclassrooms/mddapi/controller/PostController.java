@@ -1,5 +1,8 @@
 package com.openclassrooms.mddapi.controller;
 
+import com.openclassrooms.mddapi.documentation.post.ApiFeedResponse;
+import com.openclassrooms.mddapi.documentation.post.ApiFeedValidationErrorResponse;
+import com.openclassrooms.mddapi.documentation.user.ApiUserNotFoundResponse;
 import com.openclassrooms.mddapi.dto.response.PostFeedResponse;
 import com.openclassrooms.mddapi.service.PostService;
 import jakarta.validation.constraints.NotBlank;
@@ -21,6 +24,9 @@ public class PostController {
 
     private PostService postService;
 
+    @ApiFeedResponse
+    @ApiFeedValidationErrorResponse
+    @ApiUserNotFoundResponse
     @GetMapping("/feed")
     public List<PostFeedResponse> feed(
             @Validated

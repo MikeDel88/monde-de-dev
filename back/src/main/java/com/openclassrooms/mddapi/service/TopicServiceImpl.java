@@ -16,6 +16,10 @@ import com.openclassrooms.mddapi.repository.TopicRepository;
 import com.openclassrooms.mddapi.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Implémentation de {@link TopicService} : liste les topics et gère
+ * l'abonnement d'un utilisateur à un topic.
+ */
 @Slf4j
 @Service
 @AllArgsConstructor

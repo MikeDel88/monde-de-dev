@@ -13,6 +13,11 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
+/**
+ * Implémentation de {@link JwtService} : génère un JWT signé RS256 via
+ * {@link JwtEncoder}, avec l'id de l'utilisateur comme subject et une
+ * expiration à 30 jours.
+ */
 @Log4j2
 @AllArgsConstructor
 @Service

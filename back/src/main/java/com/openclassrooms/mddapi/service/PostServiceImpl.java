@@ -16,6 +16,11 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Implémentation de {@link PostService} : construit le fil d'actualité d'un
+ * utilisateur en agrégeant les posts de tous les topics auxquels il est
+ * abonné, triés par date.
+ */
 @Log4j2
 @AllArgsConstructor
 @Service
