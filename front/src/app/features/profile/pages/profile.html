@@ -1,0 +1,13 @@
+<div>
+  @if (profile.hasValue()) {
+    <div>{{ profile.value().name }}</div>
+    <div>{{ profile.value().email }}</div>
+    @for (topic of profile.value().topics; track topic.id) {
+      <app-topic-card
+        [topic]="topic"
+        [btnUnsubscribed]="{ disabled: false, text: btnUnsubscribedText }"
+        (onClickUnsubscribe)="onUnsubscribe($event)"
+      />
+    }
+  }
+</div>
