@@ -2,7 +2,7 @@ package com.openclassrooms.mddapi.service;
 
 import java.util.List;
 
-import com.openclassrooms.mddapi.dto.response.TopicReponse;
+import com.openclassrooms.mddapi.dto.response.TopicResponse;
 import com.openclassrooms.mddapi.exception.TopicNotFoundException;
 import com.openclassrooms.mddapi.exception.UserNotFoundException;
 import com.openclassrooms.mddapi.mapper.TopicMapper;
@@ -31,7 +31,7 @@ public class TopicServiceImpl implements TopicService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<TopicReponse> getTopics(Long userId) {
+	public List<TopicResponse> getTopics(Long userId) {
 		log.info("service: getTopics");
 
 		List<Topic> topics = topicRepository.findAll();

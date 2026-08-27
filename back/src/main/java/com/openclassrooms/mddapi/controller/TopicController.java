@@ -9,7 +9,7 @@ import com.openclassrooms.mddapi.documentation.topic.ApiTopicListResponse;
 import com.openclassrooms.mddapi.documentation.topic.ApiTopicNotFoundResponse;
 import com.openclassrooms.mddapi.documentation.user.ApiUserNotFoundResponse;
 import com.openclassrooms.mddapi.dto.request.SubscribeRequest;
-import com.openclassrooms.mddapi.dto.response.TopicReponse;
+import com.openclassrooms.mddapi.dto.response.TopicResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +25,7 @@ public class TopicController {
 
 	@ApiTopicListResponse
 	@GetMapping
-	public List<TopicReponse> getTopics(
+	public List<TopicResponse> getTopics(
 			Principal principal
 	) {
 		return topicService.getTopics(Long.valueOf(principal.getName()));

@@ -7,7 +7,7 @@ package com.openclassrooms.mddapi.dto.response;
  * @param description
  * @param subscribed si l'utilisateur est abonné ou non au thème.
  */
-public record TopicReponse(
+public record TopicResponse(
         Long id,
         String title,
         String description,
