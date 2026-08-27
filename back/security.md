@@ -11,7 +11,7 @@ L'authentification repose sur un serveur de ressources OAuth2 (`spring-boot-star
 - **CSRF** : désactivé (`csrf(AbstractHttpConfigurer::disable)`). Cohérent avec une API purement stateless sans cookie, mais devra être revu si les tokens passent un jour par un cookie.
 - **CORS** : configuration par défaut de Spring (`Customizer.withDefaults()`), aucune restriction de domaine explicite.
 - **Autorisations** : pas de notion de rôle. Toute requête authentifiée est acceptée (`anyRequest().authenticated()`), il n'existe pas de distinction admin/utilisateur au niveau de l'entité `User` ni des endpoints.
-- **Routes publiques** : documentation Swagger/OpenAPI, ainsi que `/auth/register` et `/auth/login`.
+- **Routes publiques** : documentation Swagger/OpenAPI (`/v3/api-docs`, `/swagger-ui.html`, non versionnée), ainsi que `/api/v1/auth/register` et `/api/v1/auth/login`.
 - **Gestion des erreurs** : `JwtAuthenticationEntryPoint` renvoie un 401 JSON en cas d'authentification manquante/invalide, `JwtAccessDeniedHandler` renvoie un 403 JSON en cas d'accès refusé.
 
 Ce fonctionnement est volontairement simple et suffisant pour un MVP, mais présente des limites : absence de révocation ou de renouvellement du token, durée de vie de l'access token beaucoup trop longue pour un usage sécurisé, absence de granularité des droits.

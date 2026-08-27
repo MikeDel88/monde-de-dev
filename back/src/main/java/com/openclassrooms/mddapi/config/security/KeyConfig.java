@@ -6,8 +6,9 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import com.openclassrooms.mddapi.config.properties.RsaConfigProperties;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -26,34 +27,35 @@ import java.util.UUID;
 /**
  * Charge la paire de clés RSA fixe utilisée pour signer/vérifier les JWT oauth2.
  */
+@RequiredArgsConstructor
 @Log4j2
 @Configuration
 public class KeyConfig {
 
+    private final RsaConfigProperties rsaConfigProperties;
+
     /**
      * Génère une clé RSA Private key
-     * @param encodedKey clé encodé en base64 dans les variables d'environnement.
      * @return RSAPrivateKey la clé générée.
      * @throws Exception en cas d'erreur sur le décodage ou la génération de la clé.
      */
     @Bean
-    public RSAPrivateKey privateKey(@Value("${rsa.private-key}") String encodedKey) throws Exception {
+    public RSAPrivateKey privateKey() throws Exception {
         log.info("Loading RSA private key");
-        byte[] decoded = Base64.getDecoder().decode(encodedKey);
+        byte[] decoded = Base64.getDecoder().decode(rsaConfigProperties.privateKey());
         return (RSAPrivateKey) KeyFactory.getInstance("RSA")
                 .generatePrivate(new PKCS8EncodedKeySpec(decoded));
     }
 
     /**
      * Génère une clé RSA Public key
-     * @param encodedKey clé encodé en base64 dans les variables d'environnement.
      * @return RSAPrivateKey la clé générée.
      * @throws Exception en cas d'erreur sur le décodage ou la génération de la clé.
      */
     @Bean
-    public RSAPublicKey publicKey(@Value("${rsa.public-key}") String encodedKey) throws Exception {
+    public RSAPublicKey publicKey() throws Exception {
         log.info("Loading RSA public key");
-        byte[] decoded = Base64.getDecoder().decode(encodedKey);
+        byte[] decoded = Base64.getDecoder().decode(rsaConfigProperties.publicKey());
         return (RSAPublicKey) KeyFactory.getInstance("RSA")
                 .generatePublic(new X509EncodedKeySpec(decoded));
     }
