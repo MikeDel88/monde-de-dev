@@ -7,8 +7,8 @@ POST /auth/login
 
 ## PROFIL USER
 # charge le profil de l'utilisateur connecté avec la liste des topics abonnées.
-GET /profil
-PUT /profil
+GET /profile
+PUT /profile
 
 ## TOPICS
 # Liste des thèmes (attention il faudra regarder si l'utilisateur est abonné ou non).
