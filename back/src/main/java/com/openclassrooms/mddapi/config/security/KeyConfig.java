@@ -30,6 +30,12 @@ import java.util.UUID;
 @Configuration
 public class KeyConfig {
 
+    /**
+     * Génère une clé RSA Private key
+     * @param encodedKey clé encodé en base64 dans les variables d'environnement.
+     * @return RSAPrivateKey la clé générée.
+     * @throws Exception en cas d'erreur sur le décodage ou la génération de la clé.
+     */
     @Bean
     public RSAPrivateKey privateKey(@Value("${rsa.private-key}") String encodedKey) throws Exception {
         log.info("Loading RSA private key");
@@ -38,6 +44,12 @@ public class KeyConfig {
                 .generatePrivate(new PKCS8EncodedKeySpec(decoded));
     }
 
+    /**
+     * Génère une clé RSA Public key
+     * @param encodedKey clé encodé en base64 dans les variables d'environnement.
+     * @return RSAPrivateKey la clé générée.
+     * @throws Exception en cas d'erreur sur le décodage ou la génération de la clé.
+     */
     @Bean
     public RSAPublicKey publicKey(@Value("${rsa.public-key}") String encodedKey) throws Exception {
         log.info("Loading RSA public key");
@@ -46,12 +58,23 @@ public class KeyConfig {
                 .generatePublic(new X509EncodedKeySpec(decoded));
     }
 
+    /**
+     * Vérifie la signature des JWT entrants lors de l'authentification.
+     * @param publicKey clé publique.
+     * @return JwtDecoder la configuration du NimbusJwtDecoder
+     */
     @Bean
     public JwtDecoder jwtDecoder(RSAPublicKey publicKey) {
         log.info("Creating JWT Decoder");
         return NimbusJwtDecoder.withPublicKey(publicKey).build();
     }
 
+    /**
+     * Signe et génère un JWT.
+     * @param publicKey clé publique
+     * @param privateKey clé privée
+     * @return JwtEncoder qui sera utilisé pour généré le token.
+     */
     @Bean
     public JwtEncoder jwtEncoder(RSAPublicKey publicKey, RSAPrivateKey privateKey) {
         log.info("Creating JWT Encoder");

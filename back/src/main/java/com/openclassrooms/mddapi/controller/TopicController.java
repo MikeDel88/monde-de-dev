@@ -1,28 +1,42 @@
 package com.openclassrooms.mddapi.controller;
 
+import java.security.Principal;
 import java.util.List;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.openclassrooms.mddapi.documentation.topic.ApiSubscribeValidResponse;
+import com.openclassrooms.mddapi.documentation.topic.ApiSubscribeValidationErrorResponse;
+import com.openclassrooms.mddapi.documentation.topic.ApiTopicListResponse;
+import com.openclassrooms.mddapi.documentation.topic.ApiTopicNotFoundResponse;
+import com.openclassrooms.mddapi.documentation.user.ApiUserNotFoundResponse;
+import com.openclassrooms.mddapi.dto.request.SubscribeRequest;
+import com.openclassrooms.mddapi.dto.response.TopicReponse;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
-import com.openclassrooms.mddapi.model.Topic;
-import com.openclassrooms.mddapi.service.ITopicService;
+import com.openclassrooms.mddapi.service.TopicService;
 
 @RestController
-@RequestMapping("/topic")
+@AllArgsConstructor
+@RequestMapping("/topics")
 public class TopicController {
-	
-	private ITopicService topicService;
-	
-	public TopicController(ITopicService topicService) {
-		this.topicService = topicService;		
+
+	private TopicService topicService;
+
+	@ApiTopicListResponse
+	@GetMapping
+	public List<TopicReponse> getTopics(
+			Principal principal
+	) {
+		return topicService.getTopics(Long.valueOf(principal.getName()));
 	}
 
-	@GetMapping
-	public List<Topic> getTopics() {
-		return topicService.getTopics();
+	@ApiSubscribeValidResponse
+	@ApiSubscribeValidationErrorResponse
+	@ApiTopicNotFoundResponse
+	@ApiUserNotFoundResponse
+	@PostMapping("/subscribe")
+	public void subscribe(@Valid @RequestBody SubscribeRequest request, Principal principal) {
+		topicService.subscribe(request.topicId(), Long.valueOf(principal.getName()));
 	}
-	
-	
 }

@@ -16,10 +16,26 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+/**
+ * Configuration de la sécurité HTTP de l'API : authentification par JWT en mode
+ * stateless, politique CORS et gestion des accès aux routes.
+ */
 @Log4j2
 @Configuration
 public class SecurityConfig {
 
+    /**
+     * Construit la chaîne de filtres de sécurité appliquée aux requêtes HTTP :
+     * CSRF et form-login désactivés (API stateless sans cookies), sessions
+     * stateless, CORS via {@link #corsConfigurationSource()}, routes publiques
+     * (Swagger, /auth/register, /auth/login) et routes protégées nécessitant
+     * un JWT valide, avec gestion des erreurs d'authentification et d'accès
+     * refusé via les handlers dédiés.
+     * @param http le builder de configuration de la sécurité HTTP.
+     * @param jwtAuthenticationEntryPoint gère les erreurs d'authentification (401).
+     * @param jwtAccessDeniedHandler gère les erreurs d'accès refusé (403).
+     * @return SecurityFilterChain la chaîne de filtres de sécurité configurée.
+     */
     @Bean
     public SecurityFilterChain filterChain(
             HttpSecurity http,
@@ -56,13 +72,26 @@ public class SecurityConfig {
                 .build();
     }
 
+    /**
+     * Fournit l'encodeur de mot de passe utilisé pour le hachage lors de
+     * l'inscription et la vérification lors de la connexion.
+     * @return PasswordEncoder l'encodeur BCrypt.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
+        log.info("password encoder");
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Définit la politique CORS appliquée à toutes les routes : origine autorisée
+     * (front Angular en local), méthodes HTTP autorisées, en-têtes autorisés et
+     * envoi des credentials autorisé.
+     * @return CorsConfigurationSource la configuration CORS.
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        log.info("cors configuration");
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:4200"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE"));

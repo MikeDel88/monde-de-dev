@@ -31,3 +31,8 @@ Remplacer la configuration CORS par défaut par une configuration explicite (`Co
 
 ### Gestion des rôles
 Ajouter une notion de rôle sur l'utilisateur (ex. enum `USER` / `ADMIN` sur l'entité `User`), la propager dans les claims du JWT (ou via les `GrantedAuthority` de Spring Security), puis sécuriser les endpoints sensibles avec `hasRole(...)` ou `@PreAuthorize` selon le rôle requis.
+
+### Timing attack sur le login
+Le login retourne bien la même erreur (`UserNotFoundException` / 404) que l'utilisateur existe ou non, mais le **temps de traitement diffère** : si l'utilisateur n'existe pas, la requête échoue immédiatement après la recherche en base (rapide) ; si l'utilisateur existe mais le mot de passe est incorrect, `passwordEncoder.matches(...)` (BCrypt, volontairement coûteux en CPU) est exécuté avant l'échec (nettement plus lent). Un attaquant peut mesurer ce delta pour déterminer si un email ou un nom d'utilisateur existe en base, malgré une réponse HTTP identique dans les deux cas.
+
+En production, la meilleure solution serait d'exécuter `passwordEncoder.matches(...)` dans tous les cas — y compris quand l'utilisateur n'existe pas, en le comparant à un hash factice précalculé (ex. un hash BCrypt constant) — afin que le coût CPU, et donc le temps de réponse, soit identique que l'utilisateur existe ou non. Ne jamais court-circuiter la comparaison de mot de passe sur la seule absence d'utilisateur.

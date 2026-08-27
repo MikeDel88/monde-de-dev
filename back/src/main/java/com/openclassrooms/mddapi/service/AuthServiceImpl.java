@@ -13,6 +13,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Implémentation de {@link AuthService} : inscription (hachage du mot de
+ * passe via le mapper) et connexion (vérification des identifiants puis
+ * génération d'un JWT via {@link JwtService}).
+ */
 @Log4j2
 @AllArgsConstructor
 @Service

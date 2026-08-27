@@ -1,6 +1,7 @@
 import {Service, signal, WritableSignal} from '@angular/core';
 import {httpResource, HttpResourceRef} from "@angular/common/http";
 import {PostFeed} from "../models/post-feed";
+import {environment} from "../../../../environments/environment";
 
 @Service()
 export class FeedService {
@@ -12,7 +13,7 @@ export class FeedService {
   }
 
   posts: HttpResourceRef<PostFeed[] | undefined> = httpResource<PostFeed[]>(() => ({
-    url: 'http://localhost:9000/feed',
+    url: `${environment.apiUrl}/feed`,
     params: {
       sort: this.sortByAsc() ? "asc" : "desc"
     }

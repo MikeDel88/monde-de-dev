@@ -6,6 +6,10 @@ import org.springframework.http.ProblemDetail;
 
 import java.util.List;
 
+/**
+ * Classe qui permet de renvoyer une liste d'erreur
+ * utile lors de validation d'un body.
+ */
 @Getter
 @Setter
 public class BodyProblemDetail extends ProblemDetail {
