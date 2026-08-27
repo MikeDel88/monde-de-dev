@@ -57,7 +57,9 @@ Couches transverses, utilisées à plusieurs niveaux :
 - **`exception`** — `GlobalExceptionHandler` (`@RestControllerAdvice`) centralise la traduction des exceptions en réponses HTTP ; `UserNotFoundException`/`TopicNotFoundException` (404) ; `BodyProblemDetail`/`FieldError` étendent `ProblemDetail` (RFC 7807) pour porter une liste d'erreurs de validation par champ.
 - **`validation`** — `ValidPassword`, contrainte Bean Validation composée qui impose la robustesse du mot de passe (longueur, majuscule, minuscule, chiffre, caractère spécial).
 - **`documentation`** — annotations OpenAPI composées, organisées par fonctionnalité (`login`, `register`, `topic`, `post`, `user`, `database`), posées sur les méthodes de contrôleur pour documenter les réponses de succès et d'erreur dans Swagger.
-- **`config.security`** — `SecurityConfig` (chaîne de filtres HTTP, CORS, encodeur de mot de passe), `KeyConfig` (chargement des clés RSA, `JwtDecoder`/`JwtEncoder`), `JwtAuthenticationEntryPoint`/`JwtAccessDeniedHandler` (réponses 401/403). Détail complet dans [security.md](./security.md).
+- **`config.properties`** — `ApiConfigProperties`, `RsaConfigProperties` et `AppConfigProperties` : records `@ConfigurationProperties` (enregistrés via `@EnableConfigurationProperties` sur `MddApiApplication`) qui centralisent la lecture typée des propriétés custom d'`application.properties` (`spring.mvc.apiversion.default`, `rsa.private-key`/`rsa.public-key`, `app.domains.allows`), injectés respectivement dans `WebMvcConfig`, `KeyConfig` et `SecurityConfig`.
+- **`config.security`** — `SecurityConfig` (chaîne de filtres HTTP, CORS, encodeur de mot de passe), `KeyConfig` (chargement des clés RSA via `RsaConfigProperties`, `JwtDecoder`/`JwtEncoder`), `JwtAuthenticationEntryPoint`/`JwtAccessDeniedHandler` (réponses 401/403). Détail complet dans [security.md](./security.md).
+- **`config.web`** — `WebMvcConfig` : préfixe toutes les routes des contrôleurs applicatifs (`com.openclassrooms.mddapi.controller`) avec `/api/v{version}` (version lue depuis `ApiConfigProperties`). La résolution de version d'API elle-même est entièrement pilotée par les propriétés `spring.mvc.apiversion.*` (auto-configuration Spring Boot), sans code Java dédié.
 - **racine** — `MddApiApplication`, point d'entrée Spring Boot (`@SpringBootApplication`).
 
 ## Choix techniques et justifications
@@ -73,6 +75,8 @@ Couches transverses, utilisées à plusieurs niveaux :
 - **`ValidPassword` en contrainte Bean Validation composée** : centralise la règle de robustesse du mot de passe (`@Size`/`@Pattern` empilés) en un seul endroit réutilisable, plutôt que de la coder à la main dans le service ou de la dupliquer.
 - **Annotations OpenAPI composées custom** plutôt que des `@ApiResponse` répétés inline sur chaque contrôleur : springdoc déduit déjà automatiquement le schéma des DTO depuis les signatures Java, ces annotations documentent en plus les réponses d'erreur métier (404, 400, 409) qu'il ne peut pas déduire seul, de façon réutilisable entre endpoints (ex. `ApiUserNotFoundResponse` partagée entre `/auth/login`, `/feed` et `/topics/subscribe`).
 - **DTO en `record` Java** : immuables par défaut, moins de code que des classes avec getters/constructeurs explicites — adapté à des objets de transfert qui ne changent jamais après construction.
+- **Versioning d'API par préfixe d'URL (`/api/v1/...`)** plutôt que par header : la version est visible directement dans l'URL, cohérent avec ce qu'anticipait déjà [endpoints.md](./endpoints.md) (`PATH: api/v1/`). Le préfixe est appliqué uniquement aux contrôleurs applicatifs (`HandlerTypePredicate.forBasePackage("com.openclassrooms.mddapi.controller")`) et non à tous les `@RestController` : la documentation Swagger/OpenAPI de springdoc utilise aussi cette annotation en interne, mais une documentation d'API n'a pas vocation à être versionnée de la même façon que l'API elle-même.
+- **`@ConfigurationProperties` (records) plutôt que des `@Value` épars** : `ApiConfigProperties`/`RsaConfigProperties` centralisent en un seul endroit typé la lecture des propriétés custom, au lieu de dupliquer des `@Value("${...}")` dans plusieurs classes (c'était le cas de `spring.mvc.apiversion.default`, lu à la fois dans `WebMvcConfig` et `SecurityConfig`). Le composant `apiVersionDefault` utilise `@Name("default")` pour se binder sur la propriété `spring.mvc.apiversion.default` : `default` étant un mot réservé Java, il ne peut pas être utilisé tel quel comme nom de composant de record — c'est la même technique que Spring Boot utilise en interne pour son propre champ équivalent (`WebMvcProperties.Apiversion.defaultVersion`).
 
 ## Persistance & migrations
 
@@ -84,5 +88,5 @@ L'authentification repose sur un serveur de ressources OAuth2 validant des JWT s
 
 ## Documentation de l'API
 
-- Liste des routes (cibles et implémentées) : [endpoints.md](./endpoints.md).
+- Liste des routes (cibles et implémentées), toutes relatives au préfixe `/api/v1/` sauf mention contraire : [endpoints.md](./endpoints.md).
 - Documentation OpenAPI générée automatiquement, consultable via Swagger UI (`/swagger-ui.html`) une fois l'application démarrée.
