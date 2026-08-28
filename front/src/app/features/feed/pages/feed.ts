@@ -3,6 +3,7 @@ import {PostCard} from "../../../shared/components/post-card/post-card";
 import {FeedService} from "../services/feed-service";
 import {HttpResourceRef} from "@angular/common/http";
 import {PostFeed} from "../models/post-feed";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-feed',
@@ -17,6 +18,7 @@ export class Feed {
   readonly btnCreatePostText: string = "Créer un article";
 
   feedService: FeedService = inject(FeedService);
+  readonly router = inject(Router);
   sortByAsc: WritableSignal<Boolean> = this.feedService.sortByAsc;
   posts!: HttpResourceRef<PostFeed[] | undefined>;
 
@@ -27,6 +29,10 @@ export class Feed {
 
   toggle(): void {
     this.feedService.toogleFilterByAsc();
+  }
+
+  onClickCreatePost(): void {
+    this.router.navigate(['/post']);
   }
 }
 
