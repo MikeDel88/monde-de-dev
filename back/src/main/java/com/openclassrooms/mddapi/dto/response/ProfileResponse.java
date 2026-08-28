@@ -8,7 +8,7 @@ import java.util.List;
  * @param email l'email de l'utilisateur.
  * @param topics la liste des thèmes auxquels l'utilisateur est abonné.
  */
-public record ProfilResponse(
+public record ProfileResponse(
         String name,
         String email,
         List<TopicResponse> topics

@@ -1,7 +1,7 @@
 package com.openclassrooms.mddapi.mapper;
 
 import com.openclassrooms.mddapi.dto.request.RegisterRequest;
-import com.openclassrooms.mddapi.dto.response.ProfilResponse;
+import com.openclassrooms.mddapi.dto.response.ProfileResponse;
 import com.openclassrooms.mddapi.dto.response.TopicResponse;
 import com.openclassrooms.mddapi.model.User;
 import org.mapstruct.Context;
@@ -38,5 +38,5 @@ public interface UserMapper {
      * @return ProfilResponse le profil mappé pour envoyer au client.
      */
     @Mapping(target = "topics", source = "topicsResponses")
-    ProfilResponse toProfilResponse(User user, List<TopicResponse> topicsResponses);
+    ProfileResponse toProfilResponse(User user, List<TopicResponse> topicsResponses);
 }
