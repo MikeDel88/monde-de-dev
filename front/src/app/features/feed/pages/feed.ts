@@ -13,19 +13,20 @@ import {PostFeed} from "../models/post-feed";
   styleUrl: './feed.css',
 })
 export class Feed {
-  readonly sortByAscText: string = "Trier par"
-  readonly btnCreatePostText: string = "Créer un article"
+  readonly sortByAscText: string = "Trier par";
+  readonly btnCreatePostText: string = "Créer un article";
 
   feedService: FeedService = inject(FeedService);
   sortByAsc: WritableSignal<Boolean> = this.feedService.sortByAsc;
   posts!: HttpResourceRef<PostFeed[] | undefined>;
 
   constructor() {
-    this.posts = this.feedService.posts
+    this.posts = this.feedService.posts;
+    this.posts.reload();
   }
 
   toggle(): void {
-    this.feedService.toogleFilterByAsc()
+    this.feedService.toogleFilterByAsc();
   }
 }
 

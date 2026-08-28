@@ -16,13 +16,18 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Implémentation de {@link PostService} : construit le fil d'actualité d'un
+ * utilisateur en agrégeant les posts de tous les topics auxquels il est
+ * abonné, triés par date.
+ */
 @Log4j2
 @AllArgsConstructor
 @Service
 public class PostServiceImpl implements PostService {
 
-    private UserRepository userRepository;
-    private PostMapper postMapper;
+    private final UserRepository userRepository;
+    private final PostMapper postMapper;
 
     @Override
     @Transactional(readOnly = true)

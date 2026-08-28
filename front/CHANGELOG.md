@@ -2,6 +2,19 @@
 
 Toutes les modifications notables de ce projet sont documentées dans ce fichier.
 
+## [0.2.0] - 2026-08-28
+
+### Ajouté
+- Page Topics : liste des thèmes avec abonnement et désabonnement
+- Page Profil : consultation et mise à jour du nom/email, changement du mot de passe avec modal de confirmation (mot de passe actuel requis)
+- Bouton de sauvegarde du profil désactivé tant que le formulaire n'est pas modifié (dirty)
+- Icône de navigation mise en surbrillance sur le lien actif
+
+### Technique
+- Propriété `apiUrl` centralisée pour les appels API, pointant vers l'API versionnée (`/api/v1`)
+- Correction du favicon
+- Correction du corps de la requête `/subscribe`
+
 ## [0.1.0] - 2026-08-26
 
 ### Ajouté

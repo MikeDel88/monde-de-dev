@@ -18,8 +18,8 @@
       <a routerLink="/topic" routerLinkActive="text-primary font-semibold" class="hover:text-primary text-xl" data-test="link-topic" (click)="menu.close()">{{ topicsText }}</a>
     </ng-template>
     <ng-template #navProfil>
-      <a routerLink="/feed" routerLinkActive="text-primary font-semibold" class="hover:text-primary text-xl" data-test="link-feed" (click)="menu.close()">
-        <img src="/assets/user.svg" alt="profile">
+      <a routerLink="/profile" routerLinkActive="text-primary font-semibold" #rla="routerLinkActive" class="hover:text-primary text-xl" data-test="link-feed" (click)="menu.close()">
+        <img [src]="rla.isActive ? '/assets/user-active.svg' : '/assets/user.svg'" alt="profile">
       </a>
     </ng-template>
     @if (!menu.isMobile()) {

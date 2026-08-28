@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.openclassrooms</groupId>
 	<artifactId>mdd-api</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>0.2.0-SNAPSHOT</version>
 	<name>mdd-api</name>
 	<description>Monde de dév - API</description>
 	<properties>

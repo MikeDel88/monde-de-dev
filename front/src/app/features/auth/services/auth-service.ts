@@ -7,6 +7,7 @@ import {FieldError} from "../../../core/models/field-error";
 import {ApiProblemDetail} from "../../../core/models/api-problem-detail";
 import {SessionService} from "../../../core/services/session-service";
 import {AuthResponse} from "../models/auth-response";
+import {environment} from "../../../../environments/environment";
 
 @Service()
 export class AuthService {
@@ -15,12 +16,12 @@ export class AuthService {
   private sessionService: SessionService = inject(SessionService);
 
    register$(datas: RegisterData): Observable<void> {
-     return this.httpClient.post<void>("http://localhost:9000/auth/register", datas)
+     return this.httpClient.post<void>(`${environment.apiUrl}/auth/register`, datas)
        .pipe(catchError((err: HttpErrorResponse) => throwError(() => new Error(this.buildRegisterErrorMessage(err)))));
    }
 
    login$(datas: LoginData): Observable<boolean> {
-    return this.httpClient.post<AuthResponse>("http://localhost:9000/auth/login", datas)
+    return this.httpClient.post<AuthResponse>(`${environment.apiUrl}/auth/login`, datas)
       .pipe(tap((authResponse: AuthResponse) => this.sessionService.logIn(authResponse.token)))
       .pipe(map(() => this.sessionService.isAuthenticated))
       .pipe(catchError((err: HttpErrorResponse) => throwError(() => new Error(this.buildLoginErrorMessage(err)))));

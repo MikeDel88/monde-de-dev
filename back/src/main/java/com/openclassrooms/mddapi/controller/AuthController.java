@@ -1,7 +1,10 @@
 package com.openclassrooms.mddapi.controller;
 
 import com.openclassrooms.mddapi.documentation.database.ApiDabataseConflictResponse;
+import com.openclassrooms.mddapi.documentation.login.ApiLoginValidResponse;
+import com.openclassrooms.mddapi.documentation.login.ApiLoginValidationErrorResponse;
 import com.openclassrooms.mddapi.documentation.register.ApiRegisterValidResponse;
+import com.openclassrooms.mddapi.documentation.user.ApiUserNotFoundResponse;
 import com.openclassrooms.mddapi.dto.request.LoginRequest;
 import com.openclassrooms.mddapi.dto.request.RegisterRequest;
 import com.openclassrooms.mddapi.documentation.register.ApiRegisterValidationErrorResponse;
@@ -24,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthController {
 
-    private AuthService authService;
+    private final AuthService authService;
 
     @SecurityRequirements()
     @ApiRegisterValidResponse
@@ -40,6 +43,9 @@ public class AuthController {
     }
 
     @SecurityRequirements()
+    @ApiLoginValidResponse
+    @ApiLoginValidationErrorResponse
+    @ApiUserNotFoundResponse
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody LoginRequest loginRequest) {
         log.info("call /login");

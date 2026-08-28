@@ -4,17 +4,18 @@
 
 L'authentification repose sur un serveur de ressources OAuth2 (`spring-boot-starter-oauth2-resource-server`) validant des JWT signés en RS256.
 
-- **Clés RSA** (`KeyConfig`) : une paire de clés 2048 bits est générée en mémoire au démarrage de l'application. Elle n'est pas persistée : à chaque redémarrage (ou avec plusieurs instances), une nouvelle paire est générée et les tokens émis précédemment deviennent invalides.
+- **Clés RSA** (`KeyConfig`) : une paire de clés 2048 bits fixe est chargée au démarrage depuis les variables d'environnement `RSA_PRIVATE_KEY`/`RSA_PUBLIC_KEY` (via `.env.properties` en local, secret manager en production). Elle est stable entre redémarrages et partageable entre plusieurs instances, les tokens émis restent donc valides après un restart.
 - **Génération du token** (`JwtServiceImpl`) : un seul type de token, l'access token, est généré. Il contient uniquement le `subject` (id de l'utilisateur), une date d'émission et une expiration fixée à **30 jours**. Aucun claim de rôle ou de scope n'est inclus.
 - **Transport du token** : le client envoie le token via le header `Authorization: Bearer <token>`. Aucun cookie n'est utilisé.
 - **Session** : l'API est stateless (`SessionCreationPolicy.STATELESS`), aucune session serveur n'est conservée.
 - **CSRF** : désactivé (`csrf(AbstractHttpConfigurer::disable)`). Cohérent avec une API purement stateless sans cookie, mais devra être revu si les tokens passent un jour par un cookie.
 - **CORS** : configuration par défaut de Spring (`Customizer.withDefaults()`), aucune restriction de domaine explicite.
 - **Autorisations** : pas de notion de rôle. Toute requête authentifiée est acceptée (`anyRequest().authenticated()`), il n'existe pas de distinction admin/utilisateur au niveau de l'entité `User` ni des endpoints.
-- **Routes publiques** : documentation Swagger/OpenAPI, ainsi que `/auth/register` et `/auth/login`.
+- **Routes publiques** : documentation Swagger/OpenAPI (`/v3/api-docs`, `/swagger-ui.html`, non versionnée), ainsi que `/api/v1/auth/register` et `/api/v1/auth/login`.
 - **Gestion des erreurs** : `JwtAuthenticationEntryPoint` renvoie un 401 JSON en cas d'authentification manquante/invalide, `JwtAccessDeniedHandler` renvoie un 403 JSON en cas d'accès refusé.
+- **Changement de mot de passe** (`PATCH /profile/password`) : en plus d'un JWT valide, le `currentPassword` est désormais requis (`UpdateProfilPasswordRequest.currentPassword`, `@NotBlank`) et vérifié via `passwordEncoder.matches(...)` (`ProfilServiceImpl.updatePassword`) avant d'appliquer le nouveau mot de passe. Cela protège contre un JWT volé par un canal autre que le réseau (XSS, token exfiltré, poste partagé) : l'attaquant ne peut plus changer le mot de passe sans connaître l'ancien. Si `currentPassword` ne correspond pas, une exception dédiée `InvalidCurrentPasswordException` est levée et traduite par `GlobalExceptionHandler` en **400** avec le code `CURRENT_PASSWORD_INVALID` sur le champ `currentPassword`, distinct du 404 "utilisateur introuvable".
 
-Ce fonctionnement est volontairement simple et suffisant pour un MVP, mais présente des limites : clé de signature non persistée, absence de révocation ou de renouvellement du token, durée de vie de l'access token beaucoup trop longue pour un usage sécurisé, absence de granularité des droits.
+Ce fonctionnement est volontairement simple et suffisant pour un MVP, mais présente des limites : absence de révocation ou de renouvellement du token, durée de vie de l'access token beaucoup trop longue pour un usage sécurisé, absence de granularité des droits.
 
 ## À prévoir avant une mise en production
 
@@ -32,5 +33,7 @@ Remplacer la configuration CORS par défaut par une configuration explicite (`Co
 ### Gestion des rôles
 Ajouter une notion de rôle sur l'utilisateur (ex. enum `USER` / `ADMIN` sur l'entité `User`), la propager dans les claims du JWT (ou via les `GrantedAuthority` de Spring Security), puis sécuriser les endpoints sensibles avec `hasRole(...)` ou `@PreAuthorize` selon le rôle requis.
 
-### Persistance de la clé de signature
-Stocker la paire de clés RSA (ou un secret) de manière durable (variables d'environnement, secret manager/vault) plutôt que de la régénérer aléatoirement à chaque démarrage, afin de permettre redémarrages et scaling horizontal sans invalider les tokens en circulation.
+### Timing attack sur le login
+Le login retourne bien la même erreur (`UserNotFoundException` / 404) que l'utilisateur existe ou non, mais le **temps de traitement diffère** : si l'utilisateur n'existe pas, la requête échoue immédiatement après la recherche en base (rapide) ; si l'utilisateur existe mais le mot de passe est incorrect, `passwordEncoder.matches(...)` (BCrypt, volontairement coûteux en CPU) est exécuté avant l'échec (nettement plus lent). Un attaquant peut mesurer ce delta pour déterminer si un email ou un nom d'utilisateur existe en base, malgré une réponse HTTP identique dans les deux cas.
+
+En production, la meilleure solution serait d'exécuter `passwordEncoder.matches(...)` dans tous les cas — y compris quand l'utilisateur n'existe pas, en le comparant à un hash factice précalculé (ex. un hash BCrypt constant) — afin que le coût CPU, et donc le temps de réponse, soit identique que l'utilisateur existe ou non. Ne jamais court-circuiter la comparaison de mot de passe sur la seule absence d'utilisateur.
