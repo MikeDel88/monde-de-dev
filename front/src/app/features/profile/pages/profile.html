@@ -29,8 +29,10 @@
       }
       <button
         type="submit"
+        [disabled]="!profileForm().dirty()"
+        [ngClass]="profileForm().dirty() ? 'bg-primary hover:bg-primary-hover' : 'bg-btn-disabled'"
         data-test="btn-submit"
-        class="self-center bg-primary text-white rounded-md px-4 py-2 my-2 font-medium hover:bg-primary-hover"
+        class="self-center hover:cursor-pointer text-white rounded-md px-4 py-2 my-2 font-medium "
       >
         {{ btnSaveProfilUser }}
       </button>

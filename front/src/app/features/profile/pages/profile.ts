@@ -15,18 +15,19 @@ import {
 } from "@angular/forms/signals";
 import {TopicService} from "../../topic/services/topic-service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {NgClass} from "@angular/common";
 
 
 export interface ProfileData {
   name: string;
   email: string,
   password: string,
-}
+};
 
 const initialProfileData: ProfileData = {
   name: "",
   email: "",
-  password: ''
+  password: ""
 };
 
 const validationProfileForm = (schemaPath: SchemaPathTree<ProfileData>) => {
@@ -35,11 +36,11 @@ const validationProfileForm = (schemaPath: SchemaPathTree<ProfileData>) => {
   pattern(schemaPath.password,
     /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).+$/,
     {message: 'Doit contenir au moins une lettre Majuscule, Minuscule, un chiffre et un caractère spécial'});
-}
+};
 
 @Component({
   selector: 'app-profile',
-  imports: [TopicCard, FormField, ConfirmPasswordModal],
+  imports: [TopicCard, FormField, ConfirmPasswordModal, NgClass],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
