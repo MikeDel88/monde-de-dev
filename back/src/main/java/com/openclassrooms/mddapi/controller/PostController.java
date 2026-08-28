@@ -22,7 +22,7 @@ import java.util.List;
 @RestController
 public class PostController {
 
-    private PostService postService;
+    private final PostService postService;
 
     @ApiFeedResponse
     @ApiFeedValidationErrorResponse

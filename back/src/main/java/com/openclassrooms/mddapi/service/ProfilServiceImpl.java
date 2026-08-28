@@ -21,9 +21,9 @@ import java.util.List;
 @Service
 public class ProfilServiceImpl implements ProfilService {
 
-    private UserRepository userRepository;
-    private UserMapper userMapper;
-    private TopicMapper topicMapper;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final TopicMapper topicMapper;
 
     @Override
     @Transactional(readOnly = true)

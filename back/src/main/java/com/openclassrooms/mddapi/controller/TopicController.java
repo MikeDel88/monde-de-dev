@@ -20,13 +20,11 @@ import com.openclassrooms.mddapi.service.TopicService;
 @RequestMapping("/topics")
 public class TopicController {
 
-	private TopicService topicService;
+	private final TopicService topicService;
 
 	@ApiTopicListResponse
 	@GetMapping
-	public List<TopicResponse> getTopics(
-			Principal principal
-	) {
+	public List<TopicResponse> getTopics(Principal principal) {
 		return topicService.getTopics(Long.valueOf(principal.getName()));
 	}
 
