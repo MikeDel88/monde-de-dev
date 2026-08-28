@@ -1,6 +1,6 @@
 package com.openclassrooms.mddapi.mapper;
 
-import com.openclassrooms.mddapi.dto.response.TopicReponse;
+import com.openclassrooms.mddapi.dto.response.TopicResponse;
 import com.openclassrooms.mddapi.model.BaseEntity;
 import com.openclassrooms.mddapi.model.Topic;
 import org.mapstruct.Context;
@@ -10,7 +10,7 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 /**
- * Mapper MapStruct entre l'entité {@link Topic} et le DTO {@link TopicReponse},
+ * Mapper MapStruct entre l'entité {@link Topic} et le DTO {@link TopicResponse},
  * avec calcul de l'état d'abonnement de l'utilisateur courant.
  */
 @Mapper(componentModel = "spring")
@@ -24,7 +24,7 @@ public interface TopicMapper {
      * @return TopicReponse la réponse mappée, avec le champ subscribed renseigné.
      */
     @Mapping(target = "subscribed", expression = "java(isSubscribed(topic, userId))")
-    TopicReponse toTopicResponse(Topic topic, @Context Long userId);
+    TopicResponse toTopicResponse(Topic topic, @Context Long userId);
 
     /**
      * Convertit une liste de topics en liste de réponses pour l'utilisateur donné.
@@ -32,7 +32,7 @@ public interface TopicMapper {
      * @param userId l'identifiant de l'utilisateur courant.
      * @return List TopicReponse; la liste des réponses mappées.
      */
-    List<TopicReponse> toTopicResponse(List<Topic> topics, @Context Long userId);
+    List<TopicResponse> toTopicResponse(List<Topic> topics, @Context Long userId);
 
     /**
      * Indique si l'utilisateur donné est abonné au topic.

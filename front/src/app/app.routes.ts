@@ -8,6 +8,7 @@ import {AuthGuard} from "./core/guards/auth-guard";
 import {GuestGuard} from "./core/guards/guest-guard";
 import {AuthLayout} from "./shared/layout/auth/auth-layout";
 import {MainLayout} from "./shared/layout/main/main-layout";
+import {Profile} from "./features/profile/pages/profile";
 
 export const routes: Routes = [
   {
@@ -35,6 +36,7 @@ export const routes: Routes = [
         children: [
           { path: 'feed', component: Feed, title: "Fil d'actualité" },
           { path: 'topic', component: TopicComponent, title: "Thèmes" },
+          { path: 'profile', component: Profile, title: "Profil utilisateur" },
         ],
       },
     ],

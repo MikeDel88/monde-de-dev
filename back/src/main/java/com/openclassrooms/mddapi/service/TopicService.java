@@ -2,7 +2,7 @@ package com.openclassrooms.mddapi.service;
 
 import java.util.List;
 
-import com.openclassrooms.mddapi.dto.response.TopicReponse;
+import com.openclassrooms.mddapi.dto.response.TopicResponse;
 
 /**
  * Service de gestion des thèmes.
@@ -14,7 +14,7 @@ public interface TopicService {
 	 * @param userId l'id de l'utilisateur connecté.
 	 * @return la liste mappé pour envoyer au client.
 	 */
-	List<TopicReponse> getTopics(Long userId);
+	List<TopicResponse> getTopics(Long userId);
 
 	/**
 	 * Abonne l'utilisateur au thème donné.

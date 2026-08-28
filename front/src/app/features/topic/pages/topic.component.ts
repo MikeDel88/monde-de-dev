@@ -3,7 +3,7 @@ import {HttpResourceRef} from "@angular/common/http";
 import {TopicService} from "../services/topic-service";
 import {Topic} from "../models/topic";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {TopicCard} from "../components/topic-card/topic-card";
+import {TopicCard} from "../../feed/components/topic-card/topic-card";
 
 @Component({
   selector: 'app-topic',

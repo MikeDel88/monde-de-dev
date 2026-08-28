@@ -1,11 +1,15 @@
 package com.openclassrooms.mddapi.mapper;
 
 import com.openclassrooms.mddapi.dto.request.RegisterRequest;
+import com.openclassrooms.mddapi.dto.response.ProfilResponse;
+import com.openclassrooms.mddapi.dto.response.TopicResponse;
 import com.openclassrooms.mddapi.model.User;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
 
 /**
  * Mapper MapStruct qui construit l'entité {@link User} à partir de la requête
@@ -27,4 +31,12 @@ public interface UserMapper {
     @Mapping(target = "updatedAt", ignore = true)
     User toUser(RegisterRequest registerRequest, @Context PasswordEncoder passwordEncoder);
 
+    /**
+     * Construit le DTO de profil à partir de l'entité User et des thèmes déjà mappés.
+     * @param user l'entité utilisateur.
+     * @param topicsResponses la liste des thèmes déjà mappée (via {@link TopicMapper}).
+     * @return ProfilResponse le profil mappé pour envoyer au client.
+     */
+    @Mapping(target = "topics", source = "topicsResponses")
+    ProfilResponse toProfilResponse(User user, List<TopicResponse> topicsResponses);
 }
