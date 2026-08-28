@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
 
@@ -106,6 +107,21 @@ public class GlobalExceptionHandler {
         bpd.setErrors(errors);
 
         return bpd;
+    }
+
+    /**
+     * Gère le cas où un paramètre de méthode de contrôleur (@PathVariable /
+     * @RequestParam) ne peut pas être converti vers le type attendu (ex. un
+     * id non numérique dans l'URL).
+     * @param ex l'exception levée par Spring lors de la conversion du paramètre.
+     * @return ProblemDetail 400 avec le nom du paramètre invalide.
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ProblemDetail handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        log.error("handleMethodArgumentTypeMismatch : {}", ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                "Le paramètre '" + ex.getName() + "' est invalide.");
     }
 
     /**

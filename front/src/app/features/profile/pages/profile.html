@@ -35,16 +35,18 @@
         {{ btnSaveProfilUser }}
       </button>
     </form>
-    <hr class="grow border-t border-black w-11/12 mx-auto my-10">
-    <h3 class="w-full text-center font-bold text-2xl">{{ titleSubscription }}</h3>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 py-8">
-    @for (topic of profile.value().topics; track topic.id) {
-        <app-topic-card
-          [topic]="topic"
-          [btnUnsubscribed]="{ disabled: false, text: btnUnsubscribed }"
-          (onClickUnsubscribe)="onUnsubscribe($event)"
-        />
+    @if (profile.value().topics.length > 0) {
+      <hr class="grow border-t border-black w-11/12 mx-auto my-10">
+      <h3 class="w-full text-center font-bold text-2xl">{{ titleSubscription }}</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-10 py-8">
+        @for (topic of profile.value().topics; track topic.id) {
+          <app-topic-card
+            [topic]="topic"
+            [btnUnsubscribed]="{ disabled: false, text: btnUnsubscribed }"
+            (onClickUnsubscribe)="onUnsubscribe($event)"
+          />
+        }
+      </div>
     }
-    </div>
   }
 </div>

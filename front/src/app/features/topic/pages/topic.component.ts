@@ -20,7 +20,8 @@ export class TopicComponent {
   topics!: HttpResourceRef<Topic[] | undefined>;
 
   constructor() {
-    this.topics = this.topicService.topics
+    this.topics = this.topicService.topics;
+    this.topics.reload();
   }
 
   onSubscribe(topicId: number) {
@@ -28,6 +29,6 @@ export class TopicComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         complete: () => this.topics.reload(),
-      })
+      });
   }
 }
