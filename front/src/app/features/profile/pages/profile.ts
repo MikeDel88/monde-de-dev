@@ -1,9 +1,11 @@
-import {Component, effect, inject, signal, WritableSignal} from '@angular/core';
+import {Component, DestroyRef, effect, inject, signal, WritableSignal} from '@angular/core';
 import {HttpResourceRef} from "@angular/common/http";
 import {ProfileService} from "../services/profile-service";
 import {ProfileResponse} from "../models/profile-response";
 import {TopicCard} from "../../feed/components/topic-card/topic-card";
-import {email, FieldTree, form, FormField, minLength, pattern, required, SchemaPathTree} from "@angular/forms/signals";
+import {email, FieldTree, form, FormField, minLength, pattern, SchemaPathTree} from "@angular/forms/signals";
+import {TopicService} from "../../topic/services/topic-service";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 
 
 export interface ProfileData {
@@ -37,6 +39,9 @@ export class Profile {
   private profilService = inject(ProfileService);
   profile!: HttpResourceRef<ProfileResponse | undefined>;
 
+  private topicService = inject(TopicService);
+  private destroyRef = inject(DestroyRef);
+
   readonly btnUnsubscribed = "Se désabonner";
   readonly titleSubscription  = "Abonnements";
   readonly titleProfilUser = "Profil utilisateur";
@@ -49,6 +54,7 @@ export class Profile {
 
   constructor() {
     this.profile = this.profilService.profile;
+    this.profile.reload();
 
     effect(() => {
       if (this.profile.hasValue()) {
@@ -63,11 +69,15 @@ export class Profile {
   }
 
   onSubmit(event: Event): void {
-
+    event.preventDefault();
   }
 
   onUnsubscribe(topicId: number) {
-
+    this.topicService.unsubscribe(topicId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        complete: () => this.profile.reload(),
+      })
   }
 
 }

@@ -14,4 +14,8 @@ export class TopicService {
   subscribe(topicId: number): Observable<void> {
     return this.httpClient.post<void>(`${environment.apiUrl}/topics/subscribe`, { topicId });
   }
+
+  unsubscribe(topicId: number) {
+    return this.httpClient.delete<void>(`${environment.apiUrl}/topics/${topicId}/subscribe`,);
+  }
 }
