@@ -8,6 +8,7 @@ import com.openclassrooms.mddapi.exception.InvalidCurrentPasswordException;
 import com.openclassrooms.mddapi.exception.UserNotFoundException;
 import com.openclassrooms.mddapi.mapper.TopicMapper;
 import com.openclassrooms.mddapi.mapper.UserMapper;
+import com.openclassrooms.mddapi.model.Topic;
 import com.openclassrooms.mddapi.model.User;
 import com.openclassrooms.mddapi.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -67,7 +69,11 @@ public class ProfilServiceImpl implements ProfilService {
 
     private ProfileResponse toProfileResponse(User user) {
         List<TopicResponse> topics = topicMapper
-                .toTopicResponse(user.getTopics().stream().toList(), user.getId());
+                .toTopicResponse(user
+                        .getTopics()
+                        .stream()
+                        .sorted(Comparator.comparing(Topic::getTitle))
+                        .toList(), user.getId());
         return userMapper.toProfilResponse(user, topics);
     }
 }
