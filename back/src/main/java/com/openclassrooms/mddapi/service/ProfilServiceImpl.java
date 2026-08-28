@@ -13,6 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * Implémentation de {@link ProfilService} : construit le profil de l'utilisateur connecté
+ * à partir de ses informations et de ses thèmes abonnés.
+ */
 @AllArgsConstructor
 @Service
 public class ProfilServiceImpl implements ProfilService {

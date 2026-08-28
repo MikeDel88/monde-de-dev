@@ -1,5 +1,7 @@
 package com.openclassrooms.mddapi.controller;
 
+import com.openclassrooms.mddapi.documentation.profil.ApiProfileValidResponse;
+import com.openclassrooms.mddapi.documentation.user.ApiUserNotFoundResponse;
 import com.openclassrooms.mddapi.dto.response.ProfilResponse;
 import com.openclassrooms.mddapi.service.ProfilService;
 import lombok.AllArgsConstructor;
@@ -19,6 +21,8 @@ public class ProfilController {
     private ProfilService profilService;
 
 
+    @ApiProfileValidResponse
+    @ApiUserNotFoundResponse
     @GetMapping
     public ProfilResponse profile(Principal principal) {
         return profilService.getProfil(Long.parseLong(principal.getName()));
