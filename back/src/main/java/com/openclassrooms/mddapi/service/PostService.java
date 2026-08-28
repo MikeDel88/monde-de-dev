@@ -2,9 +2,7 @@ package com.openclassrooms.mddapi.service;
 
 import com.openclassrooms.mddapi.dto.request.PostRequest;
 import com.openclassrooms.mddapi.dto.response.PostFeedResponse;
-import jakarta.validation.Valid;
 
-import java.security.Principal;
 import java.util.List;
 
 /**
