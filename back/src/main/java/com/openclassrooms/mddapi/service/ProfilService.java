@@ -25,9 +25,12 @@ public interface ProfilService {
     ProfileResponse updateProfil(Long userId, UpdateProfilRequest request);
 
     /**
-     * Met à jour le mot de passe de l'utilisateur connecté.
+     * Met à jour le mot de passe de l'utilisateur connecté, après vérification du mot de passe actuel.
      * @param userId l'id de l'utilisateur connecté.
-     * @param request le nouveau mot de passe.
+     * @param request le mot de passe actuel (vérifié avant application) et le nouveau mot de passe.
+     * @throws com.openclassrooms.mddapi.exception.UserNotFoundException si l'utilisateur n'existe pas.
+     * @throws com.openclassrooms.mddapi.exception.InvalidCurrentPasswordException si le mot de passe
+     *         actuel fourni ne correspond pas à celui enregistré.
      */
     void updatePassword(Long userId, UpdateProfilPasswordRequest request);
 }

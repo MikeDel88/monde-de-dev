@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponse(
         responseCode = "400",
-        description = "Le champ newPassword est requis et doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.",
+        description = "Le champ newPassword est requis et doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial. Le champ currentPassword est requis et doit correspondre au mot de passe actuel de l'utilisateur (code CURRENT_PASSWORD_INVALID sinon).",
         content = @Content(schema = @Schema(implementation = BodyProblemDetail.class))
 )
 public @interface ApiProfilUpdatePasswordValidationErrorResponse {

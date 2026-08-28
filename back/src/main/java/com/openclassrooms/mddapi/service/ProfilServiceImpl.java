@@ -4,6 +4,7 @@ import com.openclassrooms.mddapi.dto.request.UpdateProfilPasswordRequest;
 import com.openclassrooms.mddapi.dto.request.UpdateProfilRequest;
 import com.openclassrooms.mddapi.dto.response.ProfileResponse;
 import com.openclassrooms.mddapi.dto.response.TopicResponse;
+import com.openclassrooms.mddapi.exception.InvalidCurrentPasswordException;
 import com.openclassrooms.mddapi.exception.UserNotFoundException;
 import com.openclassrooms.mddapi.mapper.TopicMapper;
 import com.openclassrooms.mddapi.mapper.UserMapper;
@@ -33,7 +34,7 @@ public class ProfilServiceImpl implements ProfilService {
     @Transactional(readOnly = true)
     public ProfileResponse getProfil(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        return this.toProfilResponse(user);
+        return this.toProfileResponse(user);
     }
 
     @Override
@@ -48,7 +49,7 @@ public class ProfilServiceImpl implements ProfilService {
             user.setEmail(request.email());
         }
 
-        return this.toProfilResponse(user);
+        return this.toProfileResponse(user);
     }
 
     @Override
@@ -56,11 +57,15 @@ public class ProfilServiceImpl implements ProfilService {
     public void updatePassword(Long userId, UpdateProfilPasswordRequest request) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
+            throw new InvalidCurrentPasswordException();
+        }
+
         user.setPassword(passwordEncoder.encode(request.newPassword()));
     }
 
 
-    private ProfileResponse toProfilResponse(User user) {
+    private ProfileResponse toProfileResponse(User user) {
         List<TopicResponse> topics = topicMapper
                 .toTopicResponse(user.getTopics().stream().toList(), user.getId());
         return userMapper.toProfilResponse(user, topics);
