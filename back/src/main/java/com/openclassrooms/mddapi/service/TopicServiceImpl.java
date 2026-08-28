@@ -49,7 +49,17 @@ public class TopicServiceImpl implements TopicService {
 		User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
 		user.getTopics().add(topic);
-		userRepository.save(user);
+	}
+
+	@Override
+	@Transactional
+	public void unsubscribe(Long topicId, Long userId) {
+		log.info("service: unsubscribe");
+
+		Topic topic = topicRepository.findById(topicId).orElseThrow(TopicNotFoundException::new);
+		User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+		user.getTopics().remove(topic);
 	}
 
 }

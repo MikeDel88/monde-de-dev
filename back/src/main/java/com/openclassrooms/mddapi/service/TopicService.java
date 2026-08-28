@@ -22,4 +22,11 @@ public interface TopicService {
 	 * @param userId l'id de l'utilisateur connecté.
 	 */
 	void subscribe(Long topicId, Long userId);
+
+	/**
+	 * Désabonne l'utilisateur au thème donné.
+	 * @param topicId l'id du thème.
+	 * @param userId l'id de l'utilisateur connecté.
+	 */
+    void unsubscribe(Long topicId, Long userId);
 }
