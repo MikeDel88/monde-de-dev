@@ -3,7 +3,6 @@ package com.openclassrooms.mddapi.dto.request;
 import com.openclassrooms.mddapi.validation.ValidPassword;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 /**
  * DTO utilisé lors du changement de mot de passe du profil connecté.
