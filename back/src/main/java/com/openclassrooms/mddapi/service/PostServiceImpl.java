@@ -26,8 +26,8 @@ import java.util.List;
 @Service
 public class PostServiceImpl implements PostService {
 
-    private UserRepository userRepository;
-    private PostMapper postMapper;
+    private final UserRepository userRepository;
+    private final PostMapper postMapper;
 
     @Override
     @Transactional(readOnly = true)

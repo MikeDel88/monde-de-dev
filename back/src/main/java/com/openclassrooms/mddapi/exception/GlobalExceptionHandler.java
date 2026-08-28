@@ -89,6 +89,23 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Gère le cas où le mot de passe actuel fourni lors d'un changement de mot
+     * de passe ne correspond pas à celui enregistré pour l'utilisateur.
+     * @param ex l'exception levée lorsque le mot de passe actuel est invalide.
+     * @return BodyProblemDetail 400 avec l'erreur sur le champ currentPassword.
+     */
+    @ExceptionHandler(InvalidCurrentPasswordException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BodyProblemDetail handleInvalidCurrentPassword(InvalidCurrentPasswordException ex) {
+        log.error("handleInvalidCurrentPassword : {}", ex.getMessage());
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        BodyProblemDetail bpd = BodyProblemDetail.from(pd);
+        bpd.setErrors(List.of(new FieldError("currentPassword", "CURRENT_PASSWORD_INVALID")));
+
+        return bpd;
+    }
+
+    /**
      * Gère les échecs de validation sur les paramètres de méthode de contrôleur
      * (@RequestParam / @PathVariable annotés directement, hors @RequestBody).
      * @param ex l'exception de validation levée par Spring au niveau du handler.

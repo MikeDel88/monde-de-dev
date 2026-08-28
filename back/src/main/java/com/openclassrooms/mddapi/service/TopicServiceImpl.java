@@ -25,9 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 public class TopicServiceImpl implements TopicService {
 
-	private TopicRepository topicRepository;
-	private UserRepository userRepository;
-	private TopicMapper topicMapper;
+	private final TopicRepository topicRepository;
+	private final UserRepository userRepository;
+	private final TopicMapper topicMapper;
 
 	@Override
 	@Transactional(readOnly = true)
