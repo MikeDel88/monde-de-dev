@@ -3,7 +3,16 @@ import {HttpResourceRef} from "@angular/common/http";
 import {ProfileService} from "../services/profile-service";
 import {ProfileResponse} from "../models/profile-response";
 import {TopicCard} from "../../feed/components/topic-card/topic-card";
-import {email, FieldTree, form, FormField, minLength, pattern, SchemaPathTree} from "@angular/forms/signals";
+import {ConfirmPasswordModal} from "../components/confirm-password-modal/confirm-password-modal";
+import {
+  email,
+  FieldTree,
+  form,
+  FormField,
+  minLength,
+  pattern,
+  SchemaPathTree
+} from "@angular/forms/signals";
 import {TopicService} from "../../topic/services/topic-service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 
@@ -30,7 +39,7 @@ const validationProfileForm = (schemaPath: SchemaPathTree<ProfileData>) => {
 
 @Component({
   selector: 'app-profile',
-  imports: [TopicCard, FormField],
+  imports: [TopicCard, FormField, ConfirmPasswordModal],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
@@ -48,6 +57,8 @@ export class Profile {
   readonly btnSaveProfilUser = "Sauvegarder";
 
   error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
+  showPasswordModal: WritableSignal<boolean> = signal(false);
+  private pendingNewPassword = '';
 
   profileModel: WritableSignal<ProfileData> = signal<ProfileData>(initialProfileData);
   profileForm: FieldTree<ProfileData> = form(this.profileModel, validationProfileForm);
@@ -70,6 +81,44 @@ export class Profile {
 
   onSubmit(event: Event): void {
     event.preventDefault();
+
+    const nameDirty = this.profileForm.name().dirty();
+    const emailDirty = this.profileForm.email().dirty();
+    const passwordDirty = this.profileForm.password().dirty();
+
+    if (nameDirty || emailDirty) {
+      const name = nameDirty ? this.profileForm.name().value() : null;
+      const email = emailDirty ? this.profileForm.email().value() : null;
+
+      this.profilService.updateProfil(email, name)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: value => {
+            this.error.set(undefined);
+            this.profile.set(value);
+          },
+          error: () => {
+            this.error.set("Une erreur est survenue, le profil n'a pas été mis à jour.");
+          }
+        });
+    }
+
+    if (passwordDirty) {
+      this.pendingNewPassword = this.profileForm.password().value();
+      this.showPasswordModal.set(true);
+    }
+  }
+
+  onConfirmPassword(currentPassword: string): void {
+    this.showPasswordModal.set(false);
+    this.profilService.updatePassword(this.pendingNewPassword, currentPassword)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => { this.profileForm.password().reset("") },
+        error: () => {
+          this.error.set("Une erreur est survenue, le mot de passe n'a pas été mis à jour.");
+        }
+      });
   }
 
   onUnsubscribe(topicId: number) {

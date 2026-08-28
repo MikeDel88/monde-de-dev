@@ -35,6 +35,11 @@
         {{ btnSaveProfilUser }}
       </button>
     </form>
+    <app-confirm-password-modal
+      [open]="showPasswordModal()"
+      (confirm)="onConfirmPassword($event)"
+      (cancel)="showPasswordModal.set(false)"
+    />
     @if (profile.value().topics.length > 0) {
       <hr class="grow border-t border-black w-11/12 mx-auto my-10">
       <h3 class="w-full text-center font-bold text-2xl">{{ titleSubscription }}</h3>
