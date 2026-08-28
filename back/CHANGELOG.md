@@ -2,6 +2,23 @@
 
 Toutes les modifications notables de ce projet sont documentées dans ce fichier.
 
+## [0.2.0] - 2026-08-28
+
+### Ajouté
+- Récupération de la liste des topics
+- Abonnement et désabonnement à un topic
+- Consultation et mise à jour du profil utilisateur (nom, email, liste des topics)
+- Mise à jour séparée du mot de passe avec vérification du mot de passe actuel (`currentPassword`)
+- Versioning de l'API (`/api/v1`) avec documentation et configuration dédiées
+
+### Technique
+- Persistance des clés RSA (publique/privée) entre les démarrages du serveur
+- Migration Flyway v8 : suppression en cascade liée à un topic ou un utilisateur supprimé
+- Validation des `@RequestParam`/`@PathVariable` (ex: `topicId` `@NotNull`) et gestion des exceptions associées
+- Renommage de `ProfilResponse` en `ProfileResponse`
+- Ajout de documentation Javadoc et OpenAPI sur les contrôleurs
+- Nettoyage d'imports inutilisés
+
 ## [0.1.0] - 2026-08-26
 
 ### Ajouté
