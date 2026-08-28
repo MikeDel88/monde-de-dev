@@ -1,6 +1,8 @@
 package com.openclassrooms.mddapi.service;
 
-import com.openclassrooms.mddapi.dto.response.ProfilResponse;
+import com.openclassrooms.mddapi.dto.request.UpdateProfilPasswordRequest;
+import com.openclassrooms.mddapi.dto.request.UpdateProfilRequest;
+import com.openclassrooms.mddapi.dto.response.ProfileResponse;
 
 /**
  * Service de gestion du profil utilisateur.
@@ -12,5 +14,20 @@ public interface ProfilService {
      * @param userId l'id de l'utilisateur connecté.
      * @return le profil mappé pour envoyer au client.
      */
-    ProfilResponse getProfil(Long userId);
+    ProfileResponse getProfil(Long userId);
+
+    /**
+     * Met à jour partiellement le nom et/ou l'email de l'utilisateur connecté.
+     * @param userId l'id de l'utilisateur connecté.
+     * @param request les champs à mettre à jour (les champs null ne sont pas modifiés).
+     * @return ProfileResponse le profil mis à jour.
+     */
+    ProfileResponse updateProfil(Long userId, UpdateProfilRequest request);
+
+    /**
+     * Met à jour le mot de passe de l'utilisateur connecté.
+     * @param userId l'id de l'utilisateur connecté.
+     * @param request le nouveau mot de passe.
+     */
+    void updatePassword(Long userId, UpdateProfilPasswordRequest request);
 }
