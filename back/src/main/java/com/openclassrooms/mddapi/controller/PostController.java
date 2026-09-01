@@ -4,14 +4,18 @@ import com.openclassrooms.mddapi.documentation.post.ApiFeedResponse;
 import com.openclassrooms.mddapi.documentation.post.ApiFeedValidationErrorResponse;
 import com.openclassrooms.mddapi.documentation.post.ApiPostCreateResponse;
 import com.openclassrooms.mddapi.documentation.post.ApiPostCreateValidationErrorResponse;
+import com.openclassrooms.mddapi.documentation.post.ApiPostDetailResponse;
+import com.openclassrooms.mddapi.documentation.post.ApiPostDetailValidationErrorResponse;
 import com.openclassrooms.mddapi.documentation.topic.ApiTopicNotFoundResponse;
 import com.openclassrooms.mddapi.documentation.user.ApiUserNotFoundResponse;
 import com.openclassrooms.mddapi.dto.request.PostRequest;
 import com.openclassrooms.mddapi.dto.response.PostFeedResponse;
+import com.openclassrooms.mddapi.dto.response.PostResponse;
 import com.openclassrooms.mddapi.service.PostService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -45,9 +49,18 @@ public class PostController {
         return postService.getPosts(sort, Long.valueOf(principal.getName()));
     }
 
-    /**
-     * Crée un nouveau post pour l'utilisateur authentifié sur le topic indiqué.
-     */
+    @ApiPostDetailResponse
+    @ApiPostDetailValidationErrorResponse
+    @ApiTopicNotFoundResponse
+    @ApiUserNotFoundResponse
+    @GetMapping("/posts/{postId}")
+    public PostResponse getPost(
+            @Validated @Positive @PathVariable Long postId,
+            Principal principal) {
+        log.info("call /posts/{}", postId);
+        return postService.getPostById(postId, Long.valueOf(principal.getName()));
+    }
+
     @ApiPostCreateResponse
     @ApiPostCreateValidationErrorResponse
     @ApiTopicNotFoundResponse

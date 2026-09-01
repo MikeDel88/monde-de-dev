@@ -2,9 +2,12 @@ package com.openclassrooms.mddapi.service;
 
 import com.openclassrooms.mddapi.dto.request.PostRequest;
 import com.openclassrooms.mddapi.dto.response.PostFeedResponse;
+import com.openclassrooms.mddapi.dto.response.PostResponse;
 import com.openclassrooms.mddapi.exception.TopicNotFoundException;
 import com.openclassrooms.mddapi.exception.UserNotFoundException;
+import com.openclassrooms.mddapi.mapper.CommentMapper;
 import com.openclassrooms.mddapi.mapper.PostMapper;
+import com.openclassrooms.mddapi.model.Comment;
 import com.openclassrooms.mddapi.model.Post;
 import com.openclassrooms.mddapi.model.Topic;
 import com.openclassrooms.mddapi.model.User;
@@ -33,7 +36,11 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final PostMapper postMapper;
+    private final CommentMapper commentMapper;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional(readOnly = true)
     public List<PostFeedResponse> getPosts(String sort, Long userId) {
@@ -58,6 +65,9 @@ public class PostServiceImpl implements PostService {
         return this.postMapper.toPostFeedResponse(posts);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public void createPost(PostRequest postRequest, Long userId) {
@@ -71,5 +81,29 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(TopicNotFoundException::new);
         Post newPost = postMapper.toPost(postRequest, user, topic);
         postRepository.save(newPost);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public PostResponse getPostById(Long postId, Long userId) {
+        log.info("service: getPostById {}", postId);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        Post post = postRepository.findById(postId).orElseThrow(TopicNotFoundException::new);
+
+        // si l'utilisateur n'est pas abonné au topic du post, on lève une exception
+        if(user.getTopics().stream().noneMatch(post.getTopic()::equals)) {
+            throw new TopicNotFoundException();
+        }
+
+        // du plus ancien au plus récent, pour que le dernier commentaire soit en bas de la liste.
+        List<Comment> comments = post.getComments()
+                .stream()
+                .sorted(Comparator.comparing(Comment::getDate).reversed())
+                .toList();
+
+        return postMapper.toPostResponse(post, commentMapper.toCommentResponseList(comments));
     }
 }
