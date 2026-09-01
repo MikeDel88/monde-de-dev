@@ -1,0 +1,20 @@
+@if (post.hasValue()) {
+  @let post = this.post.value();
+  <div class="flex flex-col gap-4 bg-card p-4 rounded-lg h-full">
+    <h6 class="font-bold text-md">{{ post.title }}</h6>
+    <div class="flex flex-row w-1/2 justify-between flex-wrap-reverse">
+      <p>{{ post.date | date: 'dd/MM/YYYY' }}</p>
+      <p>{{ post.author }}</p>
+      <p>{{ post.topicName }}</p>
+    </div>
+    <p>{{ post.content }}</p>
+    @for (comment of post.comments; track comment.content) {
+      <div class="border-l-4 border-blue-500 pl-4">
+        <p class="font-semibold">{{ comment.author }}</p>
+        <p>{{ comment.content }}</p>
+      </div>
+    } @empty {
+      <p>Aucun commentaire</p>
+    }
+  </div>
+}
