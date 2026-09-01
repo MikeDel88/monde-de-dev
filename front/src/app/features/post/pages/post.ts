@@ -1,12 +1,14 @@
-import {Component, computed, inject, signal, Signal, WritableSignal} from '@angular/core';
+import {Component, computed, DestroyRef, inject, signal, Signal, WritableSignal} from '@angular/core';
 import {ProfileService} from "../../profile/services/profile-service";
 import {HttpResourceRef} from "@angular/common/http";
 import {ProfileResponse} from "../../profile/models/profile-response";
 import {Topic} from "../../topic/models/topic";
 import {Router} from "@angular/router";
-import {FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
+import {FieldState, FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
 import {FormsModule} from "@angular/forms";
 import {NgClass} from "@angular/common";
+import {PostService} from "../services/post-service";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 
 export interface CreatePost {
   topicId: string,
@@ -44,7 +46,10 @@ export class Post {
   readonly contentPlaceholder = "Contenu de l'article";
 
   readonly router = inject(Router);
-  private profilService = inject(ProfileService);
+  private destroyRef = inject(DestroyRef);
+  private readonly profilService = inject(ProfileService);
+  private readonly postService = inject(PostService);
+  error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
   topics: Signal<Topic[] | undefined> = computed(() => {
       if(this.profile.hasValue()) {
         return this.profile.value().topics;
@@ -67,10 +72,22 @@ export class Post {
   }
 
   onFocus(): void {
-
+    this.error.set(undefined);
   }
 
   onSubmit(event: Event): void {
     event.preventDefault();
+    const postData: FieldState<CreatePost> = this.postForm();
+    this.postService.createPost$(postData.value().topicId, postData.value().title, postData.value().content)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.postForm().reset(initialPostData);
+          this.router.navigate(['/feed']);
+        },
+        error: () => {
+          this.error.set('Erreur lors de la création du post.');
+        }
+      });
   }
 }

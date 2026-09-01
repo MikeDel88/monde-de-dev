@@ -25,21 +25,24 @@
         <p class="text-sm text-error" data-test="error-title">{{ error.message }}</p>
       }
     }
-    <textarea data-test="title" [formField]="postForm.content"
+    <textarea data-test="content" [formField]="postForm.content"
             [placeholder]="contentPlaceholder"
-           class="h-[200px] border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+           class="h-50 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
     </textarea>
     @if (postForm.content().touched() && postForm.content().invalid()) {
       @for (error of postForm.content().errors(); track error) {
         <p class="text-sm text-error" data-test="error-content">{{ error.message }}</p>
       }
     }
+    @if (error()) {
+      <p class="text-sm text-error" data-test="error">{{ error() }}</p>
+    }
     <button
       type="submit"
-      [disabled]="!postForm().dirty()"
-      [ngClass]="postForm().dirty() ? 'bg-primary hover:bg-primary-hover' : 'bg-btn-disabled'"
+      [disabled]="!postForm().valid()"
+      [ngClass]="postForm().valid() ? 'bg-primary hover:bg-primary-hover' : 'bg-btn-disabled'"
       data-test="btn-submit"
-      class="w-[130px] self-center hover:cursor-pointer text-white rounded-md px-4 py-2 my-2 font-medium "
+      class="w-32.5 self-center hover:cursor-pointer text-white rounded-md px-4 py-2 my-2 font-medium "
     >
       {{ btnText }}
     </button>
