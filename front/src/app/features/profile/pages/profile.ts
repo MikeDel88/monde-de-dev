@@ -46,20 +46,20 @@ const validationProfileForm = (schemaPath: SchemaPathTree<ProfileData>) => {
 })
 export class Profile {
 
-  private profilService = inject(ProfileService);
+  private profilService: ProfileService = inject(ProfileService);
   profile!: HttpResourceRef<ProfileResponse | undefined>;
 
-  private topicService = inject(TopicService);
-  private destroyRef = inject(DestroyRef);
+  private topicService: TopicService = inject(TopicService);
+  private destroyRef: DestroyRef = inject(DestroyRef);
 
-  readonly btnUnsubscribed = "Se désabonner";
-  readonly titleSubscription  = "Abonnements";
-  readonly titleProfilUser = "Profil utilisateur";
-  readonly btnSaveProfilUser = "Sauvegarder";
+  readonly btnUnsubscribed: string = "Se désabonner";
+  readonly titleSubscription: string= "Abonnements";
+  readonly titleProfilUser: string = "Profil utilisateur";
+  readonly btnSaveProfilUser: string = "Sauvegarder";
 
   error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
   showPasswordModal: WritableSignal<boolean> = signal(false);
-  private pendingNewPassword = '';
+  private pendingNewPassword: string = '';
 
   profileModel: WritableSignal<ProfileData> = signal<ProfileData>(initialProfileData);
   profileForm: FieldTree<ProfileData> = form(this.profileModel, validationProfileForm);
@@ -91,7 +91,7 @@ export class Profile {
       const name = nameDirty ? this.profileForm.name().value() : null;
       const email = emailDirty ? this.profileForm.email().value() : null;
 
-      this.profilService.updateProfil(email, name)
+      this.profilService.updateProfil$(email, name)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: value => {
@@ -112,7 +112,7 @@ export class Profile {
 
   onConfirmPassword(currentPassword: string): void {
     this.showPasswordModal.set(false);
-    this.profilService.updatePassword(this.pendingNewPassword, currentPassword)
+    this.profilService.updatePassword$(this.pendingNewPassword, currentPassword)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => { this.profileForm.password().reset("") },
@@ -123,7 +123,7 @@ export class Profile {
   }
 
   onUnsubscribe(topicId: number) {
-    this.topicService.unsubscribe(topicId)
+    this.topicService.unsubscribe$(topicId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         complete: () => this.profile.reload(),

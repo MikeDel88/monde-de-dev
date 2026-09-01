@@ -9,6 +9,7 @@ import {GuestGuard} from "./core/guards/guest-guard";
 import {AuthLayout} from "./shared/layout/auth/auth-layout";
 import {MainLayout} from "./shared/layout/main/main-layout";
 import {Profile} from "./features/profile/pages/profile";
+import {Post} from "./features/post/pages/post";
 
 export const routes: Routes = [
   {
@@ -37,6 +38,7 @@ export const routes: Routes = [
           { path: 'feed', component: Feed, title: "Fil d'actualité" },
           { path: 'topic', component: TopicComponent, title: "Thèmes" },
           { path: 'profile', component: Profile, title: "Profil utilisateur" },
+          { path: 'post', component: Post, title: "Créer un nouvel article" },
         ],
       },
     ],

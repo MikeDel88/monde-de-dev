@@ -25,7 +25,7 @@ export class TopicComponent {
   }
 
   onSubscribe(topicId: number) {
-    this.topicService.subscribe(topicId)
+    this.topicService.subscribe$(topicId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         complete: () => this.topics.reload(),
