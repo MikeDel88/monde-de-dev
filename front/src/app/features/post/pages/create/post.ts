@@ -1,13 +1,13 @@
 import {Component, computed, DestroyRef, inject, signal, Signal, WritableSignal} from '@angular/core';
-import {ProfileService} from "../../profile/services/profile-service";
+import {ProfileService} from "../../../profile/services/profile-service";
 import {HttpResourceRef} from "@angular/common/http";
-import {ProfileResponse} from "../../profile/models/profile-response";
-import {Topic} from "../../topic/models/topic";
+import {ProfileResponse} from "../../../profile/models/profile-response";
+import {Topic} from "../../../topic/models/topic";
 import {Router} from "@angular/router";
 import {FieldState, FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
 import {FormsModule} from "@angular/forms";
 import {NgClass} from "@angular/common";
-import {PostService} from "../services/post-service";
+import {PostService} from "../../services/post-service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 
 export interface CreatePost {

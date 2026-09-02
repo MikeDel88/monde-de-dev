@@ -34,6 +34,10 @@ export class Feed {
   onClickCreatePost(): void {
     this.router.navigate(['/post']);
   }
+
+  onClickPost(postId: number): void {
+    this.router.navigate(['/post', postId]);
+  }
 }
 
 

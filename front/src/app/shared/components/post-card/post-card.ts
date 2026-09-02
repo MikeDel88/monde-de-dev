@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 import {DatePipe} from "@angular/common";
 import {PostFeed} from "../../../features/feed/models/post-feed";
 
@@ -12,4 +12,9 @@ import {PostFeed} from "../../../features/feed/models/post-feed";
 })
 export class PostCard {
     post = input.required<PostFeed>();
+    clickPost = output<number>();
+
+    onClick(postId: number) {
+      this.clickPost.emit(postId);
+    }
 }

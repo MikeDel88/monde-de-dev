@@ -1,7 +1,9 @@
 package com.openclassrooms.mddapi.mapper;
 
 import com.openclassrooms.mddapi.dto.request.PostRequest;
+import com.openclassrooms.mddapi.dto.response.CommentResponse;
 import com.openclassrooms.mddapi.dto.response.PostFeedResponse;
+import com.openclassrooms.mddapi.dto.response.PostResponse;
 import com.openclassrooms.mddapi.model.Post;
 import com.openclassrooms.mddapi.model.Topic;
 import com.openclassrooms.mddapi.model.User;
@@ -48,4 +50,15 @@ public interface PostMapper {
     @Mapping(target = "comments", ignore = true)
     @Mapping(target = "title", source = "postRequest.title")
     Post toPost(PostRequest postRequest, User user, Topic topic);
+
+    /**
+     * Convertit un post en réponse détaillée pour l'affichage d'un post unique.
+     * @param post l'entité post source.
+     * @return PostResponse la réponse mappée (date → postDate, user.name → name).
+     */
+    @Mapping(target = "postDate", source = "post.date")
+    @Mapping(target = "name", source = "post.user.name")
+    @Mapping(target = "topicName", source = "post.topic.title")
+    @Mapping(target = "comments", source = "commentResponses")
+    PostResponse toPostResponse(Post post, List<CommentResponse> commentResponses);
 }

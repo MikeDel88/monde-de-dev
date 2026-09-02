@@ -17,7 +17,7 @@
   @if(posts.hasValue()) {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-10 py-8">
       @for (post of posts.value(); track post.id) {
-        <app-post-card [post]="post"/>
+        <app-post-card [post]="post" (clickPost)="onClickPost($event)"/>
       }
     </div>
   }
