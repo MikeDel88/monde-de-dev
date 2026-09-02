@@ -1,0 +1,9 @@
+<button
+  [type]="type()"
+  [disabled]="disabled()"
+  (click)="onClick()"
+  [ngClass] = "disabled() ? 'bg-btn-disabled' : 'bg-primary hover:bg-primary-hover hover:cursor-pointer'"
+  class="bg-btn-disabled text-white rounded-md px-4 py-2 my-2 font-bold"
+>
+  {{ text() }}
+</button>
