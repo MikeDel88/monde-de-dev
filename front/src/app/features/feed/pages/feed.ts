@@ -4,11 +4,13 @@ import {FeedService} from "../services/feed-service";
 import {HttpResourceRef} from "@angular/common/http";
 import {PostFeed} from "../models/post-feed";
 import {Router} from "@angular/router";
+import {Button} from "../../../shared/components/buttons/button";
 
 @Component({
   selector: 'app-feed',
   imports: [
-    PostCard
+    PostCard,
+    Button
   ],
   templateUrl: './feed.html',
   styleUrl: './feed.css',
