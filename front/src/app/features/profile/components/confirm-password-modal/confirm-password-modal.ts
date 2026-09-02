@@ -1,5 +1,6 @@
 import {Component, effect, ElementRef, viewChild, input, output, signal, WritableSignal} from '@angular/core';
 import {FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
+import {Error} from "../../../../shared/components/errors/error";
 
 interface ConfirmPasswordData {
   currentPassword: string;
@@ -13,7 +14,7 @@ const validation = (schemaPath: SchemaPathTree<ConfirmPasswordData>) => {
 
 @Component({
   selector: 'app-confirm-password-modal',
-  imports: [FormField],
+  imports: [FormField, Error],
   templateUrl: './confirm-password-modal.html',
 })
 export class ConfirmPasswordModal {

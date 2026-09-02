@@ -6,14 +6,14 @@
              class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
       @if (profileForm.name().touched() && profileForm.name().invalid()) {
         @for (error of profileForm.name().errors(); track error) {
-          <p class="text-sm text-error" data-test="error-name">{{ error.message }}</p>
+          <app-error data-test="error-name" [message]="error.message" />
         }
       }
       <input type="text" data-test="name" [formField]="profileForm.email"
              class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
       @if (profileForm.email().touched() && profileForm.email().invalid()) {
         @for (error of profileForm.email().errors(); track error) {
-          <p class="text-sm text-error" data-test="error-name">{{ error.message }}</p>
+          <app-error data-test="error-email" [message]="error.message" />
         }
       }
       <input type="password" data-test="password" [formField]="profileForm.password"
@@ -21,11 +21,11 @@
              class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
       @if (profileForm.password().touched() && profileForm.password().invalid()) {
         @for (error of profileForm.password().errors(); track error) {
-          <p class="text-sm text-error" data-test="error-password">{{ error.message }}</p>
+          <app-error data-test="error-password" [message]="error.message" />
         }
       }
       @if (error()) {
-        <p class="text-sm text-error" data-test="error">{{ error() }}</p>
+        <app-error data-test="error" [message]="error()" />
       }
       <app-button
         type="submit"

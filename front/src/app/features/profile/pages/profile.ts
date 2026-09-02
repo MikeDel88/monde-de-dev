@@ -17,6 +17,7 @@ import {TopicService} from "../../topic/services/topic-service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Button} from "../../../shared/components/buttons/button";
 import {Dividers} from "../../../shared/components/dividers/dividers";
+import {Error} from "../../../shared/components/errors/error";
 
 
 export interface ProfileData {
@@ -41,7 +42,7 @@ const validationProfileForm = (schemaPath: SchemaPathTree<ProfileData>) => {
 
 @Component({
   selector: 'app-profile',
-  imports: [TopicCard, FormField, ConfirmPasswordModal, Button, Dividers],
+  imports: [TopicCard, FormField, ConfirmPasswordModal, Button, Dividers, Error],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })

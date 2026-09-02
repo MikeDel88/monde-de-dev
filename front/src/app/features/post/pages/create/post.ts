@@ -9,6 +9,7 @@ import {FormsModule} from "@angular/forms";
 import {PostService} from "../../services/post-service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Button} from "../../../../shared/components/buttons/button";
+import {Error} from "../../../../shared/components/errors/error";
 
 export interface CreatePost {
   topicId: string,
@@ -33,7 +34,8 @@ const validationCreatePostForm = (schemaPath: SchemaPathTree<CreatePost>) => {
   imports: [
     FormsModule,
     FormField,
-    Button
+    Button,
+    Error
   ],
   templateUrl: './post.html',
   styleUrl: './post.css',

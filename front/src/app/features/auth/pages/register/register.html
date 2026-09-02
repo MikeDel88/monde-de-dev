@@ -13,7 +13,7 @@
   </label>
   @if (registerForm.name().touched() && registerForm.name().invalid()) {
     @for (error of registerForm.name().errors(); track error) {
-      <p class="text-sm text-error" data-test="error-name">{{ error.message }}</p>
+      <app-error data-test="error-name" [message]="error.message" />
     }
   }
   <label class="flex flex-col gap-1 text-sm font-medium text-gray-700">
@@ -23,7 +23,7 @@
   </label>
   @if (registerForm.email().touched() && registerForm.email().invalid()) {
     @for (error of registerForm.email().errors(); track error) {
-      <p class="text-sm text-error" data-test="error-email">{{ error.message }}</p>
+      <app-error data-test="error-email" [message]="error.message" />
     }
   }
   <label class="flex flex-col gap-1 text-sm font-medium text-gray-700">
@@ -33,11 +33,11 @@
   </label>
   @if (registerForm.password().touched() && registerForm.password().invalid()) {
     @for (error of registerForm.password().errors(); track error) {
-      <p class="text-sm text-error" data-test="error-password">{{ error.message }}</p>
+      <app-error data-test="error-password" [message]="error.message" />
     }
   }
   @if (error()) {
-    <p class="text-sm text-error" data-test="error">{{ error() }}</p>
+    <app-error data-test="error" [message]="error()" />
   }
   <app-button
     type="submit"

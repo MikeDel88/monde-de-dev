@@ -14,7 +14,7 @@
     </select>
     @if (postForm.topicId().touched() && postForm.topicId().invalid()) {
       @for (error of postForm.topicId().errors(); track error) {
-        <p class="text-sm text-error" data-test="error-topic">{{ error.message }}</p>
+        <app-error data-test="error-topic" [message]="error.message"/>
       }
     }
     <input type="text" data-test="title" [formField]="postForm.title"
@@ -22,7 +22,7 @@
            class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
     @if (postForm.title().touched() && postForm.title().invalid()) {
       @for (error of postForm.title().errors(); track error) {
-        <p class="text-sm text-error" data-test="error-title">{{ error.message }}</p>
+        <app-error data-test="error-title" [message]="error.message"/>
       }
     }
     <textarea data-test="content" [formField]="postForm.content"
@@ -31,11 +31,11 @@
     </textarea>
     @if (postForm.content().touched() && postForm.content().invalid()) {
       @for (error of postForm.content().errors(); track error) {
-        <p class="text-sm text-error" data-test="error-content">{{ error.message }}</p>
+        <app-error data-test="error-content" [message]="error.message"/>
       }
     }
     @if (error()) {
-      <p class="text-sm text-error" data-test="error">{{ error() }}</p>
+      <app-error data-test="error" [message]="error()"/>
     }
     <app-button
       type="submit"
