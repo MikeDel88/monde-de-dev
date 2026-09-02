@@ -6,7 +6,6 @@ import {Topic} from "../../../topic/models/topic";
 import {Router} from "@angular/router";
 import {FieldState, FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
 import {FormsModule} from "@angular/forms";
-import {NgClass} from "@angular/common";
 import {PostService} from "../../services/post-service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Button} from "../../../../shared/components/buttons/button";
@@ -34,7 +33,6 @@ const validationCreatePostForm = (schemaPath: SchemaPathTree<CreatePost>) => {
   imports: [
     FormsModule,
     FormField,
-    NgClass,
     Button
   ],
   templateUrl: './post.html',

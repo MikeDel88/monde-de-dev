@@ -12,6 +12,7 @@ import {AuthService} from "../../services/auth-service";
 import {RegisterData} from "../../models/register-data";
 import {Toast} from "../../../../shared/components/toasts/toast";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {Button} from "../../../../shared/components/buttons/button";
 
 const initialRegisterData: RegisterData = {
   name: "",
@@ -34,7 +35,7 @@ const validationRegisterForm = (schemaPath: SchemaPathTree<RegisterData>) => {
 
 @Component({
   selector: 'app-register',
-  imports: [FormField, Toast],
+  imports: [FormField, Toast, Button],
   templateUrl: './register.html',
   styleUrl: './register.css',
 })

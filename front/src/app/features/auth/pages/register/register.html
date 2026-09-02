@@ -39,13 +39,13 @@
   @if (error()) {
     <p class="text-sm text-error" data-test="error">{{ error() }}</p>
   }
-  <button
+  <app-button
     type="submit"
+    class="self-center"
     data-test="btn-submit"
-    class="self-center bg-primary text-white rounded-md px-4 py-2 my-2 font-medium hover:bg-primary-hover"
-  >
-    {{ btnText }}
-  </button>
+    [disabled]="false"
+    [text]="btnText"
+  />
 </form>
 
 

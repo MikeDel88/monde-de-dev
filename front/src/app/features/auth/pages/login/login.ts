@@ -4,6 +4,7 @@ import {AuthService} from "../../services/auth-service";
 import {Router} from "@angular/router";
 import {LoginData} from "../../models/login-data";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {Button} from "../../../../shared/components/buttons/button";
 
 const initialLoginData: LoginData = {
   emailOrName: "",
@@ -21,7 +22,7 @@ const validationLoginForm = (schemaPath: SchemaPathTree<LoginData>) => {
   selector: 'app-login',
   templateUrl: './login.html',
   styleUrl: './login.css',
-  imports: [FormField]
+  imports: [FormField, Button]
 })
 export class Login {
 

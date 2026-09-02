@@ -15,7 +15,6 @@ import {
 } from "@angular/forms/signals";
 import {TopicService} from "../../topic/services/topic-service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {NgClass} from "@angular/common";
 import {Button} from "../../../shared/components/buttons/button";
 
 
@@ -23,7 +22,7 @@ export interface ProfileData {
   name: string;
   email: string,
   password: string,
-};
+}
 
 const initialProfileData: ProfileData = {
   name: "",
@@ -41,7 +40,7 @@ const validationProfileForm = (schemaPath: SchemaPathTree<ProfileData>) => {
 
 @Component({
   selector: 'app-profile',
-  imports: [TopicCard, FormField, ConfirmPasswordModal, NgClass, Button],
+  imports: [TopicCard, FormField, ConfirmPasswordModal, Button],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
