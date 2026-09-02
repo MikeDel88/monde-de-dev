@@ -10,7 +10,7 @@ import {AuthLayout} from "./shared/layout/auth/auth-layout";
 import {MainLayout} from "./shared/layout/main/main-layout";
 import {Profile} from "./features/profile/pages/profile";
 import {Post} from "./features/post/pages/create/post";
-import {PostDetail} from "./features/post/pages/detail/post-detail/post-detail";
+import {PostDetail} from "./features/post/pages/detail/post-detail";
 
 export const routes: Routes = [
   {

@@ -1,6 +1,6 @@
 import {Component, inject} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
-import {Post, PostService} from "../../../services/post-service";
+import {Post, PostService} from "../../services/post-service";
 import {HttpResourceRef} from "@angular/common/http";
 import {DatePipe} from "@angular/common";
 
