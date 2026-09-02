@@ -1,5 +1,7 @@
 package com.openclassrooms.mddapi.controller;
 
+import com.openclassrooms.mddapi.documentation.comment.ApiCommentCreateResponse;
+import com.openclassrooms.mddapi.documentation.comment.ApiCommentCreateValidationErrorResponse;
 import com.openclassrooms.mddapi.documentation.post.ApiFeedResponse;
 import com.openclassrooms.mddapi.documentation.post.ApiFeedValidationErrorResponse;
 import com.openclassrooms.mddapi.documentation.post.ApiPostCreateResponse;
@@ -8,6 +10,7 @@ import com.openclassrooms.mddapi.documentation.post.ApiPostDetailResponse;
 import com.openclassrooms.mddapi.documentation.post.ApiPostDetailValidationErrorResponse;
 import com.openclassrooms.mddapi.documentation.topic.ApiTopicNotFoundResponse;
 import com.openclassrooms.mddapi.documentation.user.ApiUserNotFoundResponse;
+import com.openclassrooms.mddapi.dto.request.CommentRequest;
 import com.openclassrooms.mddapi.dto.request.PostRequest;
 import com.openclassrooms.mddapi.dto.response.PostFeedResponse;
 import com.openclassrooms.mddapi.dto.response.PostResponse;
@@ -69,6 +72,20 @@ public class PostController {
     public ResponseEntity<Void> create(@Valid @RequestBody PostRequest postRequest, Principal principal) {
         log.info("call /posts create");
         this.postService.createPost(postRequest, Long.valueOf(principal.getName()));
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @ApiCommentCreateResponse
+    @ApiCommentCreateValidationErrorResponse
+    @ApiTopicNotFoundResponse
+    @ApiUserNotFoundResponse
+    @PostMapping("/posts/{postId}/comments")
+    public ResponseEntity<Void> createComment(
+            @Validated @Positive @PathVariable Long postId,
+            @Valid @RequestBody CommentRequest commentRequest,
+            Principal principal) {
+        log.info("call /posts/{}/comments create", postId);
+        this.postService.createComment(postId, commentRequest, Long.valueOf(principal.getName()));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

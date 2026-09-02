@@ -1,7 +1,10 @@
 package com.openclassrooms.mddapi.mapper;
 
+import com.openclassrooms.mddapi.dto.request.CommentRequest;
 import com.openclassrooms.mddapi.dto.response.CommentResponse;
 import com.openclassrooms.mddapi.model.Comment;
+import com.openclassrooms.mddapi.model.Post;
+import com.openclassrooms.mddapi.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -28,4 +31,19 @@ public interface CommentMapper {
      * @return List<CommentResponse> la liste des réponses mappées.
      */
     List<CommentResponse> toCommentResponseList(List<Comment> comments);
+
+    /**
+     * Convertit une requête de création de commentaire en entité commentaire.
+     * @param commentRequest les données du commentaire à créer.
+     * @param user l'auteur du commentaire.
+     * @param post le post commenté.
+     * @return Comment l'entité commentaire mappée, datée du moment de l'appel.
+     */
+    @Mapping(target = "user", source = "user")
+    @Mapping(target = "post", source = "post")
+    @Mapping(target = "date", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "content", source = "commentRequest.content")
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    Comment toComment(CommentRequest commentRequest, User user, Post post);
 }
