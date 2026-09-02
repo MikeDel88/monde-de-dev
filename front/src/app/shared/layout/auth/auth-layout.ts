@@ -2,10 +2,11 @@ import {Component, inject} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router, RouterOutlet} from "@angular/router";
 import {filter, map, startWith} from "rxjs";
 import {toSignal} from "@angular/core/rxjs-interop";
+import {Title} from "../../components/title/title";
 
 @Component({
   selector: 'app-auth-layout',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, Title],
   templateUrl: './auth-layout.html',
   styleUrl: './auth-layout.css',
 })

@@ -1,6 +1,6 @@
 <div class="flex flex-col p-4 gap-4">
   @if (profile.hasValue()) {
-    <h3 class="w-full text-center font-bold text-2xl">{{ titleProfilUser }}</h3>
+    <app-title class="font-bold" [content]="titleProfilUser" />
     <form (submit)="onSubmit($event)" (focusin)="onFocus()" class="flex flex-col gap-2 w-full lg:w-1/2 2xl:w-1/6 mx-auto p-6">
       <app-input type="text" data-test="name" errorDataTest="error-name"
                  [formField]="profileForm.name" />
@@ -24,7 +24,7 @@
     />
     @if (profile.value().topics.length > 0) {
       <app-dividers class="w-11/12 mx-auto"/>
-      <h3 class="w-full text-center font-bold text-2xl">{{ titleSubscription }}</h3>
+      <app-title  class="font-bold" [content]="titleSubscription" />
       <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
         @for (topic of profile.value().topics; track topic.id) {
           <app-topic-card

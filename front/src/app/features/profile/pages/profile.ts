@@ -19,6 +19,7 @@ import {Button} from "../../../shared/components/buttons/button";
 import {Dividers} from "../../../shared/components/dividers/dividers";
 import {Error} from "../../../shared/components/errors/error";
 import {Input} from "../../../shared/components/input/input";
+import {Title} from "../../../shared/components/title/title";
 
 
 export interface ProfileData {
@@ -43,7 +44,7 @@ const validationProfileForm = (schemaPath: SchemaPathTree<ProfileData>) => {
 
 @Component({
   selector: 'app-profile',
-  imports: [TopicCard, FormField, ConfirmPasswordModal, Button, Dividers, Error, Input],
+  imports: [TopicCard, FormField, ConfirmPasswordModal, Button, Dividers, Error, Input, Title],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })

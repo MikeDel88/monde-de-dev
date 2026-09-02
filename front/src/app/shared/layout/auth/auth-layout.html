@@ -6,6 +6,6 @@
     <img src="/assets/arrow-back.png" alt="retour" height="23" width="41">
   </button>
   <img src="/assets/logo.png" alt="Logo" height="130" width="255" class="mx-auto sm:hidden" />
-  <h2 class="mx-auto text-2xl" data-test="title">{{ title() }}</h2>
+  <app-title class="mx-auto" [content]="title()" />
   <router-outlet/>
 </div>

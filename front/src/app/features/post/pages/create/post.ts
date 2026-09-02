@@ -11,6 +11,7 @@ import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Button} from "../../../../shared/components/buttons/button";
 import {Error} from "../../../../shared/components/errors/error";
 import {Input} from "../../../../shared/components/input/input";
+import {Title} from "../../../../shared/components/title/title";
 
 export interface CreatePost {
   topicId: string,
@@ -37,7 +38,8 @@ const validationCreatePostForm = (schemaPath: SchemaPathTree<CreatePost>) => {
     FormField,
     Button,
     Error,
-    Input
+    Input,
+    Title
   ],
   templateUrl: './post.html',
   styleUrl: './post.css',
