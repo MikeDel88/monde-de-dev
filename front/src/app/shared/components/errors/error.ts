@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, InputSignal} from '@angular/core';
 
 @Component({
   selector: 'app-error',
@@ -7,5 +7,5 @@ import {Component, input} from '@angular/core';
   styleUrl: './error.css',
 })
 export class Error {
-   readonly message = input.required();
+   readonly message: InputSignal<string | undefined> = input.required();
 }
