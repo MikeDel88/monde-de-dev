@@ -8,6 +8,7 @@ import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Dividers} from "../../../../shared/components/divider/dividers";
 import {Error} from "../../../../shared/components/error/error";
 import {Title} from "../../../../shared/components/title/title";
+import {Back} from "../../../../shared/components/back/back";
 
 export interface CreateComment {
   content: string
@@ -28,7 +29,8 @@ const validationCreateCommentForm = (schemaPath: SchemaPathTree<CreateComment>) 
     FormField,
     Dividers,
     Error,
-    Title
+    Title,
+    Back
   ],
   templateUrl: './post-detail.html',
   styleUrl: './post-detail.css',

@@ -1,8 +1,6 @@
 <div class="flex flex-col p-6">
   <div class="flex flex-col items-center gap-2 sm:relative sm:flex-row sm:items-center sm:justify-center sm:gap-0">
-    <button class="self-start sm:absolute sm:left-0 sm:top-1/2 sm:-translate-y-1/2 hover:cursor-pointer" (click)="onBack()" data-test="btn-back">
-      <img src="/assets/arrow-back.png" alt="retour" height="23" width="41">
-    </button>
+    <app-back class="self-start sm:absolute sm:left-0 sm:top-1/2 sm:-translate-y-1/2" (nav)="onBack()"/>
     <app-title class="font-bold" [content]="title" />
   </div>
   <form (submit)="onSubmit($event)" (focusin)="onFocus()" class="flex flex-col gap-2 w-full lg:w-1/2 2xl:w-1/6 mx-auto p-6">

@@ -12,6 +12,7 @@ import {Button} from "../../../../shared/components/button/button";
 import {Error} from "../../../../shared/components/error/error";
 import {Input} from "../../../../shared/components/input/input";
 import {Title} from "../../../../shared/components/title/title";
+import {Back} from "../../../../shared/components/back/back";
 
 export interface CreatePost {
   topicId: string,
@@ -39,7 +40,8 @@ const validationCreatePostForm = (schemaPath: SchemaPathTree<CreatePost>) => {
     Button,
     Error,
     Input,
-    Title
+    Title,
+    Back
   ],
   templateUrl: './post.html',
   styleUrl: './post.css',
