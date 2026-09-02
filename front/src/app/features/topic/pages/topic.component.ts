@@ -17,10 +17,9 @@ export class TopicComponent {
 
   private topicService = inject(TopicService);
   private destroyRef = inject(DestroyRef);
-  topics!: HttpResourceRef<Topic[] | undefined>;
+  topics: HttpResourceRef<Topic[] | undefined> = this.topicService.topics;
 
   constructor() {
-    this.topics = this.topicService.topics;
     this.topics.reload();
   }
 
