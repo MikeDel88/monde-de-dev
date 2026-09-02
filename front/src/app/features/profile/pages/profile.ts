@@ -18,6 +18,7 @@ import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Button} from "../../../shared/components/buttons/button";
 import {Dividers} from "../../../shared/components/dividers/dividers";
 import {Error} from "../../../shared/components/errors/error";
+import {Input} from "../../../shared/components/input/input";
 
 
 export interface ProfileData {
@@ -42,7 +43,7 @@ const validationProfileForm = (schemaPath: SchemaPathTree<ProfileData>) => {
 
 @Component({
   selector: 'app-profile',
-  imports: [TopicCard, FormField, ConfirmPasswordModal, Button, Dividers, Error],
+  imports: [TopicCard, FormField, ConfirmPasswordModal, Button, Dividers, Error, Input],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
@@ -58,6 +59,7 @@ export class Profile {
   readonly titleSubscription: string= "Abonnements";
   readonly titleProfilUser: string = "Profil utilisateur";
   readonly btnSaveProfilUser: string = "Sauvegarder";
+  readonly placeholderPassword: string = "Nouveau mot de passe"
 
   error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
   showPasswordModal: WritableSignal<boolean> = signal(false);

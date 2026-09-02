@@ -17,14 +17,7 @@
         <app-error data-test="error-topic" [message]="error.message"/>
       }
     }
-    <input type="text" data-test="title" [formField]="postForm.title"
-           [placeholder]="titlePlaceholder"
-           class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-    @if (postForm.title().touched() && postForm.title().invalid()) {
-      @for (error of postForm.title().errors(); track error) {
-        <app-error data-test="error-title" [message]="error.message"/>
-      }
-    }
+    <app-input type="text" data-test="title" errorDataTest="error-title" [formField]="postForm.title" [placeholder]="titlePlaceholder" />
     <textarea data-test="content" [formField]="postForm.content"
             [placeholder]="contentPlaceholder"
            class="h-50 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">

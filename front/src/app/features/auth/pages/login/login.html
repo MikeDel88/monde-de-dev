@@ -1,27 +1,7 @@
 <form (submit)="onSubmit($event)" (focusin)="onFocus()" class="flex flex-col gap-2 w-full lg:w-1/2 2xl:w-1/6 mx-auto p-6">
-  <label class="flex flex-col gap-1 text-sm font-medium text-gray-700">
-    {{ labelEmailOrName }}
-    <input type="text" data-test="name" [formField]="loginForm.emailOrName"
-           class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-  </label>
-  @if (loginForm.emailOrName().touched() && loginForm.emailOrName().invalid()) {
-    @for (error of loginForm.emailOrName().errors(); track error) {
-      <app-error data-test="error-name" [message]="error.message" />
-    }
-  }
-  <label class="flex flex-col gap-1 text-sm font-medium text-gray-700">
-    {{ labelPassword }}
-    <input type="password" data-test="password" [formField]="loginForm.password"
-           class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-  </label>
-  @if (loginForm.password().touched() && loginForm.password().invalid()) {
-    @for (error of loginForm.password().errors(); track error) {
-      <app-error data-test="error-password" [message]="error.message" />
-    }
-  }
-  @if (error()) {
-    <app-error data-test="error" [message]="error()" />
-  }
+  <app-input [label]="labelEmailOrName" type="text" data-test="name" errorDataTest="error-name" [formField]="loginForm.emailOrName" />
+  <app-input [label]="labelPassword" type="password" data-test="password" errorDataTest="error-password" [formField]="loginForm.password"/>
+  <app-error data-test="error" [message]="error()" />
   <app-button
     type="submit"
     class="self-center"
