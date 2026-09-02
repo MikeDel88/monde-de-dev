@@ -27,15 +27,11 @@
       @if (error()) {
         <p class="text-sm text-error" data-test="error">{{ error() }}</p>
       }
-      <button
+      <app-button
         type="submit"
+        [text]="btnSaveProfilUser"
         [disabled]="!profileForm().dirty()"
-        [ngClass]="profileForm().dirty() ? 'bg-primary hover:bg-primary-hover' : 'bg-btn-disabled'"
-        data-test="btn-submit"
-        class="self-center hover:cursor-pointer text-white rounded-md px-4 py-2 my-2 font-medium "
-      >
-        {{ btnSaveProfilUser }}
-      </button>
+      />
     </form>
     <app-confirm-password-modal
       [open]="showPasswordModal()"
