@@ -1,20 +1,39 @@
-@if (post.hasValue()) {
-  @let post = this.post.value();
-  <div class="flex flex-col gap-4 bg-card p-4 rounded-lg h-full">
-    <h6 class="font-bold text-md">{{ post.title }}</h6>
-    <div class="flex flex-row w-1/2 justify-between flex-wrap-reverse">
-      <p>{{ post.date | date: 'dd/MM/YYYY' }}</p>
-      <p>{{ post.author }}</p>
-      <p>{{ post.topicName }}</p>
-    </div>
-    <p>{{ post.content }}</p>
-    @for (comment of post.comments; track comment.content) {
-      <div class="border-l-4 border-blue-500 pl-4">
-        <p class="font-semibold">{{ comment.author }}</p>
-        <p>{{ comment.content }}</p>
-      </div>
-    } @empty {
-      <p>Aucun commentaire</p>
+
+<div class="flex flex-col p-6 gap-4">
+  <div class="flex flex-row items-center gap-4 flex-wrap">
+    <button class="hover:cursor-pointer" (click)="onBack()" data-test="btn-back">
+      <img src="/assets/arrow-back.png" alt="retour" height="23" width="41">
+    </button>
+    @if (this.post.hasValue()) {
+      <h3 class="text-2xl font-bold">{{ this.post.value().title }}</h3>
     }
   </div>
-}
+  <div class="flex flex-col flex-wrap sm:px-14 gap-4 w-full">
+    @if (this.post.hasValue()) {
+      <div class="flex flex-row gap-12">
+        <p>{{ this.post.value().date | date:"dd/MM/YYYY" }}</p>
+        <p>{{ this.post.value().author }}</p>
+        <p>{{ this.post.value().topicName }}</p>
+      </div>
+      <p class="text-md">{{ this.post.value().content }}</p>
+      @if(this.post.value().comments.length > 0) {
+        <hr class="grow border-t border-black w-full mx-auto gap-4">
+        <div class="flex flex-col gap-4">
+          <p>{{ titleComments }}</p>
+          <div class="flex flex-col sm:px-8 gap-4">
+            @for (comment of this.post.value().comments; track comment.content) {
+              <div class="flex flex-col gap-2 items-end sm:w-1/2 sm:mx-auto sm:flex-row sm:items-start sm:gap-4">
+                <p class="w-28.5 text-end sm:text-start">{{ comment.author }}</p>
+                <div class="flex flex-col w-full gap-4 bg-card p-4 rounded-lg h-full">
+                  {{ comment.content }}
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>
+
+
