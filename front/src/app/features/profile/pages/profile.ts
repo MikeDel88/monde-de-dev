@@ -15,9 +15,9 @@ import {
 } from "@angular/forms/signals";
 import {TopicService} from "../../topic/services/topic-service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {Button} from "../../../shared/components/buttons/button";
-import {Dividers} from "../../../shared/components/dividers/dividers";
-import {Error} from "../../../shared/components/errors/error";
+import {Button} from "../../../shared/components/button/button";
+import {Dividers} from "../../../shared/components/divider/dividers";
+import {Error} from "../../../shared/components/error/error";
 import {Input} from "../../../shared/components/input/input";
 import {Title} from "../../../shared/components/title/title";
 

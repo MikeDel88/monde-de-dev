@@ -1,6 +1,6 @@
 import {Component, input, InputSignal, model, ModelSignal, output, OutputEmitterRef} from '@angular/core';
 import {ValidationError} from '@angular/forms/signals';
-import {Error} from '../errors/error';
+import {Error} from '../error/error';
 
 @Component({
   selector: 'app-input',

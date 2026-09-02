@@ -8,8 +8,8 @@ import {FieldState, FieldTree, form, FormField, required, SchemaPathTree} from "
 import {FormsModule} from "@angular/forms";
 import {PostService} from "../../services/post-service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {Button} from "../../../../shared/components/buttons/button";
-import {Error} from "../../../../shared/components/errors/error";
+import {Button} from "../../../../shared/components/button/button";
+import {Error} from "../../../../shared/components/error/error";
 import {Input} from "../../../../shared/components/input/input";
 import {Title} from "../../../../shared/components/title/title";
 

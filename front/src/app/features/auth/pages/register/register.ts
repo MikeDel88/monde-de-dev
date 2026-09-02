@@ -10,10 +10,10 @@ import {
 } from '@angular/forms/signals';
 import {AuthService} from "../../services/auth-service";
 import {RegisterData} from "../../models/register-data";
-import {Toast} from "../../../../shared/components/toasts/toast";
+import {Toast} from "../../../../shared/components/toast/toast";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {Button} from "../../../../shared/components/buttons/button";
-import {Error as AppError} from "../../../../shared/components/errors/error";
+import {Button} from "../../../../shared/components/button/button";
+import {Error as AppError} from "../../../../shared/components/error/error";
 import {Input} from "../../../../shared/components/input/input";
 
 const initialRegisterData: RegisterData = {

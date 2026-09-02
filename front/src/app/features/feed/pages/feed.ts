@@ -4,7 +4,7 @@ import {FeedService} from "../services/feed-service";
 import {HttpResourceRef} from "@angular/common/http";
 import {PostFeed} from "../models/post-feed";
 import {Router} from "@angular/router";
-import {Button} from "../../../shared/components/buttons/button";
+import {Button} from "../../../shared/components/button/button";
 
 @Component({
   selector: 'app-feed',

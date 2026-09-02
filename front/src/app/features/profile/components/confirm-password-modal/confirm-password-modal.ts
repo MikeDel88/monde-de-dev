@@ -1,6 +1,6 @@
 import {Component, effect, ElementRef, viewChild, input, output, signal, WritableSignal} from '@angular/core';
 import {FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
-import {Error} from "../../../../shared/components/errors/error";
+import {Error} from "../../../../shared/components/error/error";
 
 interface ConfirmPasswordData {
   currentPassword: string;

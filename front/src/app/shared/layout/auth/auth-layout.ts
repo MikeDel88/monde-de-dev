@@ -3,10 +3,11 @@ import {ActivatedRoute, NavigationEnd, Router, RouterOutlet} from "@angular/rout
 import {filter, map, startWith} from "rxjs";
 import {toSignal} from "@angular/core/rxjs-interop";
 import {Title} from "../../components/title/title";
+import {Back} from "../../components/back/back";
 
 @Component({
   selector: 'app-auth-layout',
-  imports: [RouterOutlet, Title],
+  imports: [RouterOutlet, Title, Back],
   templateUrl: './auth-layout.html',
   styleUrl: './auth-layout.css',
 })

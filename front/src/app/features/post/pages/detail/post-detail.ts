@@ -5,8 +5,8 @@ import {HttpResourceRef} from "@angular/common/http";
 import {DatePipe} from "@angular/common";
 import {FieldState, FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {Dividers} from "../../../../shared/components/dividers/dividers";
-import {Error} from "../../../../shared/components/errors/error";
+import {Dividers} from "../../../../shared/components/divider/dividers";
+import {Error} from "../../../../shared/components/error/error";
 import {Title} from "../../../../shared/components/title/title";
 
 export interface CreateComment {

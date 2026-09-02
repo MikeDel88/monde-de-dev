@@ -8,5 +8,6 @@ import {RouterLink} from "@angular/router";
   styleUrl: './home.css',
 })
 export class Home {
-
+  login = "Se connecter";
+  register = "S'inscrire";
 }

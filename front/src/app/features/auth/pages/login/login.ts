@@ -4,8 +4,8 @@ import {AuthService} from "../../services/auth-service";
 import {Router} from "@angular/router";
 import {LoginData} from "../../models/login-data";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {Button} from "../../../../shared/components/buttons/button";
-import {Error as AppError} from "../../../../shared/components/errors/error";
+import {Button} from "../../../../shared/components/button/button";
+import {Error as AppError} from "../../../../shared/components/error/error";
 import {Input} from "../../../../shared/components/input/input";
 
 const initialLoginData: LoginData = {
