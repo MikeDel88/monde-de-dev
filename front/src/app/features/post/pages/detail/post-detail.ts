@@ -5,6 +5,7 @@ import {HttpResourceRef} from "@angular/common/http";
 import {DatePipe} from "@angular/common";
 import {FieldState, FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {Dividers} from "../../../../shared/components/dividers/dividers";
 
 export interface CreateComment {
   content: string
@@ -22,7 +23,8 @@ const validationCreateCommentForm = (schemaPath: SchemaPathTree<CreateComment>) 
   selector: 'app-post-detail',
   imports: [
     DatePipe,
-    FormField
+    FormField,
+    Dividers
   ],
   templateUrl: './post-detail.html',
   styleUrl: './post-detail.css',
