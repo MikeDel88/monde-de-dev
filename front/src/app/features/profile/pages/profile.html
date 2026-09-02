@@ -24,9 +24,7 @@
           <app-error data-test="error-password" [message]="error.message" />
         }
       }
-      @if (error()) {
-        <app-error data-test="error" [message]="error()" />
-      }
+      <app-error data-test="error" [message]="error()" />
       <app-button
         type="submit"
         class="self-center"

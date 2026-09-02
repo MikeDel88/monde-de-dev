@@ -32,9 +32,7 @@
           </div>
         </div>
       }
-      @if (error()) {
-        <app-error data-test="error" [message]="error()"/>
-      }
+      <app-error data-test="error" [message]="error()"/>
       <form class="flex flex-row gap-4 sm:px-8 sm:w-1/2 sm:mx-auto" (submit)="onSubmitComment($event)">
         <textarea class="flex-1 border rounded-2xl h-30 p-4" [formField]="commentForm.content" [placeholder]="placeholderComment"></textarea>
         <button type="submit" class="hover:cursor-pointer">
