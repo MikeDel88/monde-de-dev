@@ -16,8 +16,8 @@
         <p>{{ this.post.value().topicName }}</p>
       </div>
       <p class="text-md">{{ this.post.value().content }}</p>
+      <hr class="grow border-t border-black w-full mx-auto gap-4">
       @if(this.post.value().comments.length > 0) {
-        <hr class="grow border-t border-black w-full mx-auto gap-4">
         <div class="flex flex-col gap-4">
           <p>{{ titleComments }}</p>
           <div class="flex flex-col sm:px-8 gap-4">
@@ -32,6 +32,15 @@
           </div>
         </div>
       }
+      @if (error()) {
+        <p class="text-sm text-error" data-test="error">{{ error() }}</p>
+      }
+      <form class="flex flex-row gap-4 sm:px-8 sm:w-1/2 sm:mx-auto" (submit)="onSubmitComment($event)">
+        <textarea class="flex-1 border rounded-2xl h-30 p-4" [formField]="commentForm.content" [placeholder]="placeholderComment"></textarea>
+        <button type="submit" class="hover:cursor-pointer">
+          <img src="/assets/send.png" alt="Envoyer">
+        </button>
+      </form>
     }
   </div>
 </div>

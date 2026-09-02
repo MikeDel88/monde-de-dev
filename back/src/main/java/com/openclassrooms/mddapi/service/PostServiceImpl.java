@@ -1,5 +1,6 @@
 package com.openclassrooms.mddapi.service;
 
+import com.openclassrooms.mddapi.dto.request.CommentRequest;
 import com.openclassrooms.mddapi.dto.request.PostRequest;
 import com.openclassrooms.mddapi.dto.response.PostFeedResponse;
 import com.openclassrooms.mddapi.dto.response.PostResponse;
@@ -105,5 +106,25 @@ public class PostServiceImpl implements PostService {
                 .toList();
 
         return postMapper.toPostResponse(post, commentMapper.toCommentResponseList(comments));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public void createComment(Long postId, CommentRequest commentRequest, Long userId) {
+        log.info("service: createComment");
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        Post post = postRepository.findById(postId).orElseThrow(TopicNotFoundException::new);
+
+        // si l'utilisateur n'est pas abonné au topic du post, on lève une exception
+        if(user.getTopics().stream().noneMatch(post.getTopic()::equals)) {
+            throw new TopicNotFoundException();
+        }
+
+        Comment newComment = commentMapper.toComment(commentRequest, user, post);
+        post.getComments().add(newComment);
+        postRepository.save(post);
     }
 }
