@@ -1,9 +1,9 @@
 <div class="flex flex-col">
   <div class="flex flex-col border-b border-b-black">
-    <img src="/assets/logo.png" alt="Logo" height="80" width="140" class="self-start py-4 px-2 not-sm:hidden" />
+    <app-logo [width]="140" [height]="80" class="self-start py-4 px-2 not-sm:hidden" />
   </div>
   <app-back (nav)="onBack()"/>
-  <img src="/assets/logo.png" alt="Logo" height="130" width="255" class="mx-auto sm:hidden" />
+  <app-logo [width]="255" [height]="130" class="mx-auto sm:hidden"/>
   <app-title class="mx-auto" [content]="title()" />
   <router-outlet/>
 </div>

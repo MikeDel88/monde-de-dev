@@ -3,6 +3,7 @@ import {NgTemplateOutlet} from "@angular/common";
 import {Router, RouterLink, RouterLinkActive, RouterOutlet} from "@angular/router";
 import {SessionService} from "../../../core/services/session-service";
 import {MenuBehavior} from "../../directives/menu-behavior";
+import {Logo} from "../../components/logo/logo";
 
 @Component({
   selector: 'app-main-layout',
@@ -12,7 +13,7 @@ import {MenuBehavior} from "../../directives/menu-behavior";
       outputs: ['menuClosed'],
     },
   ],
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Logo],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.css',
 })
