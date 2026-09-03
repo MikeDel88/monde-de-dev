@@ -35,5 +35,9 @@
         }
       </div>
     }
+  } @else if (profile.isLoading()) {
+    <app-loader data-test="loader"/>
+  } @else if (profile.error()) {
+    <app-error data-test="error" [message]="profile.error()?.message"/>
   }
 </div>

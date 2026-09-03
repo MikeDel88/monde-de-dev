@@ -25,5 +25,9 @@
         <app-post-card class="hover:cursor-pointer" [post]="post" (clickPost)="onClickPost($event)"/>
       }
     </div>
+  } @else if (posts.isLoading()) {
+    <app-loader data-test="loader"/>
+  } @else if (posts.error()) {
+    <app-error data-test="error" [message]="posts.error()?.message"/>
   }
 </div>

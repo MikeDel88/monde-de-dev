@@ -1,6 +1,7 @@
 import {Component, input, output} from '@angular/core';
 import {Topic} from "../../../topic/models/topic";
 import {Button} from "../../../../shared/components/button/button";
+import {Title} from "../../../../shared/components/title/title";
 
 type BtnUnsubscribed = {
   disabled: boolean;
@@ -9,7 +10,7 @@ type BtnUnsubscribed = {
 
 @Component({
   selector: 'app-topic-card',
-  imports: [Button],
+  imports: [Button, Title],
   templateUrl: './topic-card.html',
   styleUrl: './topic-card.css',
 })

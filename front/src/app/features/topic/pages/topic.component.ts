@@ -4,13 +4,17 @@ import {TopicService} from "../services/topic-service";
 import {Topic} from "../models/topic";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {TopicCard} from "../../feed/components/topic-card/topic-card";
+import {Error} from "../../../shared/components/error/error";
+import {Loader} from "../../../shared/components/loader/loader";
 
 @Component({
   selector: 'app-topic',
   templateUrl: './topic.component.html',
   styleUrls: ['./topic.component.css'],
   imports: [
-    TopicCard
+    TopicCard,
+    Error,
+    Loader
   ]
 })
 export class TopicComponent {

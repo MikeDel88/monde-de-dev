@@ -9,6 +9,7 @@ import {Dividers} from "../../../../shared/components/divider/dividers";
 import {Error} from "../../../../shared/components/error/error";
 import {Title} from "../../../../shared/components/title/title";
 import {Back} from "../../../../shared/components/back/back";
+import {Loader} from "../../../../shared/components/loader/loader";
 
 export interface CreateComment {
   content: string
@@ -30,7 +31,8 @@ const validationCreateCommentForm = (schemaPath: SchemaPathTree<CreateComment>) 
     Dividers,
     Error,
     Title,
-    Back
+    Back,
+    Loader
   ],
   templateUrl: './post-detail.html',
   styleUrl: './post-detail.css',

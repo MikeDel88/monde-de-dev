@@ -52,6 +52,7 @@ export class Post {
   readonly btnText = "Créer";
   readonly titlePlaceholder = "Titre de l'article";
   readonly contentPlaceholder = "Contenu de l'article";
+  readonly selectDefault = "Sélectionner un thème";
 
   readonly router = inject(Router);
   private destroyRef = inject(DestroyRef);

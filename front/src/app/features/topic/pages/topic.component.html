@@ -5,5 +5,9 @@
         <app-topic-card [topic]="topic" (onClickSubscribe)="onSubscribe($event)"/>
       }
     </div>
+  } @else if (topics.isLoading()) {
+    <app-loader data-test="loader"/>
+  } @else if (topics.error()) {
+    <app-error data-test="error" [message]="topics.error()?.message"/>
   }
 </div>
