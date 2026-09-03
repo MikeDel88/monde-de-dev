@@ -2,7 +2,7 @@ import {Component, DestroyRef, effect, inject, signal, WritableSignal} from '@an
 import {HttpResourceRef} from "@angular/common/http";
 import {ProfileService} from "../services/profile-service";
 import {ProfileResponse} from "../models/profile-response";
-import {TopicCard} from "../../feed/components/topic-card/topic-card";
+import {TopicCard} from "../../../shared/components/topic-card/topic-card";
 import {ConfirmPasswordModal} from "../components/confirm-password-modal/confirm-password-modal";
 import {
   email,

@@ -1,7 +1,7 @@
 import {Component, input, output} from '@angular/core';
-import {Topic} from "../../../topic/models/topic";
-import {Button} from "../../../../shared/components/button/button";
-import {Title} from "../../../../shared/components/title/title";
+import {Topic} from "../../../features/topic/models/topic";
+import {Button} from "../button/button";
+import {Title} from "../title/title";
 
 type BtnUnsubscribed = {
   disabled: boolean;
