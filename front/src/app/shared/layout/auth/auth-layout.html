@@ -1,11 +1,9 @@
 <div class="flex flex-col">
   <div class="flex flex-col border-b border-b-black">
-    <img src="/assets/logo.png" alt="Logo" height="80" width="140" class="self-start py-4 px-2 not-sm:hidden" />
+    <app-logo [width]="140" [height]="80" class="self-start py-4 px-2 not-sm:hidden" />
   </div>
-  <button class="self-start p-4 m-6 hover:cursor-pointer" (click)="onBack()" data-test="btn-back">
-    <img src="/assets/arrow-back.png" alt="retour" height="23" width="41">
-  </button>
-  <img src="/assets/logo.png" alt="Logo" height="130" width="255" class="mx-auto sm:hidden" />
-  <h2 class="mx-auto text-2xl" data-test="title">{{ title() }}</h2>
+  <app-back (nav)="onBack()"/>
+  <app-logo [width]="255" [height]="130" class="mx-auto sm:hidden"/>
+  <app-title class="mx-auto" [content]="title()" />
   <router-outlet/>
 </div>

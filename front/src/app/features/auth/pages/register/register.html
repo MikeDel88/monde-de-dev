@@ -6,46 +6,17 @@
   (buttonClick)="onReset()"
 />
 <form (submit)="onSubmit($event)" (focusin)="onFocus()" class="flex flex-col gap-2 w-full lg:w-1/2 2xl:w-1/6 mx-auto p-6">
-  <label class="flex flex-col gap-1 text-sm font-medium text-gray-700">
-    {{ labelName }}
-    <input type="text" data-test="name" [formField]="registerForm.name"
-           class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-  </label>
-  @if (registerForm.name().touched() && registerForm.name().invalid()) {
-    @for (error of registerForm.name().errors(); track error) {
-      <p class="text-sm text-error" data-test="error-name">{{ error.message }}</p>
-    }
-  }
-  <label class="flex flex-col gap-1 text-sm font-medium text-gray-700">
-    {{ labelEmail }}
-    <input type="email" data-test="email" [formField]="registerForm.email"
-           class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-  </label>
-  @if (registerForm.email().touched() && registerForm.email().invalid()) {
-    @for (error of registerForm.email().errors(); track error) {
-      <p class="text-sm text-error" data-test="error-email">{{ error.message }}</p>
-    }
-  }
-  <label class="flex flex-col gap-1 text-sm font-medium text-gray-700">
-    {{ labelPassword }}
-    <input type="password" data-test="password" [formField]="registerForm.password"
-           class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-  </label>
-  @if (registerForm.password().touched() && registerForm.password().invalid()) {
-    @for (error of registerForm.password().errors(); track error) {
-      <p class="text-sm text-error" data-test="error-password">{{ error.message }}</p>
-    }
-  }
-  @if (error()) {
-    <p class="text-sm text-error" data-test="error">{{ error() }}</p>
-  }
-  <button
+  <app-input [label]="labelName" type="text" data-test="name" errorDataTest="error-name" [formField]="registerForm.name" />
+  <app-input [label]="labelEmail" type="email" data-test="email" errorDataTest="error-email" [formField]="registerForm.email" />
+  <app-input [label]="labelPassword" type="password" data-test="password" errorDataTest="error-password" [formField]="registerForm.password" />
+  <app-error data-test="error" [message]="error()" />
+  <app-button
     type="submit"
+    class="self-center"
     data-test="btn-submit"
-    class="self-center bg-primary text-white rounded-md px-4 py-2 my-2 font-medium hover:bg-primary-hover"
-  >
-    {{ btnText }}
-  </button>
+    [disabled]="false"
+    [text]="btnText"
+  />
 </form>
 
 

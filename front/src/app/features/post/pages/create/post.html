@@ -1,51 +1,36 @@
 <div class="flex flex-col p-6">
   <div class="flex flex-col items-center gap-2 sm:relative sm:flex-row sm:items-center sm:justify-center sm:gap-0">
-    <button class="self-start sm:absolute sm:left-0 sm:top-1/2 sm:-translate-y-1/2 hover:cursor-pointer" (click)="onBack()" data-test="btn-back">
-      <img src="/assets/arrow-back.png" alt="retour" height="23" width="41">
-    </button>
-    <h3 class="text-2xl text-center font-bold">{{ title }}</h3>
+    <app-back class="self-start sm:absolute sm:left-0 sm:top-1/2 sm:-translate-y-1/2" (nav)="onBack()"/>
+    <app-title class="font-bold" [content]="title" />
   </div>
   <form (submit)="onSubmit($event)" (focusin)="onFocus()" class="flex flex-col gap-2 w-full lg:w-1/2 2xl:w-1/6 mx-auto p-6">
     <select data-test="topic" [formField]="postForm.topicId" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-      <option value="" disabled selected>Sélectionner un thème</option>
+      <option value="" disabled selected>{{ selectDefault }}</option>
       @for (topic of topics(); track topic.id) {
         <option [value]="topic.id">{{ topic.title }}</option>
       }
     </select>
     @if (postForm.topicId().touched() && postForm.topicId().invalid()) {
       @for (error of postForm.topicId().errors(); track error) {
-        <p class="text-sm text-error" data-test="error-topic">{{ error.message }}</p>
+        <app-error data-test="error-topic" [message]="error.message"/>
       }
     }
-    <input type="text" data-test="title" [formField]="postForm.title"
-           [placeholder]="titlePlaceholder"
-           class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-    @if (postForm.title().touched() && postForm.title().invalid()) {
-      @for (error of postForm.title().errors(); track error) {
-        <p class="text-sm text-error" data-test="error-title">{{ error.message }}</p>
-      }
-    }
+    <app-input type="text" data-test="title" errorDataTest="error-title" [formField]="postForm.title" [placeholder]="titlePlaceholder" />
     <textarea data-test="content" [formField]="postForm.content"
             [placeholder]="contentPlaceholder"
            class="h-50 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
     </textarea>
     @if (postForm.content().touched() && postForm.content().invalid()) {
       @for (error of postForm.content().errors(); track error) {
-        <p class="text-sm text-error" data-test="error-content">{{ error.message }}</p>
+        <app-error data-test="error-content" [message]="error.message"/>
       }
     }
-    @if (error()) {
-      <p class="text-sm text-error" data-test="error">{{ error() }}</p>
-    }
-    <button
+    <app-error data-test="error" [message]="error()"/>
+    <app-button
       type="submit"
-      [disabled]="!postForm().valid()"
-      [ngClass]="postForm().valid() ? 'bg-primary hover:bg-primary-hover' : 'bg-btn-disabled'"
-      data-test="btn-submit"
-      class="w-32.5 self-center hover:cursor-pointer text-white rounded-md px-4 py-2 my-2 font-medium "
-    >
-      {{ btnText }}
-    </button>
+      class="self-center"
+      [text]="btnText"
+      [disabled]="!postForm().valid()"/>
   </form>
 </div>
 

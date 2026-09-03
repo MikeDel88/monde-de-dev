@@ -1,6 +1,7 @@
 import {Component, input, output} from '@angular/core';
-import {Topic} from "../../../topic/models/topic";
-import {NgClass} from "@angular/common";
+import {Topic} from "../../../features/topic/models/topic";
+import {Button} from "../button/button";
+import {Title} from "../title/title";
 
 type BtnUnsubscribed = {
   disabled: boolean;
@@ -9,9 +10,7 @@ type BtnUnsubscribed = {
 
 @Component({
   selector: 'app-topic-card',
-  imports: [
-    NgClass
-  ],
+  imports: [Button, Title],
   templateUrl: './topic-card.html',
   styleUrl: './topic-card.css',
 })
@@ -24,14 +23,10 @@ export class TopicCard {
   });
   readonly btnSubscribeText = "S'abonner";
 
-  onClickSubscribe = output<number>();
-  onClickUnsubscribe = output<number>();
+  readonly onClickTopic = output<number>();
 
-  onSubscribe(topidId: number) {
-    this.onClickSubscribe.emit(topidId);
+  onClick(topidId: number) {
+    this.onClickTopic.emit(topidId);
   }
 
-  onUnsubscribe(topidId: number) {
-    this.onClickUnsubscribe.emit(topidId);
-  }
 }

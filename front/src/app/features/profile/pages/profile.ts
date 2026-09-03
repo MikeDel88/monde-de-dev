@@ -2,7 +2,7 @@ import {Component, DestroyRef, effect, inject, signal, WritableSignal} from '@an
 import {HttpResourceRef} from "@angular/common/http";
 import {ProfileService} from "../services/profile-service";
 import {ProfileResponse} from "../models/profile-response";
-import {TopicCard} from "../../feed/components/topic-card/topic-card";
+import {TopicCard} from "../../../shared/components/topic-card/topic-card";
 import {ConfirmPasswordModal} from "../components/confirm-password-modal/confirm-password-modal";
 import {
   email,
@@ -15,14 +15,19 @@ import {
 } from "@angular/forms/signals";
 import {TopicService} from "../../topic/services/topic-service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {NgClass} from "@angular/common";
+import {Button} from "../../../shared/components/button/button";
+import {Dividers} from "../../../shared/components/divider/dividers";
+import {Error} from "../../../shared/components/error/error";
+import {Input} from "../../../shared/components/input/input";
+import {Title} from "../../../shared/components/title/title";
+import {Loader} from "../../../shared/components/loader/loader";
 
 
 export interface ProfileData {
   name: string;
   email: string,
   password: string,
-};
+}
 
 const initialProfileData: ProfileData = {
   name: "",
@@ -40,7 +45,7 @@ const validationProfileForm = (schemaPath: SchemaPathTree<ProfileData>) => {
 
 @Component({
   selector: 'app-profile',
-  imports: [TopicCard, FormField, ConfirmPasswordModal, NgClass],
+  imports: [TopicCard, FormField, ConfirmPasswordModal, Button, Dividers, Error, Input, Title, Loader],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
@@ -56,6 +61,7 @@ export class Profile {
   readonly titleSubscription: string= "Abonnements";
   readonly titleProfilUser: string = "Profil utilisateur";
   readonly btnSaveProfilUser: string = "Sauvegarder";
+  readonly placeholderPassword: string = "Nouveau mot de passe"
 
   error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
   showPasswordModal: WritableSignal<boolean> = signal(false);

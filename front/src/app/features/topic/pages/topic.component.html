@@ -2,8 +2,12 @@
   @if(topics.hasValue()) {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-10 py-8">
       @for (topic of topics.value(); track topic.id) {
-        <app-topic-card [topic]="topic" (onClickSubscribe)="onSubscribe($event)"/>
+        <app-topic-card [topic]="topic" (onClickTopic)="onSubscribe($event)"/>
       }
     </div>
+  } @else if (topics.isLoading()) {
+    <app-loader data-test="loader"/>
+  } @else if (topics.error()) {
+    <app-error data-test="error" [message]="topics.error()?.message"/>
   }
 </div>

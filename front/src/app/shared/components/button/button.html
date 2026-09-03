@@ -1,0 +1,22 @@
+@switch (display()) {
+  @case ('normal') {
+    <button
+      [type]="type()"
+      [disabled]="disabled()"
+      class="text-white rounded-md px-4 py-2 my-2 font-bold"
+      [ngClass] = "disabled() ? 'bg-btn-disabled' : 'bg-primary hover:bg-primary-hover hover:cursor-pointer'"
+    >
+      {{ text() }}
+    </button>
+  }
+  @case ('outlined') {
+    <button
+      [type]="type()"
+      [disabled]="disabled()"
+      class="text-primary rounded-md px-4 py-2 my-2 font-bold"
+      [ngClass] = "disabled() ? 'bg-btn-disabled' : 'border border-primary hover:cursor-pointer'"
+    >
+      {{ text() }}
+    </button>
+  }
+}

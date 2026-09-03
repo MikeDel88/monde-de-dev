@@ -3,28 +3,32 @@ import {HttpResourceRef} from "@angular/common/http";
 import {TopicService} from "../services/topic-service";
 import {Topic} from "../models/topic";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {TopicCard} from "../../feed/components/topic-card/topic-card";
+import {TopicCard} from "../../../shared/components/topic-card/topic-card";
+import {Error} from "../../../shared/components/error/error";
+import {Loader} from "../../../shared/components/loader/loader";
 
 @Component({
   selector: 'app-topic',
   templateUrl: './topic.component.html',
   styleUrls: ['./topic.component.css'],
   imports: [
-    TopicCard
+    TopicCard,
+    Error,
+    Loader
   ]
 })
 export class TopicComponent {
 
   private topicService = inject(TopicService);
   private destroyRef = inject(DestroyRef);
-  topics!: HttpResourceRef<Topic[] | undefined>;
+  topics: HttpResourceRef<Topic[] | undefined> = this.topicService.topics;
 
   constructor() {
-    this.topics = this.topicService.topics;
     this.topics.reload();
   }
 
   onSubscribe(topicId: number) {
+    console.log("onSubscribe", topicId);
     this.topicService.subscribe$(topicId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

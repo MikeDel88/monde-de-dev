@@ -1,5 +1,8 @@
 import {Component, effect, ElementRef, viewChild, input, output, signal, WritableSignal} from '@angular/core';
 import {FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
+import {Title} from "../../../../shared/components/title/title";
+import {Input} from "../../../../shared/components/input/input";
+import {Button} from "../../../../shared/components/button/button";
 
 interface ConfirmPasswordData {
   currentPassword: string;
@@ -13,7 +16,7 @@ const validation = (schemaPath: SchemaPathTree<ConfirmPasswordData>) => {
 
 @Component({
   selector: 'app-confirm-password-modal',
-  imports: [FormField],
+  imports: [FormField, Title, Input, Button],
   templateUrl: './confirm-password-modal.html',
 })
 export class ConfirmPasswordModal {

@@ -1,0 +1,11 @@
+@let topic = this.topic();
+<div class="flex flex-col gap-4 bg-card p-4 rounded-lg">
+  <app-title class="font-bold" [content]="topic.title"/>
+  <p>{{ topic.description }}</p>
+    <app-button
+      type="button"
+      class="self-center"
+      (click)="onClick(topic.id)"
+      [disabled]="topic.subscribed ? btnUnsubscribed().disabled : false"
+      [text]="topic.subscribed ? btnUnsubscribed().text : btnSubscribeText"/>
+</div>

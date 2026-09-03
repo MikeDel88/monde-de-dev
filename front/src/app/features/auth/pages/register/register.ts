@@ -10,8 +10,11 @@ import {
 } from '@angular/forms/signals';
 import {AuthService} from "../../services/auth-service";
 import {RegisterData} from "../../models/register-data";
-import {Toast} from "../../../../shared/components/toasts/toast";
+import {Toast} from "../../../../shared/components/toast/toast";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {Button} from "../../../../shared/components/button/button";
+import {Error as AppError} from "../../../../shared/components/error/error";
+import {Input} from "../../../../shared/components/input/input";
 
 const initialRegisterData: RegisterData = {
   name: "",
@@ -34,7 +37,7 @@ const validationRegisterForm = (schemaPath: SchemaPathTree<RegisterData>) => {
 
 @Component({
   selector: 'app-register',
-  imports: [FormField, Toast],
+  imports: [FormField, Toast, Button, AppError, Input],
   templateUrl: './register.html',
   styleUrl: './register.css',
 })
@@ -64,6 +67,10 @@ export class Register {
 
   onSubmit(event: Event): void {
     event.preventDefault();
+    this.registerForm().markAsTouched();
+    if (this.registerForm().invalid()) {
+      return;
+    }
     const credentials: FieldState<RegisterData> = this.registerForm();
     this.authService.register$(credentials.value())
       .pipe(takeUntilDestroyed(this.destroyRef))

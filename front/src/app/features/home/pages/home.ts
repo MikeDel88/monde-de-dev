@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
 import {RouterLink} from "@angular/router";
+import {Logo} from "../../../shared/components/logo/logo";
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink],
+  imports: [RouterLink, Logo],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
 export class Home {
-
+  login = "Se connecter";
+  register = "S'inscrire";
 }

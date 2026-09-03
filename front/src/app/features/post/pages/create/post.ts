@@ -6,9 +6,13 @@ import {Topic} from "../../../topic/models/topic";
 import {Router} from "@angular/router";
 import {FieldState, FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
 import {FormsModule} from "@angular/forms";
-import {NgClass} from "@angular/common";
 import {PostService} from "../../services/post-service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {Button} from "../../../../shared/components/button/button";
+import {Error} from "../../../../shared/components/error/error";
+import {Input} from "../../../../shared/components/input/input";
+import {Title} from "../../../../shared/components/title/title";
+import {Back} from "../../../../shared/components/back/back";
 
 export interface CreatePost {
   topicId: string,
@@ -33,7 +37,11 @@ const validationCreatePostForm = (schemaPath: SchemaPathTree<CreatePost>) => {
   imports: [
     FormsModule,
     FormField,
-    NgClass
+    Button,
+    Error,
+    Input,
+    Title,
+    Back
   ],
   templateUrl: './post.html',
   styleUrl: './post.css',
@@ -44,6 +52,7 @@ export class Post {
   readonly btnText = "Créer";
   readonly titlePlaceholder = "Titre de l'article";
   readonly contentPlaceholder = "Contenu de l'article";
+  readonly selectDefault = "Sélectionner un thème";
 
   readonly router = inject(Router);
   private destroyRef = inject(DestroyRef);

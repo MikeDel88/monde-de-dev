@@ -4,6 +4,9 @@ import {AuthService} from "../../services/auth-service";
 import {Router} from "@angular/router";
 import {LoginData} from "../../models/login-data";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {Button} from "../../../../shared/components/button/button";
+import {Error as AppError} from "../../../../shared/components/error/error";
+import {Input} from "../../../../shared/components/input/input";
 
 const initialLoginData: LoginData = {
   emailOrName: "",
@@ -21,7 +24,7 @@ const validationLoginForm = (schemaPath: SchemaPathTree<LoginData>) => {
   selector: 'app-login',
   templateUrl: './login.html',
   styleUrl: './login.css',
-  imports: [FormField]
+  imports: [FormField, Button, AppError, Input]
 })
 export class Login {
 
@@ -42,6 +45,10 @@ export class Login {
 
   onSubmit(event: Event): void {
     event.preventDefault();
+    this.loginForm().markAsTouched();
+    if (this.loginForm().invalid()) {
+      return;
+    }
     const credentials: FieldState<LoginData> = this.loginForm();
     this.authService.login$(credentials.value())
       .pipe(takeUntilDestroyed(this.destroyRef))

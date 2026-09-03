@@ -1,41 +1,21 @@
-<div class="flex flex-col p-4">
+<div class="flex flex-col p-4 gap-4">
   @if (profile.hasValue()) {
-    <h3 class="w-full text-center font-bold text-2xl">{{ titleProfilUser }}</h3>
+    <app-title class="font-bold" [content]="titleProfilUser" />
     <form (submit)="onSubmit($event)" (focusin)="onFocus()" class="flex flex-col gap-2 w-full lg:w-1/2 2xl:w-1/6 mx-auto p-6">
-      <input type="text" data-test="name" [formField]="profileForm.name"
-             class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-      @if (profileForm.name().touched() && profileForm.name().invalid()) {
-        @for (error of profileForm.name().errors(); track error) {
-          <p class="text-sm text-error" data-test="error-name">{{ error.message }}</p>
-        }
-      }
-      <input type="text" data-test="name" [formField]="profileForm.email"
-             class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-      @if (profileForm.email().touched() && profileForm.email().invalid()) {
-        @for (error of profileForm.email().errors(); track error) {
-          <p class="text-sm text-error" data-test="error-name">{{ error.message }}</p>
-        }
-      }
-      <input type="password" data-test="password" [formField]="profileForm.password"
-             placeholder="Nouveau mot de passe"
-             class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-      @if (profileForm.password().touched() && profileForm.password().invalid()) {
-        @for (error of profileForm.password().errors(); track error) {
-          <p class="text-sm text-error" data-test="error-password">{{ error.message }}</p>
-        }
-      }
-      @if (error()) {
-        <p class="text-sm text-error" data-test="error">{{ error() }}</p>
-      }
-      <button
+      <app-input type="text" data-test="name" errorDataTest="error-name"
+                 [formField]="profileForm.name" />
+      <app-input type="email" data-test="email" errorDataTest="error-email"
+                 [formField]="profileForm.email" />
+      <app-input type="password" data-test="password" errorDataTest="error-password"
+                 [formField]="profileForm.password"
+                 [placeholder]="placeholderPassword"/>
+      <app-error data-test="error" [message]="error()" />
+      <app-button
         type="submit"
+        class="self-center"
+        [text]="btnSaveProfilUser"
         [disabled]="!profileForm().dirty()"
-        [ngClass]="profileForm().dirty() ? 'bg-primary hover:bg-primary-hover' : 'bg-btn-disabled'"
-        data-test="btn-submit"
-        class="self-center hover:cursor-pointer text-white rounded-md px-4 py-2 my-2 font-medium "
-      >
-        {{ btnSaveProfilUser }}
-      </button>
+      />
     </form>
     <app-confirm-password-modal
       [open]="showPasswordModal()"
@@ -43,17 +23,21 @@
       (cancel)="showPasswordModal.set(false)"
     />
     @if (profile.value().topics.length > 0) {
-      <hr class="grow border-t border-black w-11/12 mx-auto my-10">
-      <h3 class="w-full text-center font-bold text-2xl">{{ titleSubscription }}</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-10 py-8">
+      <app-dividers class="w-11/12 mx-auto"/>
+      <app-title  class="font-bold" [content]="titleSubscription" />
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
         @for (topic of profile.value().topics; track topic.id) {
           <app-topic-card
             [topic]="topic"
             [btnUnsubscribed]="{ disabled: false, text: btnUnsubscribed }"
-            (onClickUnsubscribe)="onUnsubscribe($event)"
+            (onClickTopic)="onUnsubscribe($event)"
           />
         }
       </div>
     }
+  } @else if (profile.isLoading()) {
+    <app-loader data-test="loader"/>
+  } @else if (profile.error()) {
+    <app-error data-test="error" [message]="profile.error()?.message"/>
   }
 </div>
