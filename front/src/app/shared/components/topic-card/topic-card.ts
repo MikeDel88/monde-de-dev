@@ -23,14 +23,10 @@ export class TopicCard {
   });
   readonly btnSubscribeText = "S'abonner";
 
-  onClickSubscribe = output<number>();
-  onClickUnsubscribe = output<number>();
+  readonly onClickTopic = output<number>();
 
-  onSubscribe(topidId: number) {
-    this.onClickSubscribe.emit(topidId);
+  onClick(topidId: number) {
+    this.onClickTopic.emit(topidId);
   }
 
-  onUnsubscribe(topidId: number) {
-    this.onClickUnsubscribe.emit(topidId);
-  }
 }

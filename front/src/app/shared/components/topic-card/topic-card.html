@@ -5,7 +5,7 @@
     <app-button
       type="button"
       class="self-center"
-      (click)="topic.subscribed ? onUnsubscribe(topic.id) : onSubscribe(topic.id)"
+      (click)="onClick(topic.id)"
       [disabled]="topic.subscribed ? btnUnsubscribed().disabled : false"
       [text]="topic.subscribed ? btnUnsubscribed().text : btnSubscribeText"/>
 </div>
