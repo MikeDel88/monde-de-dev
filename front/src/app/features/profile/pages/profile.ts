@@ -91,7 +91,6 @@ export class Profile {
 
     const nameDirty = this.profileForm.name().dirty();
     const emailDirty = this.profileForm.email().dirty();
-    const passwordDirty = this.profileForm.password().dirty();
 
     if (nameDirty || emailDirty) {
       const name = nameDirty ? this.profileForm.name().value() : null;
@@ -110,7 +109,7 @@ export class Profile {
         });
     }
 
-    if (passwordDirty) {
+    if (this.checkHasNewPasswordToChange()) {
       this.pendingNewPassword = this.profileForm.password().value();
       this.showPasswordModal.set(true);
     }
@@ -134,6 +133,12 @@ export class Profile {
       .subscribe({
         complete: () => this.profile.reload(),
       })
+  }
+
+  private checkHasNewPasswordToChange(): boolean {
+    return this.profileForm.password().dirty()
+      && this.profileForm.password().valid()
+      && this.profileForm.password().value() !== '';
   }
 
 }
