@@ -1,6 +1,6 @@
 <form (submit)="onSubmit($event)" (focusin)="onFocus()" class="flex flex-col gap-2 w-full lg:w-1/2 2xl:w-1/6 mx-auto p-6">
-  <app-input [label]="labelEmailOrName" type="text" data-test="name" errorDataTest="error-name" [formField]="loginForm.emailOrName" />
-  <app-input [label]="labelPassword" type="password" data-test="password" errorDataTest="error-password" [formField]="loginForm.password"/>
+  <app-input [label]="labelEmailOrName" type="text" data-test="name" errorDataTest="error-name" aria-label="name or email" [formField]="loginForm.emailOrName" />
+  <app-input [label]="labelPassword" type="password" data-test="password" errorDataTest="error-password" aria-label="password" [formField]="loginForm.password"/>
   <app-error data-test="error" [message]="error()" />
   <app-button
     type="submit"
@@ -8,5 +8,6 @@
     data-test="btn-submit"
     [disabled]="false"
     [text]="btnText"
+    aria-label="submit login"
   />
 </form>
