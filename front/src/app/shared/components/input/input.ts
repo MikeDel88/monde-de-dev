@@ -2,6 +2,8 @@ import {Component, input, InputSignal, model, ModelSignal, output, OutputEmitter
 import {ValidationError} from '@angular/forms/signals';
 import {Error} from '../error/error';
 
+let nextInputId = 0;
+
 @Component({
   selector: 'app-input',
   imports: [Error],
@@ -9,8 +11,12 @@ import {Error} from '../error/error';
   styleUrl: './input.css',
 })
 export class Input {
+  readonly id = `app-input-${nextInputId++}`;
+  readonly errorId = `${this.id}-error`;
+
   readonly type: InputSignal<string> = input.required();
   readonly label: InputSignal<string | undefined> = input<string | undefined>(undefined);
+  readonly ariaLabel: InputSignal<string | undefined> = input<string | undefined>(undefined);
   readonly value: ModelSignal<string> = model<string>('');
   readonly touch: OutputEmitterRef<void> = output<void>();
   readonly placeholder: InputSignal<string> = input<string>("");

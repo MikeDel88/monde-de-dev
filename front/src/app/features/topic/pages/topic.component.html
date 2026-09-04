@@ -1,10 +1,13 @@
 <div class="px-6">
+  <h1 class="sr-only">Thèmes</h1>
   @if(topics.hasValue()) {
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 py-8">
+    <ul class="grid grid-cols-1 md:grid-cols-2 gap-10 py-8">
       @for (topic of topics.value(); track topic.id) {
-        <app-topic-card [topic]="topic" (onClickTopic)="onSubscribe($event)"/>
+        <li>
+          <app-topic-card [topic]="topic" (onClickTopic)="onSubscribe($event)"/>
+        </li>
       }
-    </div>
+    </ul>
   } @else if (topics.isLoading()) {
     <app-loader data-test="loader"/>
   } @else if (topics.error()) {

@@ -2,9 +2,12 @@
   <label class="flex flex-col gap-1 text-sm font-medium text-gray-700">
     {{ label() }}
     <input
+      [id]="id"
       [type]="type()"
       [placeholder]="placeholder()"
       [value]="value()"
+      [attr.aria-invalid]="touched() && invalid()"
+      [attr.aria-describedby]="touched() && invalid() ? errorId : null"
       (input)="value.set($any($event.target).value)"
       (blur)="touch.emit()"
       class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
@@ -12,9 +15,13 @@
   </label>
 } @else {
   <input
+    [id]="id"
     [type]="type()"
     [placeholder]="placeholder()"
     [value]="value()"
+    [attr.aria-label]="ariaLabel()"
+    [attr.aria-invalid]="touched() && invalid()"
+    [attr.aria-describedby]="touched() && invalid() ? errorId : null"
     (input)="value.set($any($event.target).value)"
     (blur)="touch.emit()"
     class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
@@ -22,7 +29,9 @@
 }
 
 @if (touched() && invalid()) {
-  @for (error of errors(); track error) {
-    <app-error [attr.data-test]="errorDataTest()" [message]="error.message" />
-  }
+  <div [id]="errorId">
+    @for (error of errors(); track error) {
+      <app-error [attr.data-test]="errorDataTest()" [message]="error.message" />
+    }
+  </div>
 }

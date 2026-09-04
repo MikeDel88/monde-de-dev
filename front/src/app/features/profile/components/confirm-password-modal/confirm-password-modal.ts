@@ -14,12 +14,16 @@ const validation = (schemaPath: SchemaPathTree<ConfirmPasswordData>) => {
   required(schemaPath.currentPassword, {message: 'Le mot de passe actuel est requis'});
 };
 
+let nextConfirmPasswordModalId = 0;
+
 @Component({
   selector: 'app-confirm-password-modal',
   imports: [FormField, Title, Input, Button],
   templateUrl: './confirm-password-modal.html',
 })
 export class ConfirmPasswordModal {
+  readonly titleId = `confirm-password-title-${nextConfirmPasswordModalId++}`;
+
   open = input(false);
   confirm = output<string>();
   cancel = output<void>();

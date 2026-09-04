@@ -1,10 +1,10 @@
 <div class="flex flex-col p-6">
   <div class="flex flex-col items-center gap-2 sm:relative sm:flex-row sm:items-center sm:justify-center sm:gap-0">
     <app-back class="self-start sm:absolute sm:left-0 sm:top-1/2 sm:-translate-y-1/2" (nav)="onBack()"/>
-    <app-title class="font-bold" [content]="title" />
+    <app-title class="font-bold" [content]="title" [level]="1" />
   </div>
   <form (submit)="onSubmit($event)" (focusin)="onFocus()" class="flex flex-col gap-2 w-full lg:w-1/2 2xl:w-1/6 mx-auto p-6">
-    <select data-test="topic" [formField]="postForm.topicId" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+    <select data-test="topic" aria-label="Thème" [formField]="postForm.topicId" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
       <option value="" disabled selected>{{ selectDefault }}</option>
       @for (topic of topics(); track topic.id) {
         <option [value]="topic.id">{{ topic.title }}</option>
@@ -15,8 +15,8 @@
         <app-error data-test="error-topic" [message]="error.message"/>
       }
     }
-    <app-input type="text" data-test="title" errorDataTest="error-title" [formField]="postForm.title" [placeholder]="titlePlaceholder" />
-    <textarea data-test="content" [formField]="postForm.content"
+    <app-input type="text" data-test="title" errorDataTest="error-title" ariaLabel="Titre de l'article" [formField]="postForm.title" [placeholder]="titlePlaceholder" />
+    <textarea data-test="content" aria-label="Contenu de l'article" [formField]="postForm.content"
             [placeholder]="contentPlaceholder"
            class="h-50 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
     </textarea>

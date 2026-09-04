@@ -33,8 +33,4 @@ export class MainLayout {
     this.sessionService.logOut();
     this.router.navigateByUrl('/login');
   }
-
-  onClickLogo(): void {
-    this.router.navigateByUrl('/feed');
-  }
 }

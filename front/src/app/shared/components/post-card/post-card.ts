@@ -12,6 +12,7 @@ import {PostFeed} from "../../../features/feed/models/post-feed";
 })
 export class PostCard {
     post = input.required<PostFeed>();
+    ariaLabel = input<string>();
     clickPost = output<number>();
 
     onClick(postId: number) {
