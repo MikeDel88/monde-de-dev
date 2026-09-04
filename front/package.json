@@ -10,7 +10,8 @@
     "e2e": "start-server-and-test start http://localhost:4200 cypress:run",
     "e2e:open": "start-server-and-test start http://localhost:4200 cypress:open",
     "cypress:open": "cypress open",
-    "cypress:run": "cypress run"
+    "cypress:run": "cypress run",
+    "lint": "ng lint"
   },
   "private": true,
   "dependencies": {
@@ -31,9 +32,12 @@
     "@angular/cli": "^22.1.4",
     "@angular/compiler-cli": "^22.1.2",
     "@cypress/schematic": "^5.0.0",
+    "@eslint/js": "^10.0.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/jest": "^30.0.0",
+    "angular-eslint": "22.2.0",
     "cypress": "15.20.1",
+    "eslint": "^10.9.0",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "jest-preset-angular": "^17.0.0",
@@ -41,6 +45,7 @@
     "postcss": "^8.5.26",
     "start-server-and-test": "^3.0.12",
     "tailwindcss": "^4.3.3",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "8.67.0"
   }
 }

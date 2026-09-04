@@ -36,7 +36,7 @@
         </ul>
       </nav>
     } @else if (menu.open()) {
-      <div class="fixed inset-0 z-40 bg-black/40" data-test="menu-backdrop" (click)="menu.close()"></div>
+      <button type="button" class="fixed inset-0 z-40 bg-black/40 border-0 p-0 cursor-default" data-test="menu-backdrop" aria-label="Fermer le menu" (click)="menu.close()"></button>
       <nav class="fixed inset-y-0 right-0 z-50 flex h-full w-64 flex-col items-end flex-auto gap-4 bg-white px-6 py-12 shadow-lg" data-test="nav-menu-mobile">
           <ul class="contents">
             <ng-container [ngTemplateOutlet]="navLinks" />

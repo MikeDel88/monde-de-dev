@@ -207,6 +207,7 @@ Quand une page n'a pas de titre visible naturel (ex. `feed`, `topic`, `home`), a
 
 ## 5. Outils de vérification
 
+- **`npx ng lint`** (angular-eslint + règles `@angular-eslint/template-accessibility`, configurées dans `eslint.config.js`) : audit statique automatisé à chaque build/CI, détecte entre autres `alt-text`, `click-events-have-key-events`, `mouse-events-have-key-events`, `no-autofocus`, `role-has-required-aria`, `valid-aria`, `interactive-supports-focus`.
 - **axe DevTools** (extension navigateur) : audit automatique de la page en cours, détecte la majorité des erreurs ARIA/contraste.
 - **Lighthouse** (onglet Accessibility, intégré à Chrome DevTools) : score global et liste des problèmes.
 - **Navigation clavier manuelle** : parcourir chaque page uniquement au clavier (`Tab`, `Shift+Tab`, `Entrée`, `Échap`) et vérifier que tout élément interactif est atteignable et que l'ordre est logique.

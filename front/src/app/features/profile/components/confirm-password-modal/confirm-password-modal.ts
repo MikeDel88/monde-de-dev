@@ -24,9 +24,9 @@ let nextConfirmPasswordModalId = 0;
 export class ConfirmPasswordModal {
   readonly titleId = `confirm-password-title-${nextConfirmPasswordModalId++}`;
 
-  open = input(false);
-  confirm = output<string>();
-  cancel = output<void>();
+  openModal = input(false);
+  confirmPassword = output<string>();
+  cancelModal = output<void>();
 
   readonly confirmText = "Confimer";
   readonly cancelText = "Annuler";
@@ -42,20 +42,20 @@ export class ConfirmPasswordModal {
     effect(() => {
       const dialog = this.dialogRef()?.nativeElement;
       if (!dialog) return;
-      if (this.open() && !dialog.open) dialog.showModal();
-      if (!this.open() && dialog.open) dialog.close();
+      if (this.openModal() && !dialog.open) dialog.showModal();
+      if (!this.openModal() && dialog.open) dialog.close();
     });
   }
 
   onSubmit(event: Event): void {
     event.preventDefault();
     if (this.passwordForm().invalid()) return;
-    this.confirm.emit(this.passwordForm.currentPassword().value());
+    this.confirmPassword.emit(this.passwordForm.currentPassword().value());
     this.model.set(initialData);
   }
 
   onCancel(): void {
     this.model.set(initialData);
-    this.cancel.emit();
+    this.cancelModal.emit();
   }
 }

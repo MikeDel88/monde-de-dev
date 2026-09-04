@@ -65,7 +65,7 @@ export class Profile {
 
   error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
   showPasswordModal: WritableSignal<boolean> = signal(false);
-  private pendingNewPassword: string = '';
+  private pendingNewPassword = '';
 
   profileModel: WritableSignal<ProfileData> = signal<ProfileData>(initialProfileData);
   profileForm: FieldTree<ProfileData> = form(this.profileModel, validationProfileForm);
