@@ -4,6 +4,7 @@ import com.openclassrooms.mddapi.dto.request.CommentRequest;
 import com.openclassrooms.mddapi.dto.request.PostRequest;
 import com.openclassrooms.mddapi.dto.response.PostFeedResponse;
 import com.openclassrooms.mddapi.dto.response.PostResponse;
+import com.openclassrooms.mddapi.exception.PostNotFoundException;
 import com.openclassrooms.mddapi.exception.TopicNotFoundException;
 import com.openclassrooms.mddapi.exception.UserNotFoundException;
 
@@ -35,7 +36,7 @@ public interface PostService {
      * @param userId l'identifiant de l'utilisateur authentifié.
      * @return le détail du post avec ses commentaires triés du plus récent au plus ancien.
      * @throws UserNotFoundException si l'utilisateur est introuvable.
-     * @throws TopicNotFoundException si le post est introuvable ou si l'utilisateur n'est pas abonné à son topic.
+     * @throws PostNotFoundException si le post est introuvable ou si l'utilisateur n'est pas abonné à son topic.
      */
     PostResponse getPostById(Long postId, Long userId);
 
@@ -45,7 +46,7 @@ public interface PostService {
      * @param commentRequest les données du commentaire à créer (content).
      * @param userId l'identifiant de l'utilisateur authentifié, auteur du commentaire.
      * @throws UserNotFoundException si l'utilisateur est introuvable.
-     * @throws TopicNotFoundException si le post est introuvable ou si l'utilisateur n'est pas abonné à son topic.
+     * @throws PostNotFoundException si le post est introuvable ou si l'utilisateur n'est pas abonné à son topic.
      */
     void createComment(Long postId, CommentRequest commentRequest, Long userId);
 }
