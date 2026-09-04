@@ -58,3 +58,32 @@ POST /posts/:id/comments
 | GET /posts/:id | 200, 400, 401, 404, 500 | 404 = post introuvable **ou** non abonné au topic (PostNotFoundException dédiée) |
 | POST /posts | 201, 400, 401, 404, 500 | 404 = user introuvable ou topic introuvable/non abonné (TopicNotFoundException) |
 | POST /posts/:id/comments | 201, 400, 401, 404, 500 | 404 = post introuvable ou non abonné au topic (PostNotFoundException dédiée) |
+
+## CODES D'ERREUR MÉTIER (400)
+
+# Ces codes apparaissent dans errors[].message du corps BodyProblemDetail lors d'une réponse 400.
+# Les codes @ValidPassword (5 dernières lignes du tableau) peuvent se cumuler sur un même champ password/newPassword.
+
+| Endpoint | DTO / paramètre | Champ | Codes possibles |
+|---|---|---|---|
+| POST /auth/register | RegisterRequest | name | NAME_REQUIRED |
+| POST /auth/register | RegisterRequest | email | EMAIL_INVALID |
+| POST /auth/register | RegisterRequest | password | PASSWORD_REQUIRED |
+| POST /auth/login | LoginRequest | emailOrName | EMAIL_OR_NAME_REQUIRED |
+| POST /auth/login | LoginRequest | password | PASSWORD_REQUIRED |
+| PATCH /profile | UpdateProfilRequest | name | NAME_INVALID |
+| PATCH /profile | UpdateProfilRequest | email | EMAIL_INVALID |
+| PATCH /profile/password | UpdateProfilPasswordRequest | newPassword | PASSWORD_REQUIRED |
+| PATCH /profile/password | UpdateProfilPasswordRequest | currentPassword | CURRENT_PASSWORD_REQUIRED (validation) ; CURRENT_PASSWORD_INVALID (métier, 400 via InvalidCurrentPasswordException) |
+| POST /topics/subscribe | SubscribeRequest | topicId | TOPIC_REQUIRED, TOPIC_POSITIVE |
+| DELETE /topics/:id/subscribe | @PathVariable topicId | topicId | TOPIC_POSITIVE |
+| GET /feed | @RequestParam sort | sort | SORT_REQUIRED, SORT_INVALID |
+| POST /posts | PostRequest | topicId | TOPIC_REQUIRED, TOPIC_POSITIVE |
+| POST /posts | PostRequest | title | TITLE_REQUIRED |
+| POST /posts | PostRequest | content | CONTENT_REQUIRED |
+| POST /posts/:id/comments | CommentRequest | content | CONTENT_REQUIRED |
+| POST /auth/register, PATCH /profile/password | password / newPassword (@ValidPassword) | password | PASSWORD_TOO_SHORT |
+| POST /auth/register, PATCH /profile/password | password / newPassword (@ValidPassword) | password | PASSWORD_MISSING_UPPERCASE |
+| POST /auth/register, PATCH /profile/password | password / newPassword (@ValidPassword) | password | PASSWORD_MISSING_LOWERCASE |
+| POST /auth/register, PATCH /profile/password | password / newPassword (@ValidPassword) | password | PASSWORD_MISSING_DIGIT |
+| POST /auth/register, PATCH /profile/password | password / newPassword (@ValidPassword) | password | PASSWORD_MISSING_SPECIAL_CHAR |
