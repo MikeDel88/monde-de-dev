@@ -1,10 +1,17 @@
 @let post = this.post();
-<div (click)="onClick(post.id)" class="flex flex-col gap-4 bg-card p-4 rounded-lg h-full hover:bg-primary/10">
-  <h6 class="font-bold text-md">{{ post.title }}</h6>
-  <div class="flex flex-row w-1/2 justify-between flex-wrap-reverse">
-    <p>{{ post.date |  date:"dd/MM/YYYY" }}</p>
-    <p>{{ post.author }}</p>
-  </div>
-  <p class="line-clamp-5">{{ post.preview }}</p>
-</div>
+<article class="h-full">
+  <button
+    type="button"
+    (click)="onClick(post.id)"
+    [attr.aria-label]="ariaLabel()"
+    class="flex flex-col gap-4 bg-card p-4 rounded-lg h-full w-full text-left hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary"
+  >
+    <h3 class="font-bold text-md">{{ post.title }}</h3>
+    <div class="flex flex-row w-1/2 justify-between flex-wrap-reverse">
+      <p>{{ post.date |  date:"dd/MM/yyyy" }}</p>
+      <p>{{ post.author }}</p>
+    </div>
+    <p class="line-clamp-5">{{ post.preview }}</p>
+  </button>
+</article>
 

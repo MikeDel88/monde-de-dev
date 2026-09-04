@@ -15,7 +15,6 @@ import {Logo} from "../../components/logo/logo";
   ],
   imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Logo],
   templateUrl: './main-layout.html',
-  styleUrl: './main-layout.css',
 })
 export class MainLayout {
 
@@ -32,9 +31,5 @@ export class MainLayout {
     this.menu.close();
     this.sessionService.logOut();
     this.router.navigateByUrl('/login');
-  }
-
-  onClickLogo(): void {
-    this.router.navigateByUrl('/feed');
   }
 }

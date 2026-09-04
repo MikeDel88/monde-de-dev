@@ -1,13 +1,16 @@
 <div class="flex flex-col p-16">
+  <h1 class="sr-only">Articles</h1>
   <div class="w-full flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
     <app-button
       type="button"
       class="self-center"
       (click)="onClickCreatePost()"
       [disabled]="false"
-      [text]="btnCreatePostText"/>
-    <button class="flex flex-row items-center gap-1 whitespace-nowrap w-auto hover:cursor-pointer" (click)="toggle()">
-      <span class="font-bold ">{{ sortByAscText }}</span>
+      [text]="btnCreatePostText"
+      aria-label="create post"
+    />
+    <button class="flex flex-row items-center gap-1 whitespace-nowrap w-auto hover:cursor-pointer" aria-label="sort posts" (click)="toggle()">
+      <span class="font-bold">{{ sortByAscText }}</span>
       @if (!sortByAsc()) {
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 shrink-0">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
@@ -20,11 +23,13 @@
     </button>
   </div>
   @if(posts.hasValue()) {
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 py-8">
+    <ul class="grid grid-cols-1 md:grid-cols-2 gap-10 py-8">
       @for (post of posts.value(); track post.id) {
-        <app-post-card class="hover:cursor-pointer" [post]="post" (clickPost)="onClickPost($event)"/>
+        <li>
+          <app-post-card class="hover:cursor-pointer" [post]="post" (clickPost)="onClickPost($event)" [ariaLabel]="post.title"/>
+        </li>
       }
-    </div>
+    </ul>
   } @else if (posts.isLoading()) {
     <app-loader data-test="loader"/>
   } @else if (posts.error()) {

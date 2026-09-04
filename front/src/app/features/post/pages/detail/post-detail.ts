@@ -1,6 +1,6 @@
 import {Component, DestroyRef, inject, signal, WritableSignal} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
-import {Post, PostService} from "../../services/post-service";
+import {PostService} from "../../services/post-service";
 import {HttpResourceRef} from "@angular/common/http";
 import {DatePipe} from "@angular/common";
 import {FieldState, FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
@@ -10,6 +10,7 @@ import {Error} from "../../../../shared/components/error/error";
 import {Title} from "../../../../shared/components/title/title";
 import {Back} from "../../../../shared/components/back/back";
 import {Loader} from "../../../../shared/components/loader/loader";
+import {Post} from "../../models/post";
 
 export interface CreateComment {
   content: string
@@ -35,7 +36,6 @@ const validationCreateCommentForm = (schemaPath: SchemaPathTree<CreateComment>) 
     Loader
   ],
   templateUrl: './post-detail.html',
-  styleUrl: './post-detail.css',
 })
 export class PostDetail {
 

@@ -2,21 +2,7 @@ import {inject, Service, signal, WritableSignal} from '@angular/core';
 import {HttpClient, httpResource, HttpResourceRef} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {environment} from "../../../../environments/environment";
-
-export interface Post {
-  id: number;
-  title: string;
-  date: string;
-  author: string;
-  content: string;
-  topicName: string;
-  comments: PostComment[];
-}
-
-export interface PostComment {
-  author: string,
-  content: string
-}
+import {Post} from "../models/post";
 
 @Service()
 export class PostService {

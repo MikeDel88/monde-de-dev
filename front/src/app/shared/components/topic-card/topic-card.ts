@@ -3,7 +3,7 @@ import {Topic} from "../../../features/topic/models/topic";
 import {Button} from "../button/button";
 import {Title} from "../title/title";
 
-type BtnUnsubscribed = {
+interface BtnUnsubscribed {
   disabled: boolean;
   text: string;
 }
@@ -12,7 +12,6 @@ type BtnUnsubscribed = {
   selector: 'app-topic-card',
   imports: [Button, Title],
   templateUrl: './topic-card.html',
-  styleUrl: './topic-card.css',
 })
 export class TopicCard {
 
@@ -23,10 +22,10 @@ export class TopicCard {
   });
   readonly btnSubscribeText = "S'abonner";
 
-  readonly onClickTopic = output<number>();
+  readonly clickTopic = output<number>();
 
   onClick(topidId: number) {
-    this.onClickTopic.emit(topidId);
+    this.clickTopic.emit(topidId);
   }
 
 }

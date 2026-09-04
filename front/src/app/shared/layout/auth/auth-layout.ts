@@ -10,7 +10,6 @@ import {Logo} from "../../components/logo/logo";
   selector: 'app-auth-layout',
   imports: [RouterOutlet, Title, Back, Logo],
   templateUrl: './auth-layout.html',
-  styleUrl: './auth-layout.css',
 })
 export class AuthLayout {
   private readonly activatedRoute = inject(ActivatedRoute);

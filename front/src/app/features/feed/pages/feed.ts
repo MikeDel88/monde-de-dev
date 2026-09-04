@@ -17,7 +17,6 @@ import {Loader} from "../../../shared/components/loader/loader";
     Loader
   ],
   templateUrl: './feed.html',
-  styleUrl: './feed.css',
 })
 export class Feed {
   readonly sortByAscText: string = "Trier par";
@@ -25,7 +24,7 @@ export class Feed {
 
   feedService: FeedService = inject(FeedService);
   readonly router = inject(Router);
-  sortByAsc: WritableSignal<Boolean> = this.feedService.sortByAsc;
+  sortByAsc: WritableSignal<boolean> = this.feedService.sortByAsc;
   posts!: HttpResourceRef<PostFeed[] | undefined>;
 
   constructor() {

@@ -1,12 +1,12 @@
 <div class="flex flex-col p-4 gap-4">
   @if (profile.hasValue()) {
-    <app-title class="font-bold" [content]="titleProfilUser" />
+    <app-title class="font-bold" [content]="titleProfilUser" [level]="1" />
     <form (submit)="onSubmit($event)" (focusin)="onFocus()" class="flex flex-col gap-2 w-full lg:w-1/2 2xl:w-1/6 mx-auto p-6">
-      <app-input type="text" data-test="name" errorDataTest="error-name"
+      <app-input type="text" data-test="name" errorDataTest="error-name" ariaLabel="Nom"
                  [formField]="profileForm.name" />
-      <app-input type="email" data-test="email" errorDataTest="error-email"
+      <app-input type="email" data-test="email" errorDataTest="error-email" ariaLabel="Email"
                  [formField]="profileForm.email" />
-      <app-input type="password" data-test="password" errorDataTest="error-password"
+      <app-input type="password" data-test="password" errorDataTest="error-password" ariaLabel="Mot de passe"
                  [formField]="profileForm.password"
                  [placeholder]="placeholderPassword"/>
       <app-error data-test="error" [message]="error()" />
@@ -18,22 +18,24 @@
       />
     </form>
     <app-confirm-password-modal
-      [open]="showPasswordModal()"
-      (confirm)="onConfirmPassword($event)"
-      (cancel)="showPasswordModal.set(false)"
+      [openModal]="showPasswordModal()"
+      (confirmPassword)="onConfirmPassword($event)"
+      (cancelModal)="showPasswordModal.set(false)"
     />
     @if (profile.value().topics.length > 0) {
       <app-dividers class="w-11/12 mx-auto"/>
       <app-title  class="font-bold" [content]="titleSubscription" />
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+      <ul class="grid grid-cols-1 md:grid-cols-2 gap-10">
         @for (topic of profile.value().topics; track topic.id) {
-          <app-topic-card
-            [topic]="topic"
-            [btnUnsubscribed]="{ disabled: false, text: btnUnsubscribed }"
-            (onClickTopic)="onUnsubscribe($event)"
-          />
+          <li>
+            <app-topic-card
+              [topic]="topic"
+              [btnUnsubscribed]="{ disabled: false, text: btnUnsubscribed }"
+              (clickTopic)="onUnsubscribe($event)"
+            />
+          </li>
         }
-      </div>
+      </ul>
     }
   } @else if (profile.isLoading()) {
     <app-loader data-test="loader"/>

@@ -4,6 +4,7 @@ import com.openclassrooms.mddapi.dto.request.CommentRequest;
 import com.openclassrooms.mddapi.dto.request.PostRequest;
 import com.openclassrooms.mddapi.dto.response.PostFeedResponse;
 import com.openclassrooms.mddapi.dto.response.PostResponse;
+import com.openclassrooms.mddapi.exception.PostNotFoundException;
 import com.openclassrooms.mddapi.exception.TopicNotFoundException;
 import com.openclassrooms.mddapi.exception.UserNotFoundException;
 import com.openclassrooms.mddapi.mapper.CommentMapper;
@@ -92,12 +93,9 @@ public class PostServiceImpl implements PostService {
     public PostResponse getPostById(Long postId, Long userId) {
         log.info("service: getPostById {}", postId);
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Post post = postRepository.findById(postId).orElseThrow(TopicNotFoundException::new);
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
 
-        // si l'utilisateur n'est pas abonné au topic du post, on lève une exception
-        if(user.getTopics().stream().noneMatch(post.getTopic()::equals)) {
-            throw new TopicNotFoundException();
-        }
+        checkUserIsSubscribedToTopic(user, post.getTopic());
 
         // du plus ancien au plus récent, pour que le dernier commentaire soit en bas de la liste.
         List<Comment> comments = post.getComments()
@@ -116,15 +114,19 @@ public class PostServiceImpl implements PostService {
     public void createComment(Long postId, CommentRequest commentRequest, Long userId) {
         log.info("service: createComment");
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Post post = postRepository.findById(postId).orElseThrow(TopicNotFoundException::new);
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
 
-        // si l'utilisateur n'est pas abonné au topic du post, on lève une exception
-        if(user.getTopics().stream().noneMatch(post.getTopic()::equals)) {
-            throw new TopicNotFoundException();
-        }
+        checkUserIsSubscribedToTopic(user, post.getTopic());
 
         Comment newComment = commentMapper.toComment(commentRequest, user, post);
         post.getComments().add(newComment);
         postRepository.save(post);
+    }
+
+    private void checkUserIsSubscribedToTopic(User user, Topic topic) {
+        // si l'utilisateur n'est pas abonné au topic du post, on lève une exception
+        if(user.getTopics().stream().noneMatch(topic::equals)) {
+            throw new PostNotFoundException();
+        }
     }
 }

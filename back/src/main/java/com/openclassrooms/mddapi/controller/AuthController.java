@@ -1,10 +1,10 @@
 package com.openclassrooms.mddapi.controller;
 
 import com.openclassrooms.mddapi.documentation.database.ApiDabataseConflictResponse;
+import com.openclassrooms.mddapi.documentation.login.ApiInvalidCredentialsResponse;
 import com.openclassrooms.mddapi.documentation.login.ApiLoginValidResponse;
 import com.openclassrooms.mddapi.documentation.login.ApiLoginValidationErrorResponse;
 import com.openclassrooms.mddapi.documentation.register.ApiRegisterValidResponse;
-import com.openclassrooms.mddapi.documentation.user.ApiUserNotFoundResponse;
 import com.openclassrooms.mddapi.dto.request.LoginRequest;
 import com.openclassrooms.mddapi.dto.request.RegisterRequest;
 import com.openclassrooms.mddapi.documentation.register.ApiRegisterValidationErrorResponse;
@@ -45,7 +45,7 @@ public class AuthController {
     @SecurityRequirements()
     @ApiLoginValidResponse
     @ApiLoginValidationErrorResponse
-    @ApiUserNotFoundResponse
+    @ApiInvalidCredentialsResponse
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody LoginRequest loginRequest) {
         log.info("call /login");
