@@ -1,7 +1,6 @@
 import {Component, input, output} from '@angular/core';
 import {Topic} from "../../../features/topic/models/topic";
 import {Button} from "../button/button";
-import {Title} from "../title/title";
 
 interface BtnUnsubscribed {
   disabled: boolean;
@@ -10,7 +9,7 @@ interface BtnUnsubscribed {
 
 @Component({
   selector: 'app-topic-card',
-  imports: [Button, Title],
+  imports: [Button],
   templateUrl: './topic-card.html',
 })
 export class TopicCard {

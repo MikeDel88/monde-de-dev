@@ -11,6 +11,7 @@ import {Title} from "../../../../shared/components/title/title";
 import {Back} from "../../../../shared/components/back/back";
 import {Loader} from "../../../../shared/components/loader/loader";
 import {Post} from "../../models/post";
+import {FirstUpperPipe} from "../../../../shared/pipes/first-upper";
 
 export interface CreateComment {
   content: string
@@ -33,7 +34,8 @@ const validationCreateCommentForm = (schemaPath: SchemaPathTree<CreateComment>) 
     Error,
     Title,
     Back,
-    Loader
+    Loader,
+    FirstUpperPipe
   ],
   templateUrl: './post-detail.html',
 })

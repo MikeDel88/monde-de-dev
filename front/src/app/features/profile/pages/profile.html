@@ -1,7 +1,7 @@
-<div class="flex flex-col p-4 gap-4">
+<div class="flex flex-col p-4 gap-4 items-center">
   @if (profile.hasValue()) {
     <app-title class="font-bold" [content]="titleProfilUser" [level]="1" />
-    <form (submit)="onSubmit($event)" (focusin)="onFocus()" class="flex flex-col gap-2 w-full lg:w-1/2 2xl:w-1/6 mx-auto p-6">
+    <form (submit)="onSubmit($event)" (focusin)="onFocus()" class="flex flex-col gap-3.5 w-62.5 sm:w-70">
       <app-input type="text" data-test="name" errorDataTest="error-name" ariaLabel="Nom"
                  [formField]="profileForm.name" />
       <app-input type="email" data-test="email" errorDataTest="error-email" ariaLabel="Email"
@@ -25,7 +25,7 @@
     @if (profile.value().topics.length > 0) {
       <app-dividers class="w-11/12 mx-auto"/>
       <app-title  class="font-bold" [content]="titleSubscription" />
-      <ul class="grid grid-cols-1 md:grid-cols-2 gap-10">
+      <ul class="w-full grid grid-cols-1 md:grid-cols-2 gap-y-3.5 gap-1.5">
         @for (topic of profile.value().topics; track topic.id) {
           <li>
             <app-topic-card

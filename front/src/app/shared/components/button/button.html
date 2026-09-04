@@ -3,7 +3,7 @@
     <button
       [type]="type()"
       [disabled]="disabled()"
-      class="text-white rounded-md px-4 py-2 my-2 font-bold"
+      class="min-w-34.75 text-white rounded-md px-4 py-2 my-2 font-bold"
       [ngClass] = "disabled() ? 'bg-btn-disabled' : 'bg-primary hover:bg-primary-hover hover:cursor-pointer'"
     >
       {{ text() }}
@@ -13,7 +13,7 @@
     <button
       [type]="type()"
       [disabled]="disabled()"
-      class="text-primary rounded-md px-4 py-2 my-2 font-bold"
+      class="min-w-34.75 text-primary rounded-md px-4 py-2 my-2 font-bold"
       [ngClass] = "disabled() ? 'bg-btn-disabled' : 'border border-primary hover:cursor-pointer'"
     >
       {{ text() }}

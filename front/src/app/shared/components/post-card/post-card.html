@@ -8,10 +8,10 @@
   >
     <h3 class="font-bold text-md">{{ post.title }}</h3>
     <div class="flex flex-row w-1/2 justify-between flex-wrap-reverse">
-      <p>{{ post.date |  date:"dd/MM/yyyy" }}</p>
-      <p>{{ post.author }}</p>
+      <p class="text-sm">{{ post.date |  date:"dd/MM/yyyy" }}</p>
+      <p class="text-sm">{{ post.author | firstUpper }}</p>
     </div>
-    <p class="line-clamp-5">{{ post.preview }}</p>
+    <p class="text-sm line-clamp-5">{{ post.preview | firstUpper }}</p>
   </button>
 </article>
 

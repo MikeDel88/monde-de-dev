@@ -1,11 +1,13 @@
 import {Component, input, output} from '@angular/core';
 import {DatePipe} from "@angular/common";
 import {PostFeed} from "../../../features/feed/models/post-feed";
+import {FirstUpperPipe} from "../../pipes/first-upper";
 
 @Component({
   selector: 'app-post-card',
   imports: [
-    DatePipe
+    DatePipe,
+    FirstUpperPipe
   ],
   templateUrl: './post-card.html',
 })
