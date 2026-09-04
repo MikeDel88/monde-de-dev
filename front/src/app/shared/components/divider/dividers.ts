@@ -4,7 +4,6 @@ import { Component } from '@angular/core';
   selector: 'app-dividers',
   imports: [],
   templateUrl: './dividers.html',
-  styleUrl: './dividers.css',
 })
 export class Dividers {
 

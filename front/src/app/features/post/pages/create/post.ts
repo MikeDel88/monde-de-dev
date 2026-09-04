@@ -44,7 +44,6 @@ const validationCreatePostForm = (schemaPath: SchemaPathTree<CreatePost>) => {
     Back
   ],
   templateUrl: './post.html',
-  styleUrl: './post.css',
 })
 export class Post {
 

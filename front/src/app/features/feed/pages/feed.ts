@@ -17,7 +17,6 @@ import {Loader} from "../../../shared/components/loader/loader";
     Loader
   ],
   templateUrl: './feed.html',
-  styleUrl: './feed.css',
 })
 export class Feed {
   readonly sortByAscText: string = "Trier par";

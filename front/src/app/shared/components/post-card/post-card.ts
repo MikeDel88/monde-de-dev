@@ -8,7 +8,6 @@ import {PostFeed} from "../../../features/feed/models/post-feed";
     DatePipe
   ],
   templateUrl: './post-card.html',
-  styleUrl: './post-card.css',
 })
 export class PostCard {
     post = input.required<PostFeed>();

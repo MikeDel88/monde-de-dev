@@ -4,8 +4,6 @@ import {
   FormField,
   required,
   email,
-  minLength,
-  pattern,
   SchemaPathTree, FieldTree, FieldState
 } from '@angular/forms/signals';
 import {AuthService} from "../../services/auth-service";
@@ -15,6 +13,7 @@ import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Button} from "../../../../shared/components/button/button";
 import {Error as AppError} from "../../../../shared/components/error/error";
 import {Input} from "../../../../shared/components/input/input";
+import {validatePasswordStrength} from "../../../../shared/validators/password-strength-validator";
 
 const initialRegisterData: RegisterData = {
   name: "",
@@ -22,24 +21,18 @@ const initialRegisterData: RegisterData = {
   password: ''
 };
 
-const registerModel: WritableSignal<RegisterData> = signal<RegisterData>(initialRegisterData);
-
 const validationRegisterForm = (schemaPath: SchemaPathTree<RegisterData>) => {
   required(schemaPath.name);
   required(schemaPath.email);
   email(schemaPath.email, {message: 'Email invalide'});
   required(schemaPath.password);
-  minLength(schemaPath.password, 8, {message: 'Doit être supérieur ou égal à 8 caractères'});
-  pattern(schemaPath.password,
-    /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).+$/,
-    {message: 'Doit contenir au moins une lettre Majuscule, Minuscule, un chiffre et un caractère spécial'});
+  validatePasswordStrength(schemaPath.password);
 }
 
 @Component({
   selector: 'app-register',
   imports: [FormField, Toast, Button, AppError, Input],
   templateUrl: './register.html',
-  styleUrl: './register.css',
 })
 export class Register {
 
@@ -53,7 +46,8 @@ export class Register {
   error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
   showToastSuccessfully: WritableSignal<boolean> = signal(false)
 
-  registerForm: FieldTree<RegisterData> = form(registerModel, validationRegisterForm);
+  private readonly registerModel: WritableSignal<RegisterData> = signal<RegisterData>(initialRegisterData);
+  registerForm: FieldTree<RegisterData> = form(this.registerModel, validationRegisterForm);
 
 
   onReset(): void {

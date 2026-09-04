@@ -15,7 +15,6 @@ import {Logo} from "../../components/logo/logo";
   ],
   imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Logo],
   templateUrl: './main-layout.html',
-  styleUrl: './main-layout.css',
 })
 export class MainLayout {
 

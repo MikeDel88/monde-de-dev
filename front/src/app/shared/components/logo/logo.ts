@@ -4,9 +4,8 @@ import {Component, input} from '@angular/core';
   selector: 'app-logo',
   imports: [],
   templateUrl: './logo.html',
-  styleUrl: './logo.css',
 })
 export class Logo {
-    width = input.required<number>()
-    height = input.required<number>()
+    width = input.required<number>();
+    height = input.required<number>();
 }

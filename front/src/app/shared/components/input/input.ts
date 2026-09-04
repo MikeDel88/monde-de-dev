@@ -8,7 +8,6 @@ let nextInputId = 0;
   selector: 'app-input',
   imports: [Error],
   templateUrl: './input.html',
-  styleUrl: './input.css',
 })
 export class Input {
   readonly id = `app-input-${nextInputId++}`;

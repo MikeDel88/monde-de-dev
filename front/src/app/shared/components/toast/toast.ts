@@ -22,12 +22,11 @@ const TOAST_VARIANTS: Record<toast, { card: string; badge: string }> = {
   selector: 'app-toast',
   imports: [],
   templateUrl: './toast.html',
-  styleUrl: './toast.css',
 })
 export class Toast {
-  message = input("")
-  visible = input(false)
-  type = input<toast>("success")
+  message = input("");
+  visible = input(false);
+  type = input<toast>("success");
 
   buttonClick = output<Event>();
 

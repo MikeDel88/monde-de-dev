@@ -12,7 +12,6 @@ interface BtnUnsubscribed {
   selector: 'app-topic-card',
   imports: [Button, Title],
   templateUrl: './topic-card.html',
-  styleUrl: './topic-card.css',
 })
 export class TopicCard {
 

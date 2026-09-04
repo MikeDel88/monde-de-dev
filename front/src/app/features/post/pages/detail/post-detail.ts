@@ -35,7 +35,6 @@ const validationCreateCommentForm = (schemaPath: SchemaPathTree<CreateComment>) 
     Loader
   ],
   templateUrl: './post-detail.html',
-  styleUrl: './post-detail.css',
 })
 export class PostDetail {
 

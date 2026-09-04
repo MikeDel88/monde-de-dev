@@ -6,7 +6,6 @@ import {Logo} from "../../../shared/components/logo/logo";
   selector: 'app-home',
   imports: [RouterLink, Logo],
   templateUrl: './home.html',
-  styleUrl: './home.css',
 })
 export class Home {
   login = "Se connecter";

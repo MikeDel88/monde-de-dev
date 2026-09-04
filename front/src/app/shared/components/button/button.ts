@@ -7,7 +7,6 @@ import {NgClass} from "@angular/common";
     NgClass
   ],
   templateUrl: './button.html',
-  styleUrl: './button.css',
 })
 export class Button {
     readonly display: InputSignal<'normal' | 'outlined'> = input<'normal' | 'outlined'>('normal');

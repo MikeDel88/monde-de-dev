@@ -9,8 +9,6 @@ import {
   FieldTree,
   form,
   FormField,
-  minLength,
-  pattern,
   SchemaPathTree
 } from "@angular/forms/signals";
 import {TopicService} from "../../topic/services/topic-service";
@@ -21,6 +19,7 @@ import {Error} from "../../../shared/components/error/error";
 import {Input} from "../../../shared/components/input/input";
 import {Title} from "../../../shared/components/title/title";
 import {Loader} from "../../../shared/components/loader/loader";
+import {validatePasswordStrength} from "../../../shared/validators/password-strength-validator";
 
 
 export interface ProfileData {
@@ -37,17 +36,13 @@ const initialProfileData: ProfileData = {
 
 const validationProfileForm = (schemaPath: SchemaPathTree<ProfileData>) => {
   email(schemaPath.email, {message: 'Email invalide'});
-  minLength(schemaPath.password, 8, {message: 'Doit être supérieur ou égal à 8 caractères'});
-  pattern(schemaPath.password,
-    /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).+$/,
-    {message: 'Doit contenir au moins une lettre Majuscule, Minuscule, un chiffre et un caractère spécial'});
+  validatePasswordStrength(schemaPath.password);
 };
 
 @Component({
   selector: 'app-profile',
   imports: [TopicCard, FormField, ConfirmPasswordModal, Button, Dividers, Error, Input, Title, Loader],
   templateUrl: './profile.html',
-  styleUrl: './profile.css',
 })
 export class Profile {
 
