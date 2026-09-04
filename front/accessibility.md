@@ -72,7 +72,6 @@ Cas sans label visible : utiliser `ariaLabel`.
   [id]="id"
   [attr.aria-invalid]="touched() && invalid()"
   [attr.aria-describedby]="touched() && invalid() ? errorId : null"
-  ...
 />
 
 @if (touched() && invalid()) {
@@ -154,7 +153,7 @@ Quand une page n'a pas de titre visible naturel (ex. `feed`, `topic`, `home`), a
 - **Fermeture au clavier** : un menu/panneau ouvert doit pouvoir se fermer avec `Échap`, pas seulement en cliquant hors de la zone.
   ```ts
   // src/app/shared/directives/menu-behavior.ts
-  host: { '(document:keydown.escape)': 'close()' }
+  host: { `'(document:keydown.escape)': 'close()'` }
   ```
 - **Élément cliquable répétable → élément sémantique focusable**, jamais un `<div (click)>` seul.
   ```html
