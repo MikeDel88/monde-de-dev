@@ -1,9 +1,11 @@
 import { TestBed } from '@angular/core/testing';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { AuthService } from './auth-service';
 import {RegisterData} from "../models/register-data";
+import {environment} from "../../../../environments/environment";
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -32,27 +34,27 @@ describe('AuthService', () => {
   });
 
   it('should return void on success', (done) => {
-    service.register(registerData).subscribe({
+    service.register$(registerData).subscribe({
       next: (value) => {
-        expect(value).toBeFalsy();
+        expect(value).toBeNull();
         done();
       },
     });
 
-    const req = httpMock.expectOne('http://localhost:9000/auth/register');
+    const req = httpMock.expectOne(`${environment.apiUrl}/auth/register`);
     expect(req.request.method).toBe('POST');
     req.flush(null, { status: 201, statusText: 'Created' });
   });
 
   it('should build a message from field errors on 400', (done) => {
-    service.register(registerData).subscribe({
+    service.register$(registerData).subscribe({
       error: (error: Error) => {
         expect(error.message).toBe('Email invalide, Mot de passe trop court');
         done();
       },
     });
 
-    const req = httpMock.expectOne('http://localhost:9000/auth/register');
+    const req = httpMock.expectOne(`${environment.apiUrl}/auth/register`);
     req.flush(
       {
         status: 400,
@@ -66,26 +68,26 @@ describe('AuthService', () => {
   });
 
   it('should return a dedicated message on 409', (done) => {
-    service.register(registerData).subscribe({
+    service.register$(registerData).subscribe({
       error: (error: Error) => {
-        expect(error.message).toBe('Cet email ou ce nom est déjà utilisé');
+        expect(error.message).toBe("Une erreur est survenue, l'utilisateur n'a pas été enregistré");
         done();
       },
     });
 
-    const req = httpMock.expectOne('http://localhost:9000/auth/register');
+    const req = httpMock.expectOne(`${environment.apiUrl}/auth/register`);
     req.flush({ status: 409 }, { status: 409, statusText: 'Conflict' });
   });
 
   it('should return a generic message on 500', (done) => {
-    service.register(registerData).subscribe({
+    service.register$(registerData).subscribe({
       error: (error: Error) => {
         expect(error.message).toBe('Une erreur est survenue, veuillez réessayer plus tard');
         done();
       },
     });
 
-    const req = httpMock.expectOne('http://localhost:9000/auth/register');
+    const req = httpMock.expectOne(`${environment.apiUrl}/auth/register`);
     req.flush({ status: 500, detail: 'Internal server error' }, { status: 500, statusText: 'Internal Server Error' });
   });
 });

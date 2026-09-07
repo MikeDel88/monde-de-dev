@@ -1,5 +1,5 @@
 import { Service } from '@angular/core';
-import {BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject} from "rxjs";
 
 @Service()
 export class SessionService {
