@@ -28,7 +28,7 @@ describe('Feed', () => {
   let router: Router
 
 
-  const postMock: PostFeed = {
+  const MOCK_POST: PostFeed = {
     id: 1,
     title: 'Test Post',
     preview: 'This is a test post.',
@@ -79,12 +79,12 @@ describe('Feed', () => {
 
     it('should navigate to post detail page when onClickPost is called', () => {
       const spyOnNavigate = jest.spyOn(router, 'navigate');
-      component.onClickPost(postMock.id);
-      expect(spyOnNavigate).toHaveBeenCalledWith(['/post', postMock.id]);
+      component.onClickPost(MOCK_POST.id);
+      expect(spyOnNavigate).toHaveBeenCalledWith(['/post', MOCK_POST.id]);
     });
 
     it('should display the posts correctly', () => {
-      component.posts.set([postMock]);
+      component.posts.set([MOCK_POST]);
       fixture.detectChanges();
       const postCard = fixture.nativeElement.querySelector('app-post-card');
       expect(postCard).toBeTruthy();
@@ -135,7 +135,7 @@ describe('Feed', () => {
       const req = expectFeedRequest('desc');
       expect(req.request.method).toBe('GET');
 
-      req.flush([postMock]);
+      req.flush([MOCK_POST]);
       await flushMicrotasks();
       fixture.detectChanges();
 
@@ -155,7 +155,7 @@ describe('Feed', () => {
     });
 
     it('should trigger a new request sorted ascending when toggle is called', async () => {
-      expectFeedRequest('desc').flush([postMock]);
+      expectFeedRequest('desc').flush([MOCK_POST]);
       await flushMicrotasks();
       fixture.detectChanges();
 
@@ -163,7 +163,7 @@ describe('Feed', () => {
       fixture.detectChanges();
 
       const secondReq = expectFeedRequest('asc');
-      secondReq.flush([postMock]);
+      secondReq.flush([MOCK_POST]);
       await flushMicrotasks();
       fixture.detectChanges();
 
