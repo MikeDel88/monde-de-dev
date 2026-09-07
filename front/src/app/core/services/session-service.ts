@@ -8,10 +8,6 @@ export class SessionService {
 
   private isLoggedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(!!localStorage.getItem(SessionService.TOKEN_KEY));
 
-  public isLogged$(): Observable<boolean> {
-    return this.isLoggedSubject.asObservable();
-  }
-
   public get isAuthenticated(): boolean {
     return this.isLoggedSubject.value;
   }
