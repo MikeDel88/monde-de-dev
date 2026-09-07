@@ -14,9 +14,10 @@ export class PostService {
     return this.httpClient.post<void>(`${environment.apiUrl}/posts`, { topicId, title, content });
   }
 
-  post: HttpResourceRef<Post | undefined> = httpResource<Post>(() => ({
-    url: `${environment.apiUrl}/posts/${this.postId()}`,
-  }));
+  post: HttpResourceRef<Post | undefined> = httpResource<Post>(() => {
+    const id: string | null = this.postId();
+    return id ? { url: `${environment.apiUrl}/posts/${id}` } : undefined;
+  });
 
   createComment$(content: string): Observable<void> {
     return this.httpClient.post<void>(`${environment.apiUrl}/posts/${this.postId()}/comments`, { content });

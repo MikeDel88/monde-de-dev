@@ -154,10 +154,17 @@ describe('Post', () => {
         }
       });
 
+      it('should not call postService.createPost$ when the form is invalid on submit', () => {
+        resetForm();
+        fixture.detectChanges();
+
+        submit();
+
+        expect(mockPostService.createPost$).not.toHaveBeenCalled();
+      });
+
       it('should show the field error slots once the fields are touched and left empty', () => {
-        component.postForm.topicId().markAsTouched();
-        component.postForm.title().markAsTouched();
-        component.postForm.content().markAsTouched();
+        submit();
         fixture.detectChanges();
 
         expect(fixture.debugElement.query(By.css('[data-test="error-topic"]'))).toBeTruthy();
@@ -233,10 +240,6 @@ describe('Post', () => {
       await configurePost([provideHttpClient(), provideHttpClientTesting()]);
 
       httpMock = TestBed.inject(HttpTestingController);
-
-      // PostService.post (httpResource) fetches eagerly on injection, even though
-      // this page never reads it — flush it away so it doesn't linger unhandled.
-      httpMock.expectOne(`${environment.apiUrl}/posts/null`).flush(null);
     });
 
     afterEach(() => {
@@ -289,6 +292,16 @@ describe('Post', () => {
 
       const errorElement = fixture.debugElement.query(By.css('[data-test="error"]'));
       expect(errorElement.nativeElement.textContent).toContain('Erreur lors de la création du post.');
+    });
+
+    it('should not call the API when the form is invalid on submit', async () => {
+      await flushProfile();
+      resetForm();
+      fixture.detectChanges();
+
+      submit();
+
+      httpMock.expectNone({ url: `${environment.apiUrl}/posts` });
     });
   });
 });

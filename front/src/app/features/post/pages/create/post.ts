@@ -86,6 +86,10 @@ export class Post {
   onSubmit(event: Event): void {
     event.preventDefault();
     const postData: FieldState<CreatePost> = this.postForm();
+    postData.markAsTouched();
+    if(postData.invalid()) {
+      return;
+    }
     this.postService.createPost$(postData.value().topicId, postData.value().title, postData.value().content)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
