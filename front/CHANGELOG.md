@@ -2,6 +2,24 @@
 
 Toutes les modifications notables de ce projet sont documentées dans ce fichier.
 
+## [0.3.0] - 2026-09-07
+
+### Ajouté
+- Page Profil : formulaire de mise à jour incluant la liste des topics abonnés
+- Création d'un article (post) depuis le feed, avec formulaire dédié
+- Page de détail d'un article : affichage du contenu et des commentaires triés du plus ancien au plus récent
+- Ajout de commentaires sur un article (formulaire + envoi)
+- Documentation ARIA et ajout d'aria-labels sur les composants pour l'accessibilité
+- Bibliothèque de composants partagés : button (normal/outlined), input, title, error, divider, loader, logo, bouton retour, topic-card
+- Mise en surbrillance / ajustements de style (hover cartes, hauteur uniforme, curseur pointer, boutons login/register)
+
+### Technique
+- Renommage des packages internes pour cohérence
+- Passage des variables selon les règles ESLint
+- Correction du format de date (yyyy) sur les vues post-card/détail
+- Renommage `TopicComponent` en `Topic`, suppression de CSS inutilisés
+- Ajustement de la cible de build de développement (`mdd-client:build:development`)
+
 ## [0.2.0] - 2026-08-28
 
 ### Ajouté
