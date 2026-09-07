@@ -29,7 +29,7 @@ export class AuthService {
 
    private buildLoginErrorMessage(err: HttpErrorResponse): string {
      switch (err.status) {
-       case 404:
+       case 401:
          return "Une erreur est survenue. Vérifier le couple email ou nom d'utilisateur et mot de passe";
        default:
          return 'Une erreur est survenue, veuillez réessayer plus tard';
