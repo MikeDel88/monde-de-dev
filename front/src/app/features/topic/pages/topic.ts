@@ -27,7 +27,6 @@ export class Topic {
   }
 
   onSubscribe(topicId: number) {
-    console.log("onSubscribe", topicId);
     this.topicService.subscribe$(topicId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

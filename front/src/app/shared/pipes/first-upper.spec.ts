@@ -1,4 +1,5 @@
 import {FirstUpperPipe} from './first-upper';
+import {describe, it, expect} from "@jest/globals";
 
 describe('FirstUpperPipe', () => {
   const pipe = new FirstUpperPipe();
