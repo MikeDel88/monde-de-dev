@@ -23,11 +23,11 @@ describe('FeedService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should sortByAsc is false by default', () => {
+  it('should have sortByAsc set to false by default', () => {
     expect(service.sortByAsc()).toBe(false);
   });
 
-  it('should toggleFilterByAsc invert the boolean value', () => {
+  it('should invert the boolean value when toggleFilterByAsc is called', () => {
     service.toggleFilterByAsc();
     expect(service.sortByAsc()).toBe(true);
   })
