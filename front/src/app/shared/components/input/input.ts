@@ -1,4 +1,4 @@
-import {Component, input, InputSignal, model, ModelSignal, output, OutputEmitterRef} from '@angular/core';
+import {Component, ElementRef, input, InputSignal, model, ModelSignal, output, OutputEmitterRef, Signal, viewChild} from '@angular/core';
 import {ValidationError} from '@angular/forms/signals';
 import {Error} from '../error/error';
 
@@ -24,4 +24,10 @@ export class Input {
   readonly invalid: InputSignal<boolean> = input<boolean>(false);
   readonly errors: InputSignal<readonly ValidationError[]> = input<readonly ValidationError[]>([]);
   readonly errorDataTest: InputSignal<string | undefined> = input<string | undefined>(undefined);
+
+  private readonly inputRef: Signal<ElementRef<HTMLInputElement> | undefined> = viewChild<ElementRef<HTMLInputElement>>('inputRef');
+
+  focus(options?: FocusOptions): void {
+    this.inputRef()?.nativeElement.focus(options);
+  }
 }
