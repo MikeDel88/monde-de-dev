@@ -2,6 +2,22 @@
 
 Toutes les modifications notables de ce projet sont documentées dans ce fichier.
 
+## [0.3.0] - 2026-09-07
+
+### Ajouté
+- Création d'un article (post) côté API, avec documentation OpenAPI
+- Récupération du détail d'un article avec ses commentaires (tri du plus ancien au plus récent)
+- Création d'un commentaire sur un article
+- Exceptions personnalisées et réponses dédiées pour identifiants invalides et post introuvable (au lieu de topic introuvable)
+- Codes d'erreurs métier documentés pour l'authentification et la mise à jour du profil
+
+### Technique
+- Tri de la liste des topics par ordre alphabétique
+- Validation personnalisée du `topicId` (positif) sur le désabonnement
+- Mise à jour de l'import `ObjectMapper` vers `tools.jackson.databind`
+- Ajout des codes d'erreur possibles pour `LoginRequest`
+- Nettoyage d'un import inutilisé
+
 ## [0.2.0] - 2026-08-28
 
 ### Ajouté
