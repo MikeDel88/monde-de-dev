@@ -16,7 +16,7 @@
       <p class="text-xl pt-7">{{ post.value().content | firstUpper }}</p>
       <app-dividers class="w-full py-5"/>
       @if(post.value().comments.length > 0) {
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-4" data-test="comments">
           <p class="text-xl">{{ titleComments }}</p>
           <ul class="flex flex-col sm:px-8 gap-4">
             @for (comment of post.value().comments; track comment.content) {

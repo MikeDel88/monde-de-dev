@@ -68,6 +68,10 @@ export class PostDetail {
     event.preventDefault();
     if(this.postId != null) {
       const commentData: FieldState<CreateComment> = this.commentForm();
+      commentData.markAsTouched();
+      if(commentData.invalid()) {
+        return;
+      }
       this.postService.createComment$(commentData.value().content)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
