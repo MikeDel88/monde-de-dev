@@ -33,7 +33,7 @@ export class Feed {
   }
 
   toggle(): void {
-    this.feedService.toogleFilterByAsc();
+    this.feedService.toggleFilterByAsc();
   }
 
   onClickCreatePost(): void {
