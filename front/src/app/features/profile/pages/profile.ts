@@ -2,27 +2,31 @@ import {Component, DestroyRef, effect, inject, signal, WritableSignal} from '@an
 import {HttpResourceRef} from "@angular/common/http";
 import {ProfileService} from "../services/profile-service";
 import {ProfileResponse} from "../models/profile-response";
-import {TopicCard} from "../../feed/components/topic-card/topic-card";
+import {TopicCard} from "../../../shared/components/topic-card/topic-card";
 import {ConfirmPasswordModal} from "../components/confirm-password-modal/confirm-password-modal";
 import {
   email,
   FieldTree,
   form,
   FormField,
-  minLength,
-  pattern,
   SchemaPathTree
 } from "@angular/forms/signals";
 import {TopicService} from "../../topic/services/topic-service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {NgClass} from "@angular/common";
+import {Button} from "../../../shared/components/button/button";
+import {Dividers} from "../../../shared/components/divider/dividers";
+import {Error} from "../../../shared/components/error/error";
+import {Input} from "../../../shared/components/input/input";
+import {Title} from "../../../shared/components/title/title";
+import {Loader} from "../../../shared/components/loader/loader";
+import {validatePasswordStrength} from "../../../shared/validators/password-strength-validator";
 
 
 export interface ProfileData {
   name: string;
   email: string,
   password: string,
-};
+}
 
 const initialProfileData: ProfileData = {
   name: "",
@@ -32,30 +36,27 @@ const initialProfileData: ProfileData = {
 
 const validationProfileForm = (schemaPath: SchemaPathTree<ProfileData>) => {
   email(schemaPath.email, {message: 'Email invalide'});
-  minLength(schemaPath.password, 8, {message: 'Doit être supérieur ou égal à 8 caractères'});
-  pattern(schemaPath.password,
-    /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).+$/,
-    {message: 'Doit contenir au moins une lettre Majuscule, Minuscule, un chiffre et un caractère spécial'});
+  validatePasswordStrength(schemaPath.password);
 };
 
 @Component({
   selector: 'app-profile',
-  imports: [TopicCard, FormField, ConfirmPasswordModal, NgClass],
+  imports: [TopicCard, FormField, ConfirmPasswordModal, Button, Dividers, Error, Input, Title, Loader],
   templateUrl: './profile.html',
-  styleUrl: './profile.css',
 })
 export class Profile {
 
-  private profilService = inject(ProfileService);
+  private profilService: ProfileService = inject(ProfileService);
   profile!: HttpResourceRef<ProfileResponse | undefined>;
 
-  private topicService = inject(TopicService);
-  private destroyRef = inject(DestroyRef);
+  private topicService: TopicService = inject(TopicService);
+  private destroyRef: DestroyRef = inject(DestroyRef);
 
-  readonly btnUnsubscribed = "Se désabonner";
-  readonly titleSubscription  = "Abonnements";
-  readonly titleProfilUser = "Profil utilisateur";
-  readonly btnSaveProfilUser = "Sauvegarder";
+  readonly btnUnsubscribed: string = "Se désabonner";
+  readonly titleSubscription: string= "Abonnements";
+  readonly titleProfilUser: string = "Profil utilisateur";
+  readonly btnSaveProfilUser: string = "Sauvegarder";
+  readonly placeholderPassword: string = "Nouveau mot de passe"
 
   error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
   showPasswordModal: WritableSignal<boolean> = signal(false);
@@ -85,13 +86,12 @@ export class Profile {
 
     const nameDirty = this.profileForm.name().dirty();
     const emailDirty = this.profileForm.email().dirty();
-    const passwordDirty = this.profileForm.password().dirty();
 
     if (nameDirty || emailDirty) {
       const name = nameDirty ? this.profileForm.name().value() : null;
       const email = emailDirty ? this.profileForm.email().value() : null;
 
-      this.profilService.updateProfil(email, name)
+      this.profilService.updateProfil$(email, name)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: value => {
@@ -104,7 +104,7 @@ export class Profile {
         });
     }
 
-    if (passwordDirty) {
+    if (this.checkHasNewPasswordToChange()) {
       this.pendingNewPassword = this.profileForm.password().value();
       this.showPasswordModal.set(true);
     }
@@ -112,7 +112,7 @@ export class Profile {
 
   onConfirmPassword(currentPassword: string): void {
     this.showPasswordModal.set(false);
-    this.profilService.updatePassword(this.pendingNewPassword, currentPassword)
+    this.profilService.updatePassword$(this.pendingNewPassword, currentPassword)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => { this.profileForm.password().reset("") },
@@ -123,11 +123,17 @@ export class Profile {
   }
 
   onUnsubscribe(topicId: number) {
-    this.topicService.unsubscribe(topicId)
+    this.topicService.unsubscribe$(topicId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         complete: () => this.profile.reload(),
       })
+  }
+
+  private checkHasNewPasswordToChange(): boolean {
+    return this.profileForm.password().dirty()
+      && this.profileForm.password().valid()
+      && this.profileForm.password().value() !== '';
   }
 
 }

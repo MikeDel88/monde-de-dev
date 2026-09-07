@@ -13,14 +13,14 @@ export class ProfileService {
     url: `${environment.apiUrl}/profile`,
   }));
 
-  updateProfil(email: string | null, name: string | null): Observable<ProfileResponse> {
+  updateProfil$(email: string | null, name: string | null): Observable<ProfileResponse> {
     return this.httpClient.patch<ProfileResponse>(`${environment.apiUrl}/profile`, {
       email: email,
       name: name,
     });
   }
 
-  updatePassword(newPassword: string, currentPassword: string): Observable<void> {
+  updatePassword$(newPassword: string, currentPassword: string): Observable<void> {
     return this.httpClient.patch<void>(`${environment.apiUrl}/profile/password`, { newPassword, currentPassword });
   }
 }

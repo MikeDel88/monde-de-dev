@@ -6,6 +6,7 @@ const MOBILE_BREAKPOINT_PX = 640;
   selector: '[appMenuBehavior]',
   host: {
     '(window:resize)': 'onResize()',
+    '(document:keydown.escape)': 'close()',
   },
 })
 export class MenuBehavior {

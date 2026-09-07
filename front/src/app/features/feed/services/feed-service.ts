@@ -9,7 +9,7 @@ export class FeedService {
   sortByAsc: WritableSignal<boolean> = signal<boolean>(false);
 
   toogleFilterByAsc(): void {
-    this.sortByAsc.set(!this.sortByAsc())
+    this.sortByAsc.set(!this.sortByAsc());
   }
 
   posts: HttpResourceRef<PostFeed[] | undefined> = httpResource<PostFeed[]>(() => ({

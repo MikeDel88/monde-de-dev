@@ -1,5 +1,8 @@
 import {Component, effect, ElementRef, viewChild, input, output, signal, WritableSignal} from '@angular/core';
 import {FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
+import {Title} from "../../../../shared/components/title/title";
+import {Input} from "../../../../shared/components/input/input";
+import {Button} from "../../../../shared/components/button/button";
 
 interface ConfirmPasswordData {
   currentPassword: string;
@@ -11,15 +14,19 @@ const validation = (schemaPath: SchemaPathTree<ConfirmPasswordData>) => {
   required(schemaPath.currentPassword, {message: 'Le mot de passe actuel est requis'});
 };
 
+let nextConfirmPasswordModalId = 0;
+
 @Component({
   selector: 'app-confirm-password-modal',
-  imports: [FormField],
+  imports: [FormField, Title, Input, Button],
   templateUrl: './confirm-password-modal.html',
 })
 export class ConfirmPasswordModal {
-  open = input(false);
-  confirm = output<string>();
-  cancel = output<void>();
+  readonly titleId = `confirm-password-title-${nextConfirmPasswordModalId++}`;
+
+  openModal = input(false);
+  confirmPassword = output<string>();
+  cancelModal = output<void>();
 
   readonly confirmText = "Confimer";
   readonly cancelText = "Annuler";
@@ -35,20 +42,20 @@ export class ConfirmPasswordModal {
     effect(() => {
       const dialog = this.dialogRef()?.nativeElement;
       if (!dialog) return;
-      if (this.open() && !dialog.open) dialog.showModal();
-      if (!this.open() && dialog.open) dialog.close();
+      if (this.openModal() && !dialog.open) dialog.showModal();
+      if (!this.openModal() && dialog.open) dialog.close();
     });
   }
 
   onSubmit(event: Event): void {
     event.preventDefault();
     if (this.passwordForm().invalid()) return;
-    this.confirm.emit(this.passwordForm.currentPassword().value());
+    this.confirmPassword.emit(this.passwordForm.currentPassword().value());
     this.model.set(initialData);
   }
 
   onCancel(): void {
     this.model.set(initialData);
-    this.cancel.emit();
+    this.cancelModal.emit();
   }
 }

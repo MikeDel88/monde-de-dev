@@ -14,7 +14,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponse(
         responseCode = "400",
-        description = "Un ou plusieurs champs sont invalides (emailOrName, password requis)",
+        description = "Un ou plusieurs champs sont invalides. Codes possibles : "
+                + "EMAIL_OR_NAME_REQUIRED, " +
+                "PASSWORD_REQUIRED, ",
         content = @Content(schema = @Schema(implementation = BodyProblemDetail.class))
 )
 public @interface ApiLoginValidationErrorResponse {

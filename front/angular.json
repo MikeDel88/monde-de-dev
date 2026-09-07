@@ -74,7 +74,7 @@
               "buildTarget": "mdd-client:build:production"
             },
             "development": {
-              "buildTarget": "mdd-client:build:production"
+              "buildTarget": "mdd-client:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -84,12 +84,22 @@
           "options": {
             "buildTarget": "mdd-client:production"
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }
   },
   "cli": {
     "schematicCollections": [
+      "angular-eslint",
       "@schematics/angular",
       "@cypress/schematic"
     ],

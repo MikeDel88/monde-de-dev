@@ -11,11 +11,11 @@ export class TopicService {
 
   topics: HttpResourceRef<Topic[] | undefined> = httpResource<Topic[]>(() => `${environment.apiUrl}/topics`);
 
-  subscribe(topicId: number): Observable<void> {
+  subscribe$(topicId: number): Observable<void> {
     return this.httpClient.post<void>(`${environment.apiUrl}/topics/subscribe`, { topicId });
   }
 
-  unsubscribe(topicId: number) {
+  unsubscribe$(topicId: number): Observable<void> {
     return this.httpClient.delete<void>(`${environment.apiUrl}/topics/${topicId}/subscribe`,);
   }
 }

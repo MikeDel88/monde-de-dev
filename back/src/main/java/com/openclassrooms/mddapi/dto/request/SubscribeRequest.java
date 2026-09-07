@@ -8,8 +8,8 @@ import jakarta.validation.constraints.Positive;
  * @param topicId
  */
 public record SubscribeRequest(
-        @NotNull
-        @Positive
+        @NotNull(message = "TOPIC_REQUIRED")
+        @Positive(message = "TOPIC_POSITIVE")
         Long topicId
 ) {
 }

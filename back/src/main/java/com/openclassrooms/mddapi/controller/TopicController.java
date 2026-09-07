@@ -42,7 +42,7 @@ public class TopicController {
 	@ApiTopicNotFoundResponse
 	@ApiUserNotFoundResponse
 	@DeleteMapping("/{topicId}/subscribe")
-	public void unsubscribe(@Validated @Positive @PathVariable Long topicId, Principal principal) {
+	public void unsubscribe(@Validated @Positive(message = "TOPIC_POSITIVE") @PathVariable Long topicId, Principal principal) {
 		topicService.unsubscribe(topicId, Long.valueOf(principal.getName()));
 	}
 }

@@ -4,13 +4,14 @@ import {AuthService} from "../../services/auth-service";
 import {Router} from "@angular/router";
 import {LoginData} from "../../models/login-data";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {Button} from "../../../../shared/components/button/button";
+import {Error as AppError} from "../../../../shared/components/error/error";
+import {Input} from "../../../../shared/components/input/input";
 
 const initialLoginData: LoginData = {
   emailOrName: "",
   password: ''
 };
-
-const loginModel: WritableSignal<LoginData> = signal<LoginData>(initialLoginData);
 
 const validationLoginForm = (schemaPath: SchemaPathTree<LoginData>) => {
   required(schemaPath.emailOrName);
@@ -20,21 +21,21 @@ const validationLoginForm = (schemaPath: SchemaPathTree<LoginData>) => {
 @Component({
   selector: 'app-login',
   templateUrl: './login.html',
-  styleUrl: './login.css',
-  imports: [FormField]
+  imports: [FormField, Button, AppError, Input]
 })
 export class Login {
 
-  readonly btnText: string = "Se connecter"
-  readonly labelEmailOrName: string = "E-mail ou nom d'utilisateur"
-  readonly labelPassword: string = "Mot de passe"
+  readonly btnText: string = "Se connecter";
+  readonly labelEmailOrName: string = "E-mail ou nom d'utilisateur";
+  readonly labelPassword: string = "Mot de passe";
 
   private readonly destroyRef: DestroyRef = inject(DestroyRef);
   private readonly router: Router = inject(Router);
   private readonly authService: AuthService = inject(AuthService);
   error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
 
-  loginForm: FieldTree<LoginData> = form(loginModel, validationLoginForm);
+  private readonly loginModel: WritableSignal<LoginData> = signal<LoginData>(initialLoginData);
+  loginForm: FieldTree<LoginData> = form(this.loginModel, validationLoginForm);
 
   onFocus(): void {
     this.error.set(undefined);
@@ -42,6 +43,10 @@ export class Login {
 
   onSubmit(event: Event): void {
     event.preventDefault();
+    this.loginForm().markAsTouched();
+    if (this.loginForm().invalid()) {
+      return;
+    }
     const credentials: FieldState<LoginData> = this.loginForm();
     this.authService.login$(credentials.value())
       .pipe(takeUntilDestroyed(this.destroyRef))
