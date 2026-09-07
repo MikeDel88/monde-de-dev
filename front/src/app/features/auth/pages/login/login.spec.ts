@@ -70,7 +70,7 @@ describe('Login', () => {
 
     await configureLogin([
       { provide: AuthService, useValue: mockAuthService },
-      provideRouter(routes),
+      { provide: Router, useValue: { navigate: jest.fn() } },
     ]);
   });
 
@@ -210,7 +210,7 @@ describe('Login', () => {
     });
   });
 
-  describe("Integration Test (Component + AuthService/Router + HttpClientTesting)", () => {
+  describe("Integration Test (Component + AuthService + HttpClientTesting)", () => {
 
     beforeEach(async () => {
       TestBed.resetTestingModule();
