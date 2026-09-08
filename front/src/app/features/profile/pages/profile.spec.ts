@@ -54,7 +54,7 @@ describe('Profile', () => {
       reload: jest.fn(),
       set: jest.fn((value: ProfileResponse) => mockProfileValue.set(value)),
     },
-    updateProfil$: jest.fn(),
+    updateProfile$: jest.fn(),
     updatePassword$: jest.fn(),
   };
 
@@ -101,7 +101,7 @@ describe('Profile', () => {
     mockProfileService.profile.reload.mockReset();
     mockProfileService.profile.set.mockReset();
     mockProfileService.profile.set.mockImplementation((value: ProfileResponse) => mockProfileValue.set(value));
-    mockProfileService.updateProfil$.mockReset();
+    mockProfileService.updateProfile$.mockReset();
     mockProfileService.updatePassword$.mockReset();
     mockTopicService.unsubscribe$.mockReset();
 
@@ -186,13 +186,13 @@ describe('Profile', () => {
 
     describe('Submit name/email', () => {
       it('should call updateProfil$ with dirty name and email', () => {
-        mockProfileService.updateProfil$.mockReturnValue(of({ ...MOCK_PROFIL, name: 'Jane', email: 'jane@test.com' }));
+        mockProfileService.updateProfile$.mockReturnValue(of({ ...MOCK_PROFIL, name: 'Jane', email: 'jane@test.com' }));
         setDirtyValue(component.profileForm.name, 'Jane');
         setDirtyValue(component.profileForm.email, 'jane@test.com');
 
         submit();
 
-        expect(mockProfileService.updateProfil$).toHaveBeenCalledWith('jane@test.com', 'Jane');
+        expect(mockProfileService.updateProfile$).toHaveBeenCalledWith('jane@test.com', 'Jane');
       });
 
       it('should not call updateProfil$ when only the password changed', () => {
@@ -200,12 +200,12 @@ describe('Profile', () => {
 
         submit();
 
-        expect(mockProfileService.updateProfil$).not.toHaveBeenCalled();
+        expect(mockProfileService.updateProfile$).not.toHaveBeenCalled();
       });
 
       it('should update the profile value on successful submission', () => {
         const updated = { ...MOCK_PROFIL, name: 'Jane' };
-        mockProfileService.updateProfil$.mockReturnValue(of(updated));
+        mockProfileService.updateProfile$.mockReturnValue(of(updated));
         setDirtyValue(component.profileForm.name, 'Jane');
 
         submit();
@@ -215,7 +215,7 @@ describe('Profile', () => {
       });
 
       it('should display an error message when updateProfil$ fails', () => {
-        mockProfileService.updateProfil$.mockReturnValue(throwError(() => new Error('fail')));
+        mockProfileService.updateProfile$.mockReturnValue(throwError(() => new Error('fail')));
         setDirtyValue(component.profileForm.name, 'Jane');
 
         submit();

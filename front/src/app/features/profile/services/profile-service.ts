@@ -13,7 +13,7 @@ export class ProfileService {
     url: `${environment.apiUrl}/profile`,
   }));
 
-  updateProfil$(email: string | null, name: string | null): Observable<ProfileResponse> {
+  updateProfile$(email: string | null, name: string | null): Observable<ProfileResponse> {
     return this.httpClient.patch<ProfileResponse>(`${environment.apiUrl}/profile`, {
       email: email,
       name: name,
