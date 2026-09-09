@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { Back } from './back';
+import {describe, beforeEach, it, expect} from "@jest/globals";
+import {By} from "@angular/platform-browser";
 
 describe('Back', () => {
   let component: Back;
@@ -19,5 +21,20 @@ describe('Back', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it("should display image arrow-back", () => {
+    const img = fixture.debugElement.query(By.css('img'));
+    expect(img).toBeTruthy();
+    expect(img.attributes['src']).toContain('arrow-back.png');
+  });
+
+  it("should call onBack() when click button", () => {
+    let emitted = false;
+    component.nav.subscribe(() => (emitted = true));
+
+    fixture.debugElement.query(By.css('[data-test="btn-back"]')).nativeElement.click();
+
+    expect(emitted).toBeTruthy();
   });
 });
