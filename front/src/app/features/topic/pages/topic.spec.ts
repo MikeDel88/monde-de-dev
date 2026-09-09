@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import {describe, it, expect, beforeEach, afterEach, jest} from "@jest/globals";
-import {of} from "rxjs";
 import {HttpTestingController, provideHttpClientTesting} from "@angular/common/http/testing";
 import {provideHttpClient} from "@angular/common/http";
 import {TopicService} from "../services/topic-service";
