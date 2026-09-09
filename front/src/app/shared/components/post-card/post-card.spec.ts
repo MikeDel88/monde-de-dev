@@ -33,39 +33,39 @@ describe('PostCard', () => {
     expect(component).toBeTruthy();
   });
 
-  it("should display title", () => {
+  it("should display the title", () => {
     const title = fixture.debugElement.query(By.css('h3')).nativeElement as HTMLElement;
     expect(title.textContent).toBe("Test Post");
   });
 
-  it("shoudl display date with dd/MM/yyyy format", () => {
+  it("should display date with dd/MM/yyyy format", () => {
     const date = fixture.debugElement.query(By.css('[data-test="date"]')).nativeElement as HTMLElement;
     expect(date.textContent).toBe("01/06/2024");
   });
 
-  it("should display author with first char upper", () => {
+  it("should display the author with the first letter capitalized", () => {
     const author = fixture.debugElement.query(By.css('[data-test="author"]')).nativeElement as HTMLElement;
     expect(author.textContent).toBe("John");
   });
 
-  it("should display preview with first char upper", () => {
+  it("should display the preview with the first letter capitalized", () => {
     const preview = fixture.debugElement.query(By.css('[data-test="preview"]')).nativeElement;
     expect(preview.textContent).toBe("This is a test post.");
   })
 
-  it("should display ariaLabel in button when set", () => {
+  it("should display the ariaLabel on the button when set", () => {
     fixture.componentRef.setInput("ariaLabel", "post");
     fixture.detectChanges();
     const button = fixture.debugElement.query(By.css('[data-test="button"]'));
     expect(button.attributes["aria-label"]).toBe("post");
   });
 
-  it("should not display ariaLabel in button when not set", () => {
+  it("should not display an aria-label on the button when not set", () => {
     const button = fixture.debugElement.query(By.css('[data-test="button"]'));
     expect(button.attributes["aria-label"]).toBeUndefined();
   });
 
-  it("should call clickPost() when click button", () => {
+  it("should call clickPost() when the button is clicked", () => {
     let emitted = false;
     component.clickPost.subscribe(() => (emitted = true));
 

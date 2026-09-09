@@ -33,7 +33,7 @@ describe('Logo', () => {
     expect(logo.attributes["src"]).toContain("logo.png");
   });
 
-  it("should contain width and height", () => {
+  it("should have the given width and height", () => {
     expect(logo.attributes["width"]).toBe("50");
     expect(logo.attributes["height"]).toBe("100");
   });

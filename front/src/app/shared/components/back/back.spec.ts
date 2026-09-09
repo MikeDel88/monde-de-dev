@@ -23,13 +23,13 @@ describe('Back', () => {
     expect(component).toBeTruthy();
   });
 
-  it("should display image arrow-back", () => {
+  it("should display the arrow-back image", () => {
     const img = fixture.debugElement.query(By.css('img'));
     expect(img).toBeTruthy();
     expect(img.attributes['src']).toContain('arrow-back.png');
   });
 
-  it("should call onBack() when click button", () => {
+  it("should call onBack() when the button is clicked", () => {
     let emitted = false;
     component.nav.subscribe(() => (emitted = true));
 

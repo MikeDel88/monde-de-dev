@@ -23,7 +23,7 @@ describe('Dividers', () => {
     expect(component).toBeTruthy();
   });
 
-  it("should contain hr", () => {
+  it("should contain an hr element", () => {
     const divider = fixture.debugElement.query(By.css('hr'));
     expect(divider).toBeTruthy();
   });
