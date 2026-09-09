@@ -1,4 +1,4 @@
-<form (submit)="onSubmit($event)" (focusin)="onFocus()" class="flex flex-col gap-2 w-full lg:w-1/2 2xl:w-1/6 mx-auto p-6">
+<form (submit)="onSubmit($event)" (focusin)="onFocus()" class="flex flex-col gap-2 w-full lg:w-1/2 2xl:w-1/6 mx-auto items-center p-6">
   <app-input [label]="labelEmailOrName" type="text" data-test="name" errorDataTest="error-name" [formField]="loginForm.emailOrName" />
   <app-input [label]="labelPassword" type="password" data-test="password" errorDataTest="error-password" [formField]="loginForm.password"/>
   <app-error data-test="error" [message]="error()" />

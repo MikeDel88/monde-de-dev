@@ -41,3 +41,30 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+declare namespace Cypress {
+    interface Chainable {
+      getBySelector(selector: string): Chainable<JQuery>
+      findBySelector(selector: string, search: string): Chainable<JQuery>
+      login(): void
+    }
+}
+
+Cypress.Commands.add("getBySelector", (selector: string) => {
+  return cy.get(`[data-test=${selector}]`)
+})
+
+Cypress.Commands.add("findBySelector", (selector: string, search: string) => {
+  return cy.getBySelector(selector).find(`[data-test=${search}]`)
+})
+
+Cypress.Commands.add('login', () => {
+  cy.env(['apiUrl', 'token']).then(({ apiUrl, token }) => {
+    cy.intercept('POST', `${apiUrl}/auth/login`, { token })
+  })
+  cy.visit('/login')
+  cy.getBySelector('name').type("test")
+  cy.getBySelector('password').type("Test1234!")
+  cy.getBySelector('btn-submit').click()
+  cy.url().should('include', '/feed')
+})
