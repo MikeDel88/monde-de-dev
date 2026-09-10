@@ -7,11 +7,10 @@ export default defineConfig({
   fixturesFolder: 'cypress/fixtures',
   video:false,
   env: {
-    apiUrl: environment.apiUrl,
-    token: 'fake-jwt-token',
+    apiUrl: environment.apiUrl
   },
   e2e: {
-    baseUrl: 'http://localhost:4200',
+    baseUrl: "http://localhost:4200",
     setupNodeEvents(on, config) {
       require('@cypress/code-coverage/task')(on, config);
       return config;

@@ -1,10 +1,10 @@
 @if (visible()) {
-  <div class="fixed top-4 right-4 z-50 flex items-center gap-3 w-full max-w-sm rounded-xl border p-4 shadow-lg {{ variant().card }}" role="alert">
+  <div data-test="alert-toast" class="fixed top-4 right-4 z-50 flex items-center gap-3 w-full max-w-sm rounded-xl border p-4 shadow-lg {{ variant().card }}" role="alert">
     <div class="flex items-center justify-center shrink-0 w-8 h-8 rounded-md {{ variant().badge }}">
       @switch (type()) {
         @case ("success") {
           <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 11.917 9.724 16.5 19 7.5"/></svg>
-          <span class="sr-only">Check icon</span>
+          <span class="sr-only" data-test="toast-success">Check icon</span>
         }
         @case ("error") {
           <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/></svg>

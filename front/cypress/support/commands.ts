@@ -46,7 +46,8 @@ declare namespace Cypress {
     interface Chainable {
       getBySelector(selector: string): Chainable<JQuery>
       findBySelector(selector: string, search: string): Chainable<JQuery>
-      login(): void
+      login(emailOrName?: string, password?: string): void
+      register(name?: string, email?: string, password?: string): void
     }
 }
 
@@ -58,13 +59,17 @@ Cypress.Commands.add("findBySelector", (selector: string, search: string) => {
   return cy.getBySelector(selector).find(`[data-test=${search}]`)
 })
 
-Cypress.Commands.add('login', () => {
-  cy.env(['apiUrl', 'token']).then(({ apiUrl, token }) => {
-    cy.intercept('POST', `${apiUrl}/auth/login`, { token })
-  })
+Cypress.Commands.add('login', (emailOrName?: string, password?: string) => {
   cy.visit('/login')
-  cy.getBySelector('name').type("test")
-  cy.getBySelector('password').type("Test1234!")
+  cy.getBySelector('name').type(emailOrName ?? "test")
+  cy.getBySelector('password').type(password ?? "Test1234!")
   cy.getBySelector('btn-submit').click()
-  cy.url().should('include', '/feed')
+})
+
+Cypress.Commands.add('register', (name?: string, email?: string, password?: string) => {
+  cy.visit('/register')
+  cy.getBySelector('name').type(name ?? "test")
+  cy.getBySelector('email').type(email ?? "test@test.com")
+  cy.getBySelector('password').type(password ?? "Test1234!")
+  cy.getBySelector('btn-submit').click()
 })

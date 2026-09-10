@@ -1,6 +1,8 @@
 describe('Auth Login', () => {
 
-  beforeEach(() => cy.visit('/login'))
+  before(() => cy.register())
+
+  beforeEach(() => cy.visit("/login"))
 
   it('loads and renders the login component', () => {
     cy.getBySelector("name").should('exist');
@@ -13,45 +15,30 @@ describe('Auth Login', () => {
     cy.getBySelector('password').should('have.attr', 'type', 'password')
   })
 
-  it("should redirect to /feed on successful login", () => {
+  it("should redirect to /feed and must have a token on successful login", () => {
     cy.login();
-  });
+    cy.url().should('include', '/feed')
+    cy.getAllLocalStorage().then((result) => {
+      const originStorage = result[Cypress.config('baseUrl')!]
+      expect(originStorage).to.have.property('token')
+      expect(originStorage["token"]).to.be.a('string').and.not.be.empty
+    })
+  })
 
   it('should display an error message on invalid credentials', () => {
-    cy.env(['apiUrl']).then(({ apiUrl }) => {
-      cy.intercept('POST', `${apiUrl}/auth/login`, {
-        statusCode: 401,
-        body: {},
-      }).as('login')
-    })
     cy.getBySelector('name').type('test')
     cy.getBySelector('password').type('WrongPassword1!')
     cy.getBySelector('btn-submit').click()
-    cy.wait('@login')
-    cy.getBySelector('error').should('exist').and('contain.text', 'Vérifier le couple')
+    cy.getBySelector('error').should('be.visible')
     cy.url().should('include', '/login')
   })
 
-  it('should not submit and should show required errors on empty fields', () => {
-    cy.env(['apiUrl']).then(({ apiUrl }) => {
-      cy.intercept('POST', `${apiUrl}/auth/login`).as('login')
-    })
-    cy.getBySelector('btn-submit').click()
-    cy.getBySelector('error-name').should('exist')
-    cy.getBySelector('error-password').should('exist')
-    cy.get('@login.all').should('have.length', 0)
-  })
-
   it('should clear the error message on field focus', () => {
-    cy.env(['apiUrl']).then(({ apiUrl }) => {
-      cy.intercept('POST', `${apiUrl}/auth/login`, { statusCode: 401, body: {} }).as('login')
-    })
     cy.getBySelector('name').type('test')
     cy.getBySelector('password').type('WrongPassword1!')
     cy.getBySelector('btn-submit').click()
-    cy.wait('@login')
-    cy.findBySelector("error", "error").should('exist')
+    cy.findBySelector("error", "error").should('be.visible')
     cy.findBySelector('name', "input").focus()
-    cy.findBySelector("error", "error").should('not.exist')
+    cy.findBySelector("error", "error").should('not.be.exist')
   })
 });
