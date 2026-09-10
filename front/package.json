@@ -8,6 +8,7 @@
     "build": "ng build",
     "build:test": "ng build --configuration=test",
     "watch": "ng build --watch --configuration development",
+    "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "e2e": "start-server-and-test start:test http://localhost:4200 cypress:run",

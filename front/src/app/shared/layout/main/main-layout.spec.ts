@@ -79,7 +79,7 @@ describe('MainLayout', () => {
     const flushMicrotasks = () => new Promise((resolve) => setTimeout(resolve, 0));
 
     it('should navigate to /feed when the feed link is clicked', async () => {
-      const harness = await RouterTestingHarness.create('/topic');
+      const harness = await RouterTestingHarness.create('/topics');
       await flushMicrotasks();
       httpMock.expectOne(`${environment.apiUrl}/topics`).flush([]);
       await flushMicrotasks();
@@ -107,7 +107,7 @@ describe('MainLayout', () => {
       await flushMicrotasks();
       harness.fixture.detectChanges();
 
-      expect(TestBed.inject(Location).path()).toBe('/topic');
+      expect(TestBed.inject(Location).path()).toBe('/topics');
     });
 
     it('should navigate to /profile when the profile link is clicked', async () => {
