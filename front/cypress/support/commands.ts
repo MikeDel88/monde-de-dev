@@ -46,8 +46,8 @@ declare namespace Cypress {
     interface Chainable {
       getBySelector(selector: string): Chainable<JQuery>
       findBySelector(selector: string, search: string): Chainable<JQuery>
-      login(emailOrName?: string, password?: string): void
-      register(name?: string, email?: string, password?: string): void
+      login(emailOrName?: string, password?: string): Chainable<void>
+      register(name?: string, email?: string, password?: string): Chainable<void>
     }
 }
 
@@ -64,6 +64,7 @@ Cypress.Commands.add('login', (emailOrName?: string, password?: string) => {
   cy.getBySelector('name').type(emailOrName ?? "test")
   cy.getBySelector('password').type(password ?? "Test1234!")
   cy.getBySelector('btn-submit').click()
+  cy.url().should('include', '/feed')
 })
 
 Cypress.Commands.add('register', (name?: string, email?: string, password?: string) => {
@@ -73,3 +74,5 @@ Cypress.Commands.add('register', (name?: string, email?: string, password?: stri
   cy.getBySelector('password').type(password ?? "Test1234!")
   cy.getBySelector('btn-submit').click()
 })
+
+

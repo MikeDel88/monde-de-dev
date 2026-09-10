@@ -17,7 +17,6 @@ describe('Auth Login', () => {
 
   it("should redirect to /feed and must have a token on successful login", () => {
     cy.login();
-    cy.url().should('include', '/feed')
     cy.getAllLocalStorage().then((result) => {
       const originStorage = result[Cypress.config('baseUrl')!]
       expect(originStorage).to.have.property('token')
