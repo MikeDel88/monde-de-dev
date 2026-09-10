@@ -9,7 +9,7 @@
       [text]="btnCreatePostText"
       aria-label="create post"
     />
-    <button class="flex flex-row items-center gap-1 whitespace-nowrap w-auto hover:cursor-pointer" aria-label="sort posts" (click)="toggle()">
+    <button data-test="btn-sort" class="flex flex-row items-center gap-1 whitespace-nowrap w-auto hover:cursor-pointer" aria-label="sort posts" (click)="toggle()">
       <span class="font-bold">{{ sortByAscText }}</span>
       @if (!sortByAsc()) {
         <svg data-test="desc" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 shrink-0">
@@ -25,7 +25,7 @@
   @if(posts.hasValue()) {
     <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-11.5 gap-y-5.5 py-8">
       @for (post of posts.value(); track post.id) {
-        <li>
+        <li data-test="posts">
           <app-post-card class="hover:cursor-pointer" [post]="post" (clickPost)="onClickPost($event)" [ariaLabel]="post.title"/>
         </li>
       }

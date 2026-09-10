@@ -20,7 +20,7 @@ describe('Auth Login', () => {
     cy.getAllLocalStorage().then((result) => {
       const originStorage = result[Cypress.config('baseUrl')!]
       expect(originStorage).to.have.property('token')
-      expect(originStorage["token"]).to.be.a('string'
+      expect(originStorage.token).to.be.a('string'
       ).and.not.be.empty
     })
   })

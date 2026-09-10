@@ -5,6 +5,7 @@
     <app-button
       type="button"
       class="self-center"
+      data-test="btn-subscribe"
       (click)="onClick(topic.id)"
       [disabled]="topic.subscribed ? btnUnsubscribed().disabled : false"
       [text]="topic.subscribed ? btnUnsubscribed().text : btnSubscribeText"/>

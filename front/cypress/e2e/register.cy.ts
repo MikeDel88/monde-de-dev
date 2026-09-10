@@ -1,7 +1,5 @@
 describe('Auth Register', () => {
 
-  const uuid = self.crypto.randomUUID()
-
   beforeEach(() => cy.visit("/register"))
 
   it('loads and renders the register component', () => {
@@ -17,8 +15,7 @@ describe('Auth Register', () => {
   })
 
   it("should show a success toast on successful register", () => {
-    cy.register(uuid, uuid + "@test.com", "Test1234!");
-    cy.findBySelector("toast", "toast-success").should('exist');
+    cy.registerUniqueUser()
   })
 
   it('should display an error message on invalid credentials', () => {
@@ -30,12 +27,14 @@ describe('Auth Register', () => {
   })
 
   it('should clear the error message on field focus', () => {
-    cy.getBySelector('name').type(uuid)
-    cy.getBySelector('email').type(uuid + "@test.com")
-    cy.getBySelector('password').type('WrongPassword1!')
-    cy.getBySelector('btn-submit').click()
-    cy.findBySelector("error", "error").should('exist')
-    cy.findBySelector('name', "input").focus()
-    cy.findBySelector("error", "error").should('not.exist')
+    cy.registerUniqueUser().then((registeredUser) => {
+      cy.getBySelector('name').type(registeredUser.name)
+      cy.getBySelector('email').type(registeredUser.email)
+      cy.getBySelector('password').type('WrongPassword1!')
+      cy.getBySelector('btn-submit').click()
+      cy.findBySelector("error", "error").should('exist')
+      cy.findBySelector('name', "input").focus()
+      cy.findBySelector("error", "error").should('not.exist')
+    })
   })
 });
