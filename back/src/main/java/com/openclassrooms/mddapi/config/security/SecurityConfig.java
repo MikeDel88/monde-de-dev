@@ -1,6 +1,5 @@
 package com.openclassrooms.mddapi.config.security;
 
-import com.openclassrooms.mddapi.config.properties.ApiConfigProperties;
 import com.openclassrooms.mddapi.config.properties.AppConfigProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -28,14 +27,13 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
-    private final ApiConfigProperties apiConfigProperties;
     private final AppConfigProperties appConfigProperties;
 
     /**
      * Construit la chaîne de filtres de sécurité appliquée aux requêtes HTTP :
      * CSRF et form-login désactivés (API stateless sans cookies), sessions
      * stateless, CORS via {@link #corsConfigurationSource()}, routes publiques
-     * (Swagger, {@code /api/v{version}/auth/register}, {@code /api/v{version}/auth/login})
+     * (Swagger, {@code /auth/register}, {@code /auth/login})
      * et routes protégées nécessitant un JWT valide, avec gestion des erreurs
      * d'authentification et d'accès refusé via les handlers dédiés.
      * @param http le builder de configuration de la sécurité HTTP.
@@ -57,18 +55,16 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(authorize -> {
-                            String apiPrefix = "/api/v" + apiConfigProperties.version();
-                            authorize
-                                    .requestMatchers(
-                                            "/v3/api-docs/**",
-                                            "/swagger-ui.html",
-                                            "/swagger-ui/**"
-                                    ).permitAll()
-                                    .requestMatchers(apiPrefix + "/auth/register").permitAll()
-                                    .requestMatchers(apiPrefix + "/auth/login").permitAll()
-                                    .anyRequest().authenticated();
-                        }
+                .authorizeHttpRequests(authorize ->
+                        authorize
+                                .requestMatchers(
+                                        "/v3/api-docs/**",
+                                        "/swagger-ui.html",
+                                        "/swagger-ui/**"
+                                ).permitAll()
+                                .requestMatchers("/auth/register").permitAll()
+                                .requestMatchers("/auth/login").permitAll()
+                                .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(Customizer.withDefaults())
