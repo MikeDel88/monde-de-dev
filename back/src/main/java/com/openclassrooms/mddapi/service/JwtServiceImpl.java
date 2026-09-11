@@ -37,9 +37,6 @@ public class JwtServiceImpl implements JwtService {
                 .build();
 
         JwsHeader header = JwsHeader.with(SignatureAlgorithm.RS256).build();
-        String token = jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
-
-        log.debug("JWT Service : Token de l'utilisateur {}", token);
-        return token;
+        return jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
     }
 }
