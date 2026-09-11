@@ -12,22 +12,24 @@
       <app-error data-test="error" [message]="error()" />
       <app-button
         type="submit"
+        data-test="btn-submit"
         class="self-center"
         [text]="btnSaveProfilUser"
         [disabled]="!profileForm().dirty()"
       />
     </form>
     <app-confirm-password-modal
+      data-test="modal"
       [openModal]="showPasswordModal()"
       (confirmPassword)="onConfirmPassword($event)"
       (cancelModal)="showPasswordModal.set(false)"
     />
     @if (profile.value().topics.length > 0) {
       <app-dividers class="w-11/12 mx-auto"/>
-      <app-title  class="font-bold" [content]="titleSubscription" />
+      <app-title data-test="title" class="font-bold" [content]="titleSubscription" />
       <ul class="w-full grid grid-cols-1 md:grid-cols-2 gap-y-3.5 gap-1.5">
         @for (topic of profile.value().topics; track topic.id) {
-          <li>
+          <li data-test="topic">
             <app-topic-card
               [topic]="topic"
               [btnUnsubscribed]="{ disabled: false, text: btnUnsubscribed }"
