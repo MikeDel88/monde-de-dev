@@ -11,6 +11,10 @@ import {HttpTestingController, provideHttpClientTesting} from "@angular/common/h
 import {provideHttpClient} from "@angular/common/http";
 import {SessionService} from "../../../core/services/session-service";
 import {environment} from "../../../../environments/environment";
+import {Page} from "../../models/page";
+import {PostFeed} from "../../../features/feed/models/post-feed";
+
+const EMPTY_PAGE: Page<PostFeed> = { content: [], totalElements: 0, totalPages: 0, number: 0, size: 20 };
 
 describe('MainLayout', () => {
   let component: MainLayout;
@@ -87,7 +91,7 @@ describe('MainLayout', () => {
 
       harness.fixture.debugElement.query(By.css('[data-test="link-feed"]')).nativeElement.click();
       await flushMicrotasks();
-      httpMock.expectOne((req) => req.url === `${environment.apiUrl}/feed`).flush([]);
+      httpMock.expectOne((req) => req.url === `${environment.apiUrl}/posts`).flush(EMPTY_PAGE);
       await flushMicrotasks();
       harness.fixture.detectChanges();
 
@@ -97,7 +101,7 @@ describe('MainLayout', () => {
     it('should navigate to /topic when the topic link is clicked', async () => {
       const harness = await RouterTestingHarness.create('/feed');
       await flushMicrotasks();
-      httpMock.expectOne((req) => req.url === `${environment.apiUrl}/feed`).flush([]);
+      httpMock.expectOne((req) => req.url === `${environment.apiUrl}/posts`).flush(EMPTY_PAGE);
       await flushMicrotasks();
       harness.fixture.detectChanges();
 
@@ -113,7 +117,7 @@ describe('MainLayout', () => {
     it('should navigate to /profile when the profile link is clicked', async () => {
       const harness = await RouterTestingHarness.create('/feed');
       await flushMicrotasks();
-      httpMock.expectOne((req) => req.url === `${environment.apiUrl}/feed`).flush([]);
+      httpMock.expectOne((req) => req.url === `${environment.apiUrl}/posts`).flush(EMPTY_PAGE);
       await flushMicrotasks();
       harness.fixture.detectChanges();
 
@@ -130,7 +134,7 @@ describe('MainLayout', () => {
     it("should logout when the logout link is clicked", async () => {
       const harness = await RouterTestingHarness.create('/feed');
       await flushMicrotasks();
-      httpMock.expectOne((req) => req.url === `${environment.apiUrl}/feed`).flush([]);
+      httpMock.expectOne((req) => req.url === `${environment.apiUrl}/posts`).flush(EMPTY_PAGE);
       await flushMicrotasks();
       harness.fixture.detectChanges();
 

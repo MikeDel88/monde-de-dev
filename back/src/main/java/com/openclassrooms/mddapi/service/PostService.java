@@ -7,6 +7,8 @@ import com.openclassrooms.mddapi.dto.response.PostResponse;
 import com.openclassrooms.mddapi.exception.PostNotFoundException;
 import com.openclassrooms.mddapi.exception.TopicNotFoundException;
 import com.openclassrooms.mddapi.exception.UserNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -16,10 +18,10 @@ import java.util.List;
 public interface PostService {
     /**
      * Permet de récupérer une liste tri par ordre
-     * @param sort "asc" ou "desc"
+     * @param direction "asc" ou "desc"
      * @return liste des Posts spécialement adaptée pour un fil d'actualité.
      */
-    List<PostFeedResponse> getPosts(String sort, Long userId);
+    Page<PostFeedResponse> getPosts(Pageable pageable, String direction, Long userId);
 
     /**
      * Crée un post pour l'utilisateur donné sur le topic indiqué dans la requête.

@@ -1,8 +1,10 @@
-import {Component, inject, WritableSignal} from '@angular/core';
+import {Component, inject, Signal, WritableSignal} from '@angular/core';
 import {PostCard} from "../../../shared/components/post-card/post-card";
 import {FeedService} from "../services/feed-service";
 import {HttpResourceRef} from "@angular/common/http";
 import {PostFeed} from "../models/post-feed";
+import {Page} from "../../../shared/models/page";
+import {InfiniteScroll} from "../../../shared/directives/infinite-scroll";
 import {Router} from "@angular/router";
 import {Button} from "../../../shared/components/button/button";
 import {Error} from "../../../shared/components/error/error";
@@ -14,7 +16,8 @@ import {Loader} from "../../../shared/components/loader/loader";
     PostCard,
     Button,
     Error,
-    Loader
+    Loader,
+    InfiniteScroll
   ],
   templateUrl: './feed.html',
 })
@@ -25,7 +28,9 @@ export class Feed {
   feedService: FeedService = inject(FeedService);
   readonly router = inject(Router);
   sortByAsc: WritableSignal<boolean> = this.feedService.sortByAsc;
-  posts!: HttpResourceRef<PostFeed[] | undefined>;
+  posts!: HttpResourceRef<Page<PostFeed> | undefined>;
+  loadedPosts: Signal<PostFeed[]> = this.feedService.loadedPosts;
+  hasMore: Signal<boolean> = this.feedService.hasMore;
 
   constructor() {
     this.posts = this.feedService.posts;
@@ -34,6 +39,10 @@ export class Feed {
 
   toggle(): void {
     this.feedService.toggleFilterByAsc();
+  }
+
+  onLoadMore(): void {
+    this.feedService.loadMore();
   }
 
   onClickCreatePost(): void {

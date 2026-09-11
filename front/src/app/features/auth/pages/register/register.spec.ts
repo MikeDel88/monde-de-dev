@@ -15,6 +15,10 @@ import {provideHttpClient} from "@angular/common/http";
 import {Location} from "@angular/common";
 import {RouterTestingHarness} from "@angular/router/testing";
 import {SessionService} from "../../../../core/services/session-service";
+import {Page} from "../../../../shared/models/page";
+import {PostFeed} from "../../../feed/models/post-feed";
+
+const EMPTY_PAGE: Page<PostFeed> = { content: [], totalElements: 0, totalPages: 0, number: 0, size: 20 };
 
 const VALID_REGISTER_DATA: RegisterData = { name: 'john', email: 'john@test.com', password: 'Azerty123!' };
 
@@ -352,8 +356,8 @@ describe('Register', () => {
 
       expect(TestBed.inject(Location).path()).toBe('/feed');
 
-      const feedReq = routingHttpMock.expectOne(req => req.url.startsWith(`${environment.apiUrl}/feed`));
-      feedReq.flush([]);
+      const feedReq = routingHttpMock.expectOne(req => req.url.startsWith(`${environment.apiUrl}/posts`));
+      feedReq.flush(EMPTY_PAGE);
     });
   });
 });

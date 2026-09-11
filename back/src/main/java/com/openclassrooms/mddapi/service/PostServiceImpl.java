@@ -18,10 +18,13 @@ import com.openclassrooms.mddapi.repository.PostRepository;
 import com.openclassrooms.mddapi.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -46,26 +49,19 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<PostFeedResponse> getPosts(String sort, Long userId) {
+    public Page<PostFeedResponse> getPosts(Pageable pageable, String direction, Long userId) {
         log.info("service: getPosts");
-        log.info("sort: {}", sort);
+        log.info("sort: {}", direction);
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-        Comparator<Post> comparator = Comparator.comparing(Post::getDate);
-        if ("desc".equalsIgnoreCase(sort)) {
-            comparator = comparator.reversed();
-        }
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by("date").descending()
+                : Sort.by("date").ascending();
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
-        List<Post> posts = user
-                .getTopics()
-                .stream()
-                .map(Topic::getPosts)
-                .flatMap(Collection::stream)
-                .sorted(comparator)
-                .toList();
-        log.debug("posts size: {}", posts.size());
+        Page<Post> posts = postRepository.findByTopicIn(user.getTopics(), sortedPageable);
 
-        return this.postMapper.toPostFeedResponse(posts);
+        return posts.map(postMapper::toPostFeedResponse);
     }
 
     /**

@@ -15,6 +15,10 @@ import {provideHttpClient} from "@angular/common/http";
 import {Location} from "@angular/common";
 import {RouterTestingHarness} from "@angular/router/testing";
 import {SessionService} from "../../../../core/services/session-service";
+import {Page} from "../../../../shared/models/page";
+import {PostFeed} from "../../../feed/models/post-feed";
+
+const EMPTY_PAGE: Page<PostFeed> = { content: [], totalElements: 0, totalPages: 0, number: 0, size: 20 };
 
 const VALID_CREDENTIALS: LoginData = { emailOrName: 'test@test.com', password: 'azerty' };
 
@@ -313,8 +317,8 @@ describe('Login', () => {
     });
 
     const flushFeedRequest = () => {
-      const feedReq = routingHttpMock.expectOne(req => req.url.startsWith(`${environment.apiUrl}/feed`));
-      feedReq.flush([]);
+      const feedReq = routingHttpMock.expectOne(req => req.url.startsWith(`${environment.apiUrl}/posts`));
+      feedReq.flush(EMPTY_PAGE);
     };
 
     it('should really navigate to /feed once AuthGuard allows it after a successful login', async () => {

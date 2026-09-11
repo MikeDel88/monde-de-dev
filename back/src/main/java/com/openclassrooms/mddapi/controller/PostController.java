@@ -22,6 +22,10 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -42,16 +46,18 @@ public class PostController {
     @ApiFeedValidationErrorResponse
     @ApiUserNotFoundResponse
     @GetMapping
-    public List<PostFeedResponse> posts(
+    public Page<PostFeedResponse> posts(
             @Validated
             @RequestParam
             @NotBlank(message = "SORT_REQUIRED")
             @Pattern(regexp = "^(asc|desc)$", message = "SORT_INVALID")
             String sort,
-            Principal principal
+            Principal principal,
+            @PageableDefault(size = 20)
+            Pageable pageable
     ) {
-        log.info("call /feed");
-        return postService.getPosts(sort, Long.valueOf(principal.getName()));
+        log.info("call /posts");
+        return postService.getPosts(pageable, sort, Long.valueOf(principal.getName()));
     }
 
     @ApiPostDetailResponse

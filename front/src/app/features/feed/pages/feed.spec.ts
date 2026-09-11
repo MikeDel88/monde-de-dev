@@ -4,10 +4,22 @@ import { Feed } from './feed';
 import {afterEach, beforeEach, describe, it, expect, jest} from "@jest/globals";
 import {Router} from "@angular/router";
 import {PostFeed} from "../models/post-feed";
+import {Page} from "../../../shared/models/page";
 import {By} from "@angular/platform-browser";
 import {HttpTestingController, provideHttpClientTesting, TestRequest} from "@angular/common/http/testing";
 import {provideHttpClient} from "@angular/common/http";
 import {environment} from "../../../../environments/environment";
+
+class IntersectionObserverMock {
+  observe = () => {};
+  disconnect = () => {};
+  unobserve = () => {};
+  takeRecords = () => [];
+  root = null;
+  rootMargin = '';
+  thresholds: ReadonlyArray<number> = [];
+}
+(window as any).IntersectionObserver = IntersectionObserverMock;
 
 /**
  * Plan de test
@@ -34,6 +46,14 @@ describe('Feed', () => {
     preview: 'This is a test post.',
     date: "2024-06-01T12:00:00Z",
     author: 'John Doe'
+  };
+
+  const MOCK_PAGE: Page<PostFeed> = {
+    content: [MOCK_POST],
+    totalElements: 1,
+    totalPages: 1,
+    number: 0,
+    size: 20,
   };
 
   beforeEach(async () => {
@@ -84,7 +104,8 @@ describe('Feed', () => {
     });
 
     it('should display the posts correctly', () => {
-      component.posts.set([MOCK_POST]);
+      component.posts.set(MOCK_PAGE);
+      TestBed.tick();
       fixture.detectChanges();
       const postCard = fixture.nativeElement.querySelector('app-post-card');
       expect(postCard).toBeTruthy();
@@ -126,8 +147,8 @@ describe('Feed', () => {
       httpMock.verify();
     });
 
-    const expectFeedRequest = (sort: 'asc' | 'desc'): TestRequest =>
-      httpMock.expectOne(req => req.url === `${environment.apiUrl}/feed` && req.params.get('sort') === sort);
+    const expectFeedRequest = (sort: 'asc' | 'desc', page = 0): TestRequest =>
+      httpMock.expectOne(req => req.url === `${environment.apiUrl}/posts` && req.params.get('sort') === sort && req.params.get('page') === String(page));
 
     const flushMicrotasks = () => new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -135,8 +156,9 @@ describe('Feed', () => {
       const req = expectFeedRequest('desc');
       expect(req.request.method).toBe('GET');
 
-      req.flush([MOCK_POST]);
+      req.flush(MOCK_PAGE);
       await flushMicrotasks();
+      TestBed.tick();
       fixture.detectChanges();
 
       const postCard = fixture.nativeElement.querySelector('app-post-card');
@@ -155,20 +177,55 @@ describe('Feed', () => {
     });
 
     it('should trigger a new request sorted ascending when toggle is called', async () => {
-      expectFeedRequest('desc').flush([MOCK_POST]);
+      expectFeedRequest('desc').flush(MOCK_PAGE);
       await flushMicrotasks();
+      TestBed.tick();
       fixture.detectChanges();
 
       component.toggle();
       fixture.detectChanges();
 
       const secondReq = expectFeedRequest('asc');
-      secondReq.flush([MOCK_POST]);
+      secondReq.flush(MOCK_PAGE);
       await flushMicrotasks();
+      TestBed.tick();
       fixture.detectChanges();
 
       const postCard = fixture.nativeElement.querySelector('app-post-card');
       expect(postCard).toBeTruthy();
+    });
+
+    it('should not show the infinite scroll sentinel when there is no more page to load', async () => {
+      expectFeedRequest('desc').flush(MOCK_PAGE);
+      await flushMicrotasks();
+      TestBed.tick();
+      fixture.detectChanges();
+
+      const sentinel = fixture.debugElement.query(By.css("[data-test='infinite-scroll-sentinel']"));
+      expect(sentinel).toBeFalsy();
+    });
+
+    it('should load and append the next page when onLoadMore is called', async () => {
+      const firstPage: Page<PostFeed> = { ...MOCK_PAGE, totalPages: 2 };
+      expectFeedRequest('desc').flush(firstPage);
+      await flushMicrotasks();
+      TestBed.tick();
+      fixture.detectChanges();
+
+      const sentinel = fixture.debugElement.query(By.css("[data-test='infinite-scroll-sentinel']"));
+      expect(sentinel).toBeTruthy();
+
+      component.onLoadMore();
+      fixture.detectChanges();
+
+      const secondPost: PostFeed = { ...MOCK_POST, id: 2 };
+      expectFeedRequest('desc', 1).flush({ ...MOCK_PAGE, content: [secondPost], number: 1, totalPages: 2 });
+      await flushMicrotasks();
+      TestBed.tick();
+      fixture.detectChanges();
+
+      const postCards = fixture.nativeElement.querySelectorAll('app-post-card');
+      expect(postCards.length).toBe(2);
     });
 
   });
