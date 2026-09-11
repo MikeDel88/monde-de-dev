@@ -3,7 +3,7 @@
   @if(topics.hasValue()) {
     <ul class="grid grid-cols-1 md:grid-cols-2 gap-y-3.5 gap-1.5 py-8">
       @for (topic of topics.value(); track topic.id) {
-        <li>
+        <li data-test="topic">
           <app-topic-card [topic]="topic" (clickTopic)="onSubscribe($event)"/>
         </li>
       }

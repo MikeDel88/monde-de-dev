@@ -1,5 +1,5 @@
 import { Service } from '@angular/core';
-import {BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject} from "rxjs";
 
 @Service()
 export class SessionService {
@@ -7,10 +7,6 @@ export class SessionService {
   private static readonly TOKEN_KEY: string = 'token';
 
   private isLoggedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(!!localStorage.getItem(SessionService.TOKEN_KEY));
-
-  public isLogged$(): Observable<boolean> {
-    return this.isLoggedSubject.asObservable();
-  }
 
   public get isAuthenticated(): boolean {
     return this.isLoggedSubject.value;

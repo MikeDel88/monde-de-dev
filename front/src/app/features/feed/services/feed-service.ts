@@ -8,7 +8,7 @@ export class FeedService {
 
   sortByAsc: WritableSignal<boolean> = signal<boolean>(false);
 
-  toogleFilterByAsc(): void {
+  toggleFilterByAsc(): void {
     this.sortByAsc.set(!this.sortByAsc());
   }
 

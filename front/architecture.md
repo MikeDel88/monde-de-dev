@@ -161,7 +161,7 @@ Tailwind v4, config CSS-first : `src/styles.css` fait `@import "tailwindcss"` pu
 ## 11. Tests
 
 - **Unitaires (Jest)** : `jest-preset-angular`, environnement `jsdom`. 32 fichiers `.spec.ts` pour 39 fichiers source — couverture correcte mais pas totale (quelques composants/directives sans spec, ex. `confirm-password-modal.ts`, `menu-behavior.ts`).
-- **E2E (Cypress)** : un seul spec (`cypress/e2e/app.cy.ts`), qui vérifie seulement que l'app démarre et route bien. **Aucun parcours métier testé** (connexion, création de post, abonnement à un thème).
+- **E2E (Cypress)** : un seul spec (`cypress/e2e/login.cy.ts`), qui vérifie seulement que l'app démarre et route bien. **Aucun parcours métier testé** (connexion, création de post, abonnement à un thème).
 
 **Recommandation** : étoffer les tests e2e sur les parcours critiques (connexion/inscription, création d'un post, abonnement/désabonnement à un thème) avant d'ajouter de nouvelles fonctionnalités.
 

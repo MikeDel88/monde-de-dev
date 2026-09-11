@@ -2,6 +2,7 @@
   <label class="flex flex-col gap-1 text-sm font-medium text-gray-700">
     {{ label() }}
     <input
+      #inputRef
       [id]="id"
       [type]="type()"
       [placeholder]="placeholder()"
@@ -10,11 +11,13 @@
       [attr.aria-describedby]="touched() && invalid() ? errorId : null"
       (input)="value.set($any($event.target).value)"
       (blur)="touch.emit()"
+      data-test="input"
       class="min-w-62.5 max-w-70 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
     />
   </label>
 } @else {
   <input
+    #inputRef
     [id]="id"
     [type]="type()"
     [placeholder]="placeholder()"
@@ -24,6 +27,7 @@
     [attr.aria-describedby]="touched() && invalid() ? errorId : null"
     (input)="value.set($any($event.target).value)"
     (blur)="touch.emit()"
+    data-test="input"
     class="min-w-62.5 max-w-70 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
   />
 }

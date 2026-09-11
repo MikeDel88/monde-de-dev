@@ -19,11 +19,11 @@
     <ng-template #navLinks>
       <li><button type="button" class="text-left text-logout hover:cursor-pointer text-sm font-bold" data-test="btn-logout" (click)="onLogout()">{{ logoutText }}</button></li>
       <li><a routerLink="/feed" routerLinkActive="text-primary font-semibold" class="hover:text-primary text-xl" data-test="link-feed" (click)="menu.close()">{{ postsText }}</a></li>
-      <li><a routerLink="/topic" routerLinkActive="text-primary font-semibold" class="hover:text-primary text-xl" data-test="link-topic" (click)="menu.close()">{{ topicsText }}</a></li>
+      <li><a routerLink="/topics" routerLinkActive="text-primary font-semibold" class="hover:text-primary text-xl" data-test="link-topic" (click)="menu.close()">{{ topicsText }}</a></li>
     </ng-template>
     <ng-template #navProfil>
       <li>
-        <a routerLink="/profile" routerLinkActive="text-primary font-semibold" #rla="routerLinkActive" class="hover:text-primary text-xl" data-test="link-feed" (click)="menu.close()">
+        <a routerLink="/profile" routerLinkActive="text-primary font-semibold" #rla="routerLinkActive" class="hover:text-primary text-xl" data-test="link-profile" (click)="menu.close()">
           <img [src]="rla.isActive ? '/assets/user-active.svg' : '/assets/user.svg'" alt="profile">
         </a>
       </li>

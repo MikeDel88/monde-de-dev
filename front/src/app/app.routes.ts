@@ -37,7 +37,7 @@ export const routes: Routes = [
         component: MainLayout,
         children: [
           { path: 'feed', component: Feed, title: "Fil d'actualité" },
-          { path: 'topic', component: Topic, title: "Thèmes" },
+          { path: 'topics', component: Topic, title: "Thèmes" },
           { path: 'profile', component: Profile, title: "Profil utilisateur" },
           { path: 'post', component: Post, title: "Créer un nouvel article" },
           { path: 'post/:id', component: PostDetail, title: "Voir un article" },

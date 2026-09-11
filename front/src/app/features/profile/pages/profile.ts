@@ -91,7 +91,7 @@ export class Profile {
       const name = nameDirty ? this.profileForm.name().value() : null;
       const email = emailDirty ? this.profileForm.email().value() : null;
 
-      this.profilService.updateProfil$(email, name)
+      this.profilService.updateProfile$(email, name)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: value => {
