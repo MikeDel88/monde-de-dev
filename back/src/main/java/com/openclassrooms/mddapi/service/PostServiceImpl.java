@@ -6,6 +6,7 @@ import com.openclassrooms.mddapi.dto.response.PostFeedResponse;
 import com.openclassrooms.mddapi.dto.response.PostResponse;
 import com.openclassrooms.mddapi.exception.PostNotFoundException;
 import com.openclassrooms.mddapi.exception.TopicNotFoundException;
+import com.openclassrooms.mddapi.exception.TopicNotSubscribedException;
 import com.openclassrooms.mddapi.exception.UserNotFoundException;
 import com.openclassrooms.mddapi.mapper.CommentMapper;
 import com.openclassrooms.mddapi.mapper.PostMapper;
@@ -126,7 +127,7 @@ public class PostServiceImpl implements PostService {
     private void checkUserIsSubscribedToTopic(User user, Topic topic) {
         // si l'utilisateur n'est pas abonné au topic du post, on lève une exception
         if(user.getTopics().stream().noneMatch(topic::equals)) {
-            throw new PostNotFoundException();
+            throw new TopicNotSubscribedException();
         }
     }
 }

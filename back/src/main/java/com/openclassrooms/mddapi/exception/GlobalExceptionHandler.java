@@ -114,6 +114,17 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Gère le cas où l'utilisateur n'est pas abonné au thème et qu'il souhaite accéder à un post.
+     * @param ex l'exception levée l'utilisateur n'est pas abonné.
+     * @return ProblemDetail 403.
+     */
+    @ExceptionHandler(TopicNotSubscribedException.class)
+    public ProblemDetail handleTopicNotSubscribed(TopicNotSubscribedException ex) {
+        log.error("handleTopicNotSubscribed : {}", ex.getMessage());
+        return ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
+    }
+
+    /**
      * Gère le cas où le mot de passe actuel fourni lors d'un changement de mot
      * de passe ne correspond pas à celui enregistré pour l'utilisateur.
      * @param ex l'exception levée lorsque le mot de passe actuel est invalide.
