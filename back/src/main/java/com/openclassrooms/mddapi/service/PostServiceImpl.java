@@ -4,8 +4,6 @@ import com.openclassrooms.mddapi.dto.request.CommentRequest;
 import com.openclassrooms.mddapi.dto.request.PostRequest;
 import com.openclassrooms.mddapi.dto.response.PostFeedResponse;
 import com.openclassrooms.mddapi.dto.response.PostResponse;
-import com.openclassrooms.mddapi.exception.PostNotFoundException;
-import com.openclassrooms.mddapi.exception.TopicNotFoundException;
 import com.openclassrooms.mddapi.exception.TopicNotSubscribedException;
 import com.openclassrooms.mddapi.exception.UserNotFoundException;
 import com.openclassrooms.mddapi.mapper.CommentMapper;
@@ -23,8 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -68,7 +64,7 @@ public class PostServiceImpl implements PostService {
                 .stream()
                 .filter(t -> Objects.equals(t.getId(), postRequest.topicId()))
                 .findFirst()
-                .orElseThrow(TopicNotFoundException::new);
+                .orElseThrow(TopicNotSubscribedException::new);
         Post newPost = postMapper.toPost(postRequest, user, topic);
         postRepository.save(newPost);
     }
@@ -82,16 +78,11 @@ public class PostServiceImpl implements PostService {
         log.info("service: getPostById {}", postId);
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
-        Post post = postRepository.findByIdAndTopicIn(postId, user.getTopics())
+
+        Post post = postRepository.findByIdAndTopicInOrderByCommentsDesc(postId, user.getTopics())
                 .orElseThrow(TopicNotSubscribedException::new);
 
-        // du plus ancien au plus récent, pour que le dernier commentaire soit en bas de la liste.
-        List<Comment> comments = post.getComments()
-                .stream()
-                .sorted(Comparator.comparing(Comment::getDate).reversed())
-                .toList();
-
-        return postMapper.toPostResponse(post, commentMapper.toCommentResponseList(comments));
+        return postMapper.toPostResponse(post, commentMapper.toCommentResponseList(post.getComments()));
     }
 
     /**
@@ -101,7 +92,9 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void createComment(Long postId, CommentRequest commentRequest, Long userId) {
         log.info("service: createComment");
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
         Post post = postRepository.findByIdAndTopicIn(postId, user.getTopics())
                 .orElseThrow(TopicNotSubscribedException::new);
 

@@ -4,8 +4,7 @@ import com.openclassrooms.mddapi.dto.request.CommentRequest;
 import com.openclassrooms.mddapi.dto.request.PostRequest;
 import com.openclassrooms.mddapi.dto.response.PostFeedResponse;
 import com.openclassrooms.mddapi.dto.response.PostResponse;
-import com.openclassrooms.mddapi.exception.PostNotFoundException;
-import com.openclassrooms.mddapi.exception.TopicNotFoundException;
+import com.openclassrooms.mddapi.exception.TopicNotSubscribedException;
 import com.openclassrooms.mddapi.exception.UserNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +15,10 @@ import org.springframework.data.domain.Pageable;
 public interface PostService {
     /**
      * Permet de récupérer le fil d'actualité paginé et trié (tri porté par {@code pageable}).
+     * @param pageable la pagination et le tri à appliquer.
+     * @param userId l'identifiant de l'utilisateur authentifié.
      * @return liste des Posts spécialement adaptée pour un fil d'actualité.
+     * @throws UserNotFoundException si l'utilisateur est introuvable.
      */
     Page<PostFeedResponse> getPosts(Pageable pageable, Long userId);
 
@@ -25,7 +27,7 @@ public interface PostService {
      * @param postRequest les données du post à créer (topicId, title, content).
      * @param userId l'identifiant de l'utilisateur authentifié, auteur du post.
      * @throws UserNotFoundException si l'utilisateur est introuvable.
-     * @throws TopicNotFoundException si le topic est introuvable ou non abonné par l'utilisateur.
+     * @throws TopicNotSubscribedException si le topic n'est pas dans les abonnements de l'utilisateur.
      */
     void createPost(PostRequest postRequest, Long userId);
 
@@ -35,7 +37,7 @@ public interface PostService {
      * @param userId l'identifiant de l'utilisateur authentifié.
      * @return le détail du post avec ses commentaires triés du plus récent au plus ancien.
      * @throws UserNotFoundException si l'utilisateur est introuvable.
-     * @throws PostNotFoundException si le post est introuvable ou si l'utilisateur n'est pas abonné à son topic.
+     * @throws TopicNotSubscribedException si le post est introuvable ou si l'utilisateur n'est pas abonné à son topic.
      */
     PostResponse getPostById(Long postId, Long userId);
 
@@ -45,7 +47,7 @@ public interface PostService {
      * @param commentRequest les données du commentaire à créer (content).
      * @param userId l'identifiant de l'utilisateur authentifié, auteur du commentaire.
      * @throws UserNotFoundException si l'utilisateur est introuvable.
-     * @throws PostNotFoundException si le post est introuvable ou si l'utilisateur n'est pas abonné à son topic.
+     * @throws TopicNotSubscribedException si le post est introuvable ou si l'utilisateur n'est pas abonné à son topic.
      */
     void createComment(Long postId, CommentRequest commentRequest, Long userId);
 }

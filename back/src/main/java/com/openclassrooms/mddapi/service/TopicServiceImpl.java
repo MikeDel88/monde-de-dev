@@ -1,15 +1,14 @@
 package com.openclassrooms.mddapi.service;
 
-import java.util.Comparator;
 import java.util.List;
 
 import com.openclassrooms.mddapi.dto.response.TopicResponse;
 import com.openclassrooms.mddapi.exception.TopicNotFoundException;
 import com.openclassrooms.mddapi.exception.UserNotFoundException;
 import com.openclassrooms.mddapi.mapper.TopicMapper;
-import com.openclassrooms.mddapi.model.Post;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.openclassrooms.mddapi.model.Topic;
@@ -36,11 +35,7 @@ public class TopicServiceImpl implements TopicService {
 	public List<TopicResponse> getTopics(Long userId) {
 		log.info("service: getTopics");
 
-		List<Topic> topics = topicRepository
-				.findAll()
-				.stream()
-				.sorted(Comparator.comparing(Topic::getTitle))
-				.toList();
+		List<Topic> topics = topicRepository.findAll(Sort.by("title"));
 		log.info("topics: {}", topics.size());
 
         return topicMapper.toTopicResponse(topics, userId);

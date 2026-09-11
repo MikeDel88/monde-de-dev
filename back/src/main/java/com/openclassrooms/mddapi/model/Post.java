@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 /**
  * Entité représentant un post publié dans un topic.
@@ -48,10 +48,10 @@ public class Post extends BaseEntity {
     private User user;
 
     /**
-     * Ensemble des commentaires associés au post.
+     * Liste des commentaires associés au post.
      * Suppression en cascade (CascadeType.ALL) : supprimer ce post supprime
      * tous ses commentaires.
      */
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<Comment> comments;
+    private List<Comment> comments;
 }
