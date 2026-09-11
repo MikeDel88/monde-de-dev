@@ -110,7 +110,7 @@ export class FeedService {
   sortByAsc: WritableSignal<boolean> = signal<boolean>(false);
 
   posts: HttpResourceRef<PostFeed[] | undefined> = httpResource<PostFeed[]>(() => ({
-    url: `${environment.apiUrl}/feed`,
+    url: `${environment.apiUrl}/posts`,
     params: { sort: this.sortByAsc() ? "asc" : "desc" }
   }));
 }

@@ -33,6 +33,7 @@ import java.util.List;
 @Log4j2
 @AllArgsConstructor
 @RestController
+@RequestMapping("/posts")
 public class PostController {
 
     private final PostService postService;
@@ -40,8 +41,8 @@ public class PostController {
     @ApiFeedResponse
     @ApiFeedValidationErrorResponse
     @ApiUserNotFoundResponse
-    @GetMapping("/feed")
-    public List<PostFeedResponse> feed(
+    @GetMapping
+    public List<PostFeedResponse> posts(
             @Validated
             @RequestParam
             @NotBlank(message = "SORT_REQUIRED")
@@ -57,7 +58,7 @@ public class PostController {
     @ApiPostDetailValidationErrorResponse
     @ApiPostNotFoundResponse
     @ApiUserNotFoundResponse
-    @GetMapping("/posts/{postId}")
+    @GetMapping("/{postId}")
     public PostResponse getPost(
             @Validated @Positive @PathVariable Long postId,
             Principal principal) {
@@ -69,7 +70,7 @@ public class PostController {
     @ApiPostCreateValidationErrorResponse
     @ApiTopicNotFoundResponse
     @ApiUserNotFoundResponse
-    @PostMapping("/posts")
+    @PostMapping
     public ResponseEntity<Void> create(@Valid @RequestBody PostRequest postRequest, Principal principal) {
         log.info("call /posts create");
         this.postService.createPost(postRequest, Long.valueOf(principal.getName()));
@@ -80,7 +81,7 @@ public class PostController {
     @ApiCommentCreateValidationErrorResponse
     @ApiPostNotFoundResponse
     @ApiUserNotFoundResponse
-    @PostMapping("/posts/{postId}/comments")
+    @PostMapping("/{postId}/comments")
     public ResponseEntity<Void> createComment(
             @Validated @Positive @PathVariable Long postId,
             @Valid @RequestBody CommentRequest commentRequest,
