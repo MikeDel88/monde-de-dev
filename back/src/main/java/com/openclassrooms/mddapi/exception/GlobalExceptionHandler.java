@@ -89,18 +89,6 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Gère le cas où le post demandé n'existe pas, ou n'est pas accessible car
-     * l'utilisateur n'est pas abonné à son topic.
-     * @param ex l'exception levée lorsque le post est introuvable.
-     * @return ProblemDetail 404.
-     */
-    @ExceptionHandler(PostNotFoundException.class)
-    public ProblemDetail handlePostNotFound(PostNotFoundException ex) {
-        log.error("handlePostNotFound : {}", ex.getMessage());
-        return ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-    }
-
-    /**
      * Gère le cas où les identifiants de connexion fournis sont invalides
      * (compte inexistant ou mot de passe incorrect). Volontairement générique
      * pour ne pas permettre à un client de deviner si un compte existe.
@@ -115,7 +103,7 @@ public class GlobalExceptionHandler {
 
     /**
      * Gère le cas où l'utilisateur n'est pas abonné au thème et qu'il souhaite accéder à un post.
-     * @param ex l'exception levée l'utilisateur n'est pas abonné.
+     * @param ex l'exception levée lorsque l'utilisateur n'est pas abonné.
      * @return ProblemDetail 403.
      */
     @ExceptionHandler(TopicNotSubscribedException.class)

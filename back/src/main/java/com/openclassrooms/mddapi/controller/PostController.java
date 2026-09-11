@@ -7,8 +7,7 @@ import com.openclassrooms.mddapi.documentation.post.ApiPostCreateResponse;
 import com.openclassrooms.mddapi.documentation.post.ApiPostCreateValidationErrorResponse;
 import com.openclassrooms.mddapi.documentation.post.ApiPostDetailResponse;
 import com.openclassrooms.mddapi.documentation.post.ApiPostDetailValidationErrorResponse;
-import com.openclassrooms.mddapi.documentation.post.ApiPostNotFoundResponse;
-import com.openclassrooms.mddapi.documentation.topic.ApiTopicNotFoundResponse;
+import com.openclassrooms.mddapi.documentation.topic.ApiTopicNotSubscribedResponse;
 import com.openclassrooms.mddapi.documentation.user.ApiUserNotFoundResponse;
 import com.openclassrooms.mddapi.dto.request.CommentRequest;
 import com.openclassrooms.mddapi.dto.request.PostRequest;
@@ -52,7 +51,7 @@ public class PostController {
 
     @ApiPostDetailResponse
     @ApiPostDetailValidationErrorResponse
-    @ApiPostNotFoundResponse
+    @ApiTopicNotSubscribedResponse
     @ApiUserNotFoundResponse
     @GetMapping("/{postId}")
     public PostResponse getPost(
@@ -64,7 +63,7 @@ public class PostController {
 
     @ApiPostCreateResponse
     @ApiPostCreateValidationErrorResponse
-    @ApiTopicNotFoundResponse
+    @ApiTopicNotSubscribedResponse
     @ApiUserNotFoundResponse
     @PostMapping
     public ResponseEntity<Void> create(@Valid @RequestBody PostRequest postRequest, Principal principal) {
@@ -75,7 +74,7 @@ public class PostController {
 
     @ApiCommentCreateResponse
     @ApiCommentCreateValidationErrorResponse
-    @ApiPostNotFoundResponse
+    @ApiTopicNotSubscribedResponse
     @ApiUserNotFoundResponse
     @PostMapping("/{postId}/comments")
     public ResponseEntity<Void> createComment(

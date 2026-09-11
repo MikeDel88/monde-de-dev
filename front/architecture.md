@@ -108,15 +108,20 @@ Pattern **cohérent et appliqué uniformément** dans tous les services (`feed-s
 @Service()
 export class FeedService {
   sortByAsc: WritableSignal<boolean> = signal<boolean>(false);
+  private page: WritableSignal<number> = signal<number>(0);
 
-  posts: HttpResourceRef<PostFeed[] | undefined> = httpResource<PostFeed[]>(() => ({
+  posts: HttpResourceRef<Page<PostFeed> | undefined> = httpResource<Page<PostFeed>>(() => ({
     url: `${environment.apiUrl}/posts`,
-    params: { sort: this.sortByAsc() ? "asc" : "desc" }
+    params: {
+      sort: `date,${this.sortByAsc() ? "asc" : "desc"}`,
+      page: this.page(),
+      size: PAGE_SIZE
+    }
   }));
 }
 ```
 
-Ici `posts` se re-fetch automatiquement quand `sortByAsc` change, sans code de souscription manuel — bon usage idiomatique de `httpResource`. Seul `auth-service.ts` (login/register) est entièrement en `HttpClient`/`Observable`, ce qui est cohérent puisqu'il n'y a rien à "lire" en continu à ce niveau.
+Ici `posts` se re-fetch automatiquement quand `sortByAsc` ou `page` change, sans code de souscription manuel — bon usage idiomatique de `httpResource`. La réponse est un `Page<PostFeed>` (pagination Spring standard : `content`, `totalPages`, `number`...), pas un tableau brut ; le tri est encodé au format `Pageable` de Spring Data (`sort=date,asc|desc`) plutôt qu'en paramètre custom. `FeedService` accumule les pages chargées dans un signal `loadedPosts` séparé pour le scroll infini (voir `feed-service.ts` pour le détail — `loadMore()`/`hasMore`). Seul `auth-service.ts` (login/register) est entièrement en `HttpClient`/`Observable`, ce qui est cohérent puisqu'il n'y a rien à "lire" en continu à ce niveau.
 
 ## 7. Gestion d'état
 
