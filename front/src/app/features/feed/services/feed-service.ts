@@ -13,7 +13,7 @@ export class FeedService {
   }
 
   posts: HttpResourceRef<PostFeed[] | undefined> = httpResource<PostFeed[]>(() => ({
-    url: `${environment.apiUrl}/feed`,
+    url: `${environment.apiUrl}/posts`,
     params: {
       sort: this.sortByAsc() ? "asc" : "desc"
     }
