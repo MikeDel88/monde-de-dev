@@ -39,10 +39,6 @@ public class Topic extends BaseEntity {
 	 * supprimées automatiquement en base via ON DELETE CASCADE sur la
 	 * contrainte fk_subscription_topic (voir V8__subscriptions_on_delete_cascade.sql).
 	 */
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(
-			name = "subscriptions",
-			joinColumns = @JoinColumn(name = "topic_id"),
-			inverseJoinColumns = @JoinColumn(name = "user_id"))
+	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "topics")
 	private Set<User> users;
 }
