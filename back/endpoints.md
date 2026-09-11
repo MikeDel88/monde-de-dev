@@ -21,9 +21,9 @@ POST /topics/subscribe
 DELETE /topics/:id/subscribe
 
 ## FEED
-# Liste du fil d'actualité (user contient la liste des topic abonné et topic contient la liste des posts)
-GET /feeds?sort=ASC
-GET /feeds?sort=DESC
+# Liste paginée et triée du fil d'actualité (posts des topics auxquels l'utilisateur est abonné).
+# Pagination/tri portés par le Pageable standard Spring Data : page, size, sort=date,asc|desc (défaut : date,desc).
+GET /posts?page=0&size=20&sort=date,desc
 
 ## POSTS
 # Detail d'un article avec ses commentaires.
@@ -39,7 +39,7 @@ POST /posts/:id/comments
 # Codes globaux (s'appliquent à presque tous les endpoints)
 # 400 Bad Request         : validation échouée (@Valid/@Validated), JSON illisible, type mismatch sur un id de path/query
 # 401 Unauthorized        : JWT manquant/invalide/expiré (tous les endpoints sauf /auth/register et /auth/login)
-# 403 Forbidden           : câblé mais actuellement inatteignable (pas de règles de rôle définies)
+# 403 Forbidden           : utilisateur non abonné au topic d'un post (TopicNotSubscribedException, sur GET/POST /posts et POST /posts/:id/comments)
 # 409 Conflict            : contrainte unique violée en base (email/username déjà pris)
 # 500 Internal Server Error : fallback générique
 # Toutes les réponses d'erreur (400/401/403/404/409/500) suivent désormais le format ProblemDetail (RFC 7807).
@@ -54,10 +54,10 @@ POST /posts/:id/comments
 | GET /topics | 200, 401, 500 | pas de 404 |
 | POST /topics/subscribe | 200, 400, 401, 404, 500 | 404 = topic ou user introuvable |
 | DELETE /topics/:id/subscribe | 200, 400, 401, 404, 500 | |
-| GET /feeds (implémenté en GET /feed) | 200, 400, 401, 404, 500 | 400 = sort invalide |
-| GET /posts/:id | 200, 400, 401, 404, 500 | 404 = post introuvable **ou** non abonné au topic (PostNotFoundException dédiée) |
-| POST /posts | 201, 400, 401, 404, 500 | 404 = user introuvable ou topic introuvable/non abonné (TopicNotFoundException) |
-| POST /posts/:id/comments | 201, 400, 401, 404, 500 | 404 = post introuvable ou non abonné au topic (PostNotFoundException dédiée) |
+| GET /posts | 200, 401, 500 | pagination/tri via Pageable (page, size, sort), pas de validation custom |
+| GET /posts/:id | 200, 400, 401, 403, 500 | 403 = post introuvable **ou** non abonné au topic (TopicNotSubscribedException, mêmes symptômes volontairement) |
+| POST /posts | 201, 400, 401, 403, 404, 500 | 404 = user introuvable ; 403 = topic non abonné (TopicNotSubscribedException) |
+| POST /posts/:id/comments | 201, 400, 401, 403, 404, 500 | 404 = user introuvable ; 403 = post introuvable ou non abonné au topic (TopicNotSubscribedException) |
 
 ## CODES D'ERREUR MÉTIER (400)
 
@@ -77,7 +77,6 @@ POST /posts/:id/comments
 | PATCH /profile/password | UpdateProfilPasswordRequest | currentPassword | CURRENT_PASSWORD_REQUIRED (validation) ; CURRENT_PASSWORD_INVALID (métier, 400 via InvalidCurrentPasswordException) |
 | POST /topics/subscribe | SubscribeRequest | topicId | TOPIC_REQUIRED, TOPIC_POSITIVE |
 | DELETE /topics/:id/subscribe | @PathVariable topicId | topicId | TOPIC_POSITIVE |
-| GET /feed | @RequestParam sort | sort | SORT_REQUIRED, SORT_INVALID |
 | POST /posts | PostRequest | topicId | TOPIC_REQUIRED, TOPIC_POSITIVE |
 | POST /posts | PostRequest | title | TITLE_REQUIRED |
 | POST /posts | PostRequest | content | CONTENT_REQUIRED |
