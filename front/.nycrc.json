@@ -1,0 +1,13 @@
+{
+  "include": ["src/app/**/*.ts"],
+  "exclude": [
+    "src/app/**/*.spec.ts",
+    "src/environments/**"
+  ],
+  "reporter": ["text-summary", "lcov"],
+  "check-coverage": true,
+  "lines": 70,
+  "branches": 70,
+  "functions": 70,
+  "statements": 70
+}
