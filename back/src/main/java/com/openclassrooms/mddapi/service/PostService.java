@@ -10,18 +10,15 @@ import com.openclassrooms.mddapi.exception.UserNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 /**
  * Service qui permet la gestion des posts.
  */
 public interface PostService {
     /**
-     * Permet de récupérer une liste tri par ordre
-     * @param direction "asc" ou "desc"
+     * Permet de récupérer le fil d'actualité paginé et trié (tri porté par {@code pageable}).
      * @return liste des Posts spécialement adaptée pour un fil d'actualité.
      */
-    Page<PostFeedResponse> getPosts(Pageable pageable, String direction, Long userId);
+    Page<PostFeedResponse> getPosts(Pageable pageable, Long userId);
 
     /**
      * Crée un post pour l'utilisateur donné sur le topic indiqué dans la requête.

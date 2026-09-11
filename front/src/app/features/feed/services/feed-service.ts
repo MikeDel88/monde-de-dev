@@ -16,7 +16,7 @@ export class FeedService {
   posts: HttpResourceRef<Page<PostFeed> | undefined> = httpResource<Page<PostFeed>>(() => ({
     url: `${environment.apiUrl}/posts`,
     params: {
-      sort: this.sortByAsc() ? "asc" : "desc",
+      sort: `date,${this.sortByAsc() ? "asc" : "desc"}`,
       page: this.page(),
       size: PAGE_SIZE
     }

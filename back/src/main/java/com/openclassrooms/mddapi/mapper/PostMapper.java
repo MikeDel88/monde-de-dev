@@ -29,13 +29,6 @@ public interface PostMapper {
     PostFeedResponse toPostFeedResponse(Post post);
 
     /**
-     * Convertit une liste de posts en liste de réponses pour le fil d'actualité.
-     * @param posts la liste des posts source.
-     * @return List&lt;PostFeedResponse&gt; la liste des réponses mappées.
-     */
-    List<PostFeedResponse> toPostFeedResponse(List<Post> posts);
-
-    /**
      * Convertit une requête de création de post en entité {@link Post}, avec la date de publication fixée au moment de l'appel.
      * @param postRequest les données du post à créer.
      * @param user l'auteur du post.

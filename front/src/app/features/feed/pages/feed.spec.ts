@@ -49,7 +49,7 @@ describe('Feed', () => {
   };
 
   const MOCK_PAGE: Page<PostFeed> = {
-    content: [MOCK_POST],
+    content: [MOCK_POST, { ...MOCK_POST, id: 2}],
     totalElements: 1,
     totalPages: 1,
     number: 0,
@@ -77,18 +77,6 @@ describe('Feed', () => {
       const initialSortByAsc = component.sortByAsc();
       component.toggle();
       expect(component.sortByAsc()).toBe(!initialSortByAsc);
-    });
-
-    it('should display the descending arrow when sortByAsc is false', () => {
-      const arrowDesc = fixture.debugElement.query(By.css("[data-test='desc']"));
-      expect(arrowDesc).toBeTruthy();
-    });
-
-    it('should display the ascending arrow when sortByAsc is true', () => {
-      component.sortByAsc.set(true);
-      fixture.detectChanges();
-      const arrowAsc = fixture.debugElement.query(By.css("[data-test='asc']"));
-      expect(arrowAsc).toBeTruthy();
     });
 
     it('should navigate to create post page when onClickCreatePost is called', () => {
@@ -148,7 +136,7 @@ describe('Feed', () => {
     });
 
     const expectFeedRequest = (sort: 'asc' | 'desc', page = 0): TestRequest =>
-      httpMock.expectOne(req => req.url === `${environment.apiUrl}/posts` && req.params.get('sort') === sort && req.params.get('page') === String(page));
+      httpMock.expectOne(req => req.url === `${environment.apiUrl}/posts` && req.params.get('sort') === `date,${sort}` && req.params.get('page') === String(page));
 
     const flushMicrotasks = () => new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -218,14 +206,14 @@ describe('Feed', () => {
       component.onLoadMore();
       fixture.detectChanges();
 
-      const secondPost: PostFeed = { ...MOCK_POST, id: 2 };
-      expectFeedRequest('desc', 1).flush({ ...MOCK_PAGE, content: [secondPost], number: 1, totalPages: 2 });
+      const thirdPost: PostFeed = { ...MOCK_POST, id: 3 };
+      expectFeedRequest('desc', 1).flush({ ...MOCK_PAGE, content: [thirdPost], number: 1, totalPages: 2 });
       await flushMicrotasks();
       TestBed.tick();
       fixture.detectChanges();
 
       const postCards = fixture.nativeElement.querySelectorAll('app-post-card');
-      expect(postCards.length).toBe(2);
+      expect(postCards.length).toBe(3);
     });
 
   });

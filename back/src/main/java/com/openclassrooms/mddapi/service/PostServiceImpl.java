@@ -19,9 +19,7 @@ import com.openclassrooms.mddapi.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,17 +47,10 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<PostFeedResponse> getPosts(Pageable pageable, String direction, Long userId) {
+    public Page<PostFeedResponse> getPosts(Pageable pageable, Long userId) {
         log.info("service: getPosts");
-        log.info("sort: {}", direction);
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-
-        Sort sort = direction.equalsIgnoreCase("desc")
-                ? Sort.by("date").descending()
-                : Sort.by("date").ascending();
-        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-
-        Page<Post> posts = postRepository.findByTopicIn(user.getTopics(), sortedPageable);
+        Page<Post> posts = postRepository.findByTopicIn(user.getTopics(), pageable);
 
         return posts.map(postMapper::toPostFeedResponse);
     }
@@ -89,10 +80,10 @@ public class PostServiceImpl implements PostService {
     @Transactional(readOnly = true)
     public PostResponse getPostById(Long postId, Long userId) {
         log.info("service: getPostById {}", postId);
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-
-        checkUserIsSubscribedToTopic(user, post.getTopic());
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+        Post post = postRepository.findByIdAndTopicIn(postId, user.getTopics())
+                .orElseThrow(TopicNotSubscribedException::new);
 
         // du plus ancien au plus récent, pour que le dernier commentaire soit en bas de la liste.
         List<Comment> comments = post.getComments()
@@ -111,19 +102,11 @@ public class PostServiceImpl implements PostService {
     public void createComment(Long postId, CommentRequest commentRequest, Long userId) {
         log.info("service: createComment");
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-
-        checkUserIsSubscribedToTopic(user, post.getTopic());
+        Post post = postRepository.findByIdAndTopicIn(postId, user.getTopics())
+                .orElseThrow(TopicNotSubscribedException::new);
 
         Comment newComment = commentMapper.toComment(commentRequest, user, post);
         post.getComments().add(newComment);
         postRepository.save(post);
-    }
-
-    private void checkUserIsSubscribedToTopic(User user, Topic topic) {
-        // si l'utilisateur n'est pas abonné au topic du post, on lève une exception
-        if(user.getTopics().stream().noneMatch(topic::equals)) {
-            throw new TopicNotSubscribedException();
-        }
     }
 }

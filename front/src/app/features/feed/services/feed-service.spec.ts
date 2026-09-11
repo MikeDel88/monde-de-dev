@@ -39,7 +39,7 @@ describe('FeedService', () => {
   const expectRequest = (page: number, sort: 'asc' | 'desc'): TestRequest =>
     httpMock.expectOne(
       (r) => r.url === `${environment.apiUrl}/posts`
-        && r.params.get('sort') === sort
+        && r.params.get('sort') === `date,${sort}`
         && r.params.get('page') === String(page)
     );
 
