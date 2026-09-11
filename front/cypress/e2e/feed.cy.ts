@@ -29,13 +29,17 @@ describe('Page Feed', () => {
     cy.getBySelector('posts').should('have.length.greaterThan', 1)
   })
 
-  it('should toggle sort order when clicking the sort button', () => {
-    cy.getBySelector('posts').its('length').then((initialCount) => {
-      cy.getBySelector('btn-sort').find('[data-test=desc]').should('exist')
-      cy.getBySelector('btn-sort').click()
-      cy.getBySelector('btn-sort').find('[data-test=asc]').should('exist')
-      cy.getBySelector('posts').should('have.length', initialCount)
+
+  describe('Feed sort', () => {
+    it('should toggle sort order when clicking the sort button', () => {
+      cy.getBySelector('posts').its('length').then((initialCount) => {
+        cy.getBySelector('btn-sort').find('[data-test=desc]').should('exist')
+        cy.getBySelector('btn-sort').click()
+        cy.getBySelector('btn-sort').find('[data-test=asc]').should('exist')
+        cy.getBySelector('posts').should('have.length', initialCount)
+      })
     })
+
   })
 
   describe('Nav Menu', () => {
@@ -61,12 +65,14 @@ describe('Page Feed', () => {
     })
   })
 
-  it("should logout when click logout button", () => {
-    cy.getBySelector("btn-logout").should('exist').click()
-    cy.url().should('include', '/login')
-    cy.getAllLocalStorage().then((result) => {
-      const originStorage = result[Cypress.config('baseUrl')!]
-      expect(originStorage?.token).to.be.undefined
+  describe('Logout', () => {
+    it("should logout when click logout button", () => {
+      cy.getBySelector("btn-logout").should('exist').click()
+      cy.url().should('include', '/login')
+      cy.getAllLocalStorage().then((result) => {
+        const originStorage = result[Cypress.config('baseUrl')!]
+        expect(originStorage?.token).to.be.undefined
+      })
     })
   })
 });

@@ -28,17 +28,22 @@ describe('Page Create Post', () => {
     cy.getBySelector("btn-submit").should('exist');
   });
 
-  it('should create a post', () => {
-    cy.createPost('Mon titre de test', 'Mon contenu de test')
+
+  describe('Form', () => {
+    it("should be disabled while any field is empty", () => {
+      cy.getBySelector("btn-submit").find('button').should('be.disabled');
+      cy.getBySelector('topic').select(1);
+      cy.getBySelector("btn-submit").find('button').should('be.disabled');
+      cy.findBySelector('title', 'input').type('Mon titre de test')
+      cy.getBySelector("btn-submit").find('button').should('be.disabled');
+      cy.getBySelector('content').type('Mon contenu de test')
+      cy.getBySelector("btn-submit").find('button').should('not.be.disabled');
+    })
   })
 
-  it("should be disabled while any field is empty", () => {
-    cy.getBySelector("btn-submit").find('button').should('be.disabled');
-    cy.getBySelector('topic').select(1);
-    cy.getBySelector("btn-submit").find('button').should('be.disabled');
-    cy.findBySelector('title', 'input').type('Mon titre de test')
-    cy.getBySelector("btn-submit").find('button').should('be.disabled');
-    cy.getBySelector('content').type('Mon contenu de test')
-    cy.getBySelector("btn-submit").find('button').should('not.be.disabled');
+  describe('Submit form', () => {
+    it('should create a post', () => {
+      cy.createPost('Mon titre de test', 'Mon contenu de test')
+    })
   })
 });

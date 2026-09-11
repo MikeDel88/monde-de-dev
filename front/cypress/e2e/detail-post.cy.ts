@@ -33,11 +33,13 @@ describe('Page Detail Post', () => {
     cy.getBySelector('date').should('exist')
   })
 
-  it('should post a comment and display it', () => {
-    const commentText = 'Mon commentaire de test'
-    cy.getBySelector('comment-input').type(commentText)
-    cy.getBySelector('btn-comment-submit').click()
-    cy.getBySelector('comments').should('exist')
-    cy.getBySelector('comment-content').should('contain.text', commentText)
+  describe('Comments', () => {
+    it('should post a comment and display it', () => {
+      const commentText = 'Mon commentaire de test'
+      cy.getBySelector('comment-input').type(commentText)
+      cy.getBySelector('btn-comment-submit').click()
+      cy.getBySelector('comments').should('exist')
+      cy.getBySelector('comment-content').should('contain.text', commentText)
+    })
   })
 });
