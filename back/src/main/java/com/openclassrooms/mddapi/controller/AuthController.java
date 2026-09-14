@@ -4,13 +4,16 @@ import com.openclassrooms.mddapi.documentation.database.ApiDabataseConflictRespo
 import com.openclassrooms.mddapi.documentation.login.ApiInvalidCredentialsResponse;
 import com.openclassrooms.mddapi.documentation.login.ApiLoginValidResponse;
 import com.openclassrooms.mddapi.documentation.login.ApiLoginValidationErrorResponse;
+import com.openclassrooms.mddapi.documentation.ratelimit.ApiRateLimitExceededResponse;
 import com.openclassrooms.mddapi.documentation.register.ApiRegisterValidResponse;
 import com.openclassrooms.mddapi.dto.request.LoginRequest;
 import com.openclassrooms.mddapi.dto.request.RegisterRequest;
 import com.openclassrooms.mddapi.documentation.register.ApiRegisterValidationErrorResponse;
 import com.openclassrooms.mddapi.dto.response.AuthResponse;
 import com.openclassrooms.mddapi.service.AuthService;
+import com.openclassrooms.mddapi.service.RateLimiterService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -28,14 +31,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final RateLimiterService rateLimiterService;
 
     @SecurityRequirements()
     @ApiRegisterValidResponse
     @ApiDabataseConflictResponse
     @ApiRegisterValidationErrorResponse
+    @ApiRateLimitExceededResponse
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest registerRequest, HttpServletRequest request) {
         log.info("call /register");
+        rateLimiterService.checkRegister(request.getRemoteAddr(), registerRequest.email());
         authService.register(registerRequest);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -46,9 +52,11 @@ public class AuthController {
     @ApiLoginValidResponse
     @ApiLoginValidationErrorResponse
     @ApiInvalidCredentialsResponse
+    @ApiRateLimitExceededResponse
     @PostMapping("/login")
-    public AuthResponse login(@Valid @RequestBody LoginRequest loginRequest) {
+    public AuthResponse login(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         log.info("call /login");
+        rateLimiterService.checkLogin(request.getRemoteAddr(), loginRequest.emailOrName());
         return authService.login(loginRequest);
     }
 }

@@ -16,6 +16,19 @@ L'authentification repose sur un serveur de ressources OAuth2 (`spring-boot-star
 - **Changement de mot de passe** (`PATCH /profile/password`) : en plus d'un JWT valide, le `currentPassword` est désormais requis (`UpdateProfilPasswordRequest.currentPassword`, `@NotBlank`) et vérifié via `passwordEncoder.matches(...)` (`ProfilServiceImpl.updatePassword`) avant d'appliquer le nouveau mot de passe. Cela protège contre un JWT volé par un canal autre que le réseau (XSS, token exfiltré, poste partagé) : l'attaquant ne peut plus changer le mot de passe sans connaître l'ancien. Si `currentPassword` ne correspond pas, une exception dédiée `InvalidCurrentPasswordException` est levée et traduite par `GlobalExceptionHandler` en **400** avec le code `CURRENT_PASSWORD_INVALID` sur le champ `currentPassword`, distinct du 404 "utilisateur introuvable".
 - **Login** (`POST /auth/login`) : l'authentification ne compare plus le mot de passe "à la main" après une recherche en base, mais délègue à un `AuthenticationManager` Spring Security (`SecurityConfig.authenticationManager`), adossé à un `DaoAuthenticationProvider` et à un `UserDetailsService` (`SecurityConfig.userDetailsService`, qui charge l'utilisateur par email ou nom et l'adapte au contrat `UserDetails` via `AuthenticatedUser`). `DaoAuthenticationProvider` exécute systématiquement une comparaison BCrypt — contre le hash réel si l'utilisateur existe, contre un hash factice sinon — ce qui rend le temps de traitement indépendant de l'existence du compte (voir ci-dessous). En cas d'échec, l'`AuthenticationException` levée par Spring Security n'est pas interceptée dans `AuthServiceImpl` : elle remonte jusqu'à `GlobalExceptionHandler.handleAuthenticationException`, qui la traduit en **401** générique (même réponse qu'un compte inexistant).
 
+- **Rate limiting sur `/auth/login` et `/auth/register`** (`RateLimiterService`) : chaque appel est soumis à deux compteurs cumulés de type token-bucket (bucket4j), stockés en mémoire dans des caches Caffeine à expiration (`expireAfterAccess`, pas de partage entre plusieurs instances de l'application) :
+  - une limite par **adresse IP** source (`request.getRemoteAddr()`, pas de gestion de `X-Forwarded-For` pour l'instant, l'application n'étant pas déployée derrière un reverse proxy),
+  - une limite par **compte visé**, normalisé (`trim().toLowerCase()`) : `emailOrName` pour le login, `email` pour l'inscription.
+
+  Valeurs par défaut (configurables via `app.rate-limit.*`, cf. `RateLimitConfigProperties`) :
+
+  | Endpoint | Limite IP | Limite compte |
+  |---|---|---|
+  | POST /auth/login | 10 req / min | 5 req / min |
+  | POST /auth/register | 5 req / min | 3 req / 10 min |
+
+  Le dépassement de l'une ou l'autre limite lève `RateLimitExceededException`, traduite par `GlobalExceptionHandler` en **429** générique (ne précise pas laquelle des deux limites a été atteinte).
+
 Ce fonctionnement est volontairement simple et suffisant pour un MVP, mais présente des limites : absence de révocation ou de renouvellement du token, durée de vie de l'access token beaucoup trop longue pour un usage sécurisé, absence de granularité des droits.
 
 ## À prévoir avant une mise en production
@@ -33,6 +46,9 @@ Remplacer la configuration CORS par défaut par une configuration explicite (`Co
 
 ### Gestion des rôles
 Ajouter une notion de rôle sur l'utilisateur (ex. enum `USER` / `ADMIN` sur l'entité `User`), la propager dans les claims du JWT (ou via les `GrantedAuthority` de Spring Security), puis sécuriser les endpoints sensibles avec `hasRole(...)` ou `@PreAuthorize` selon le rôle requis.
+
+### Rate limiting partagé entre instances
+Le rate limiting actuel est en mémoire locale à chaque instance (Caffeine, pas de Redis). Si l'application est un jour déployée avec plusieurs instances derrière un load balancer, chaque instance applique sa propre limite indépendamment : un attaquant réparti sur plusieurs instances peut dépasser la limite globale visée. À prévoir : un backend partagé (ex. Redis via `bucket4j-redis`) si un déploiement multi-instances est envisagé. Si un reverse proxy est ajouté devant l'application, `server.forward-headers-strategy` devra aussi être configuré pour que l'IP utilisée par le rate limiting soit la vraie IP client (`X-Forwarded-For`) et non celle du proxy.
 
 ### ~~Timing attack sur le login~~ (corrigé)
 Résolu en déléguant l'authentification à `AuthenticationManager`/`DaoAuthenticationProvider` (voir "Login" ci-dessus) : le mot de passe est désormais toujours comparé via BCrypt, contre un hash factice quand l'utilisateur n'existe pas, ce qui rend le temps de traitement indépendant de l'existence du compte.

@@ -145,6 +145,19 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Gère le dépassement du nombre de tentatives autorisées sur le login ou
+     * l'inscription (par IP ou par compte visé). Volontairement générique pour
+     * ne pas révéler laquelle des deux limites a été atteinte.
+     * @param ex l'exception levée lorsque la limite de tentatives est dépassée.
+     * @return ProblemDetail 429.
+     */
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ProblemDetail handleRateLimitExceeded(RateLimitExceededException ex) {
+        log.info("handleRateLimitExceeded : {}", ex.getMessage());
+        return ProblemDetail.forStatus(HttpStatus.TOO_MANY_REQUESTS);
+    }
+
+    /**
      * Gère les échecs de validation sur les paramètres de méthode de contrôleur
      * (@RequestParam / @PathVariable annotés directement, hors @RequestBody).
      * @param ex l'exception de validation levée par Spring au niveau du handler.
