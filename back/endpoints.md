@@ -66,22 +66,22 @@ POST /posts/:id/comments
 
 | Endpoint | DTO / paramètre | Champ | Codes possibles |
 |---|---|---|---|
-| POST /auth/register | RegisterRequest | name | NAME_REQUIRED |
-| POST /auth/register | RegisterRequest | email | EMAIL_INVALID |
+| POST /auth/register | RegisterRequest | name | NAME_REQUIRED, NAME_TOO_LONG (max 255, cf. users.name) |
+| POST /auth/register | RegisterRequest | email | EMAIL_INVALID, EMAIL_TOO_LONG (max 255, cf. users.email) |
 | POST /auth/register | RegisterRequest | password | PASSWORD_REQUIRED |
 | POST /auth/login | LoginRequest | emailOrName | EMAIL_OR_NAME_REQUIRED |
 | POST /auth/login | LoginRequest | password | PASSWORD_REQUIRED |
-| PATCH /profile | UpdateProfilRequest | name | NAME_INVALID |
-| PATCH /profile | UpdateProfilRequest | email | EMAIL_INVALID |
+| PATCH /profile | UpdateProfilRequest | name | NAME_INVALID (vide ou > 255, cf. users.name) |
+| PATCH /profile | UpdateProfilRequest | email | EMAIL_INVALID, EMAIL_TOO_LONG (max 255, cf. users.email) |
 | PATCH /profile/password | UpdateProfilPasswordRequest | newPassword | PASSWORD_REQUIRED |
 | PATCH /profile/password | UpdateProfilPasswordRequest | currentPassword | CURRENT_PASSWORD_REQUIRED (validation) ; CURRENT_PASSWORD_INVALID (métier, 400 via InvalidCurrentPasswordException) |
 | GET /posts | @RequestParam direction | direction | DIRECTION_INVALID |
 | POST /topics/subscribe | SubscribeRequest | topicId | TOPIC_REQUIRED, TOPIC_POSITIVE |
 | DELETE /topics/:id/subscribe | @PathVariable topicId | topicId | TOPIC_POSITIVE |
 | POST /posts | PostRequest | topicId | TOPIC_REQUIRED, TOPIC_POSITIVE |
-| POST /posts | PostRequest | title | TITLE_REQUIRED |
-| POST /posts | PostRequest | content | CONTENT_REQUIRED |
-| POST /posts/:id/comments | CommentRequest | content | CONTENT_REQUIRED |
+| POST /posts | PostRequest | title | TITLE_REQUIRED, TITLE_TOO_LONG (max 255, cf. posts.title) |
+| POST /posts | PostRequest | content | CONTENT_REQUIRED, CONTENT_TOO_LONG (max 65535, cf. posts.content TEXT) |
+| POST /posts/:id/comments | CommentRequest | content | CONTENT_REQUIRED, CONTENT_TOO_LONG (max 65535, cf. comments.content TEXT) |
 | POST /auth/register, PATCH /profile/password | password / newPassword (@ValidPassword) | password | PASSWORD_TOO_SHORT |
 | POST /auth/register, PATCH /profile/password | password / newPassword (@ValidPassword) | password | PASSWORD_MISSING_UPPERCASE |
 | POST /auth/register, PATCH /profile/password | password / newPassword (@ValidPassword) | password | PASSWORD_MISSING_LOWERCASE |

@@ -13,11 +13,12 @@ import jakarta.validation.constraints.Size;
 public record UpdateProfilRequest(
 
         @Size(min = 1, max = 255, message = "NAME_INVALID")
-        @Schema(nullable = true, description = "Nouveau nom, laisser vide/absent pour ne pas le modifier", example = "John")
+        @Schema(nullable = true, minLength = 1, maxLength = 255, description = "Nouveau nom, laisser vide/absent pour ne pas le modifier", example = "John")
         String name,
 
         @Email(message = "EMAIL_INVALID")
-        @Schema(nullable = true, description = "Nouvel email, laisser vide/absent pour ne pas le modifier", example = "john@example.com")
+        @Size(max = 255, message = "EMAIL_TOO_LONG")
+        @Schema(nullable = true, maxLength = 255, description = "Nouvel email, laisser vide/absent pour ne pas le modifier", example = "john@example.com")
         String email
 ) {
 }
