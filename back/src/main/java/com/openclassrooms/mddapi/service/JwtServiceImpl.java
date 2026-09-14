@@ -1,6 +1,7 @@
 package com.openclassrooms.mddapi.service;
 
 import com.openclassrooms.mddapi.config.properties.AppConfigProperties;
+import com.openclassrooms.mddapi.config.security.JwtClaimsConstants;
 import com.openclassrooms.mddapi.model.User;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 /**
  * Implémentation de {@link JwtService} : génère un JWT signé RS256 via
@@ -34,8 +36,11 @@ public class JwtServiceImpl implements JwtService {
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .subject(String.valueOf(user.getId()))
+                .issuer(JwtClaimsConstants.ISSUER)
+                .audience(List.of(JwtClaimsConstants.AUDIENCE))
                 .issuedAt(now)
                 .expiresAt(now.plus(appConfigProperties.tokenExpiration(), ChronoUnit.DAYS))
+                .claim(JwtClaimsConstants.ROLE_CLAIM, user.getRole().name())
                 .build();
 
         JwsHeader header = JwsHeader.with(SignatureAlgorithm.RS256).build();

@@ -29,6 +29,11 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
+    /** Rôle applicatif de l'utilisateur, propagé dans les claims du JWT. */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
     /**
      * Ensemble des topics auxquels l'utilisateur est abonné (table subscriptions).
      * Aucun cascade JPA configuré : supprimer cet utilisateur ne supprime
@@ -53,6 +58,7 @@ public class User extends BaseEntity {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.role = Role.USER;
     }
 
     /** Change le nom d'utilisateur. */
