@@ -4,17 +4,14 @@ import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { authInterceptor } from './http-interceptor';
-import { SessionService } from '../services/session-service';
 
 describe('authInterceptor', () => {
   let httpClient: HttpClient;
   let httpMock: HttpTestingController;
-  let sessionService: SessionService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        SessionService,
         provideHttpClient(withInterceptors([authInterceptor])),
         provideHttpClientTesting(),
       ],
@@ -22,27 +19,16 @@ describe('authInterceptor', () => {
 
     httpClient = TestBed.inject(HttpClient);
     httpMock = TestBed.inject(HttpTestingController);
-    sessionService = TestBed.inject(SessionService);
   });
 
   afterEach(() => {
     httpMock.verify();
-    localStorage.clear();
   });
 
-  it('should add an Authorization header when a token exists', () => {
-    sessionService.logIn('abc');
-
+  it('should send the request with credentials so the auth cookie is included', () => {
     httpClient.get('/api/test').subscribe();
 
     const req = httpMock.expectOne('/api/test');
-    expect(req.request.headers.get('Authorization')).toBe('Bearer abc');
-  });
-
-  it('should not add an Authorization header when there is no token', () => {
-    httpClient.get('/api/test').subscribe();
-
-    const req = httpMock.expectOne('/api/test');
-    expect(req.request.headers.has('Authorization')).toBe(false);
+    expect(req.request.withCredentials).toBe(true);
   });
 });

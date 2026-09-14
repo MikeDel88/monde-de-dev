@@ -3,7 +3,6 @@ package com.openclassrooms.mddapi.service;
 import com.openclassrooms.mddapi.config.security.AuthenticatedUser;
 import com.openclassrooms.mddapi.dto.request.LoginRequest;
 import com.openclassrooms.mddapi.dto.request.RegisterRequest;
-import com.openclassrooms.mddapi.dto.response.AuthResponse;
 import com.openclassrooms.mddapi.mapper.UserMapper;
 import com.openclassrooms.mddapi.model.User;
 import com.openclassrooms.mddapi.repository.UserRepository;
@@ -44,7 +43,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional(readOnly = true)
-    public AuthResponse login(LoginRequest request) {
+    public String login(LoginRequest request) {
         log.info("service : login");
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.emailOrName().trim(), request.password())
@@ -52,6 +51,6 @@ public class AuthServiceImpl implements AuthService {
 
         User user = ((AuthenticatedUser) Objects.requireNonNull(authentication.getPrincipal())).user();
 
-        return new AuthResponse(jwtService.generateAccessToken(user));
+        return jwtService.generateAccessToken(user);
     }
 }

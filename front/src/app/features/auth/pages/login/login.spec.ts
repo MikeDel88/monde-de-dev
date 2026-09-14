@@ -249,7 +249,7 @@ describe('Login', () => {
     it('should connexion is success', () => {
       const req = submitAndExpectLoginRequest();
 
-      req.flush({ token: 'fake-jwt-token' });
+      req.flush(null);
       fixture.detectChanges();
 
       expect(router.navigate).toHaveBeenCalledWith(['/feed']);
@@ -281,14 +281,13 @@ describe('Login', () => {
       expect(errorElement.nativeElement.textContent).toContain('Une erreur est survenue, veuillez réessayer plus tard');
     });
 
-    it('should persist the session (token + isAuthenticated) after a successful login', () => {
+    it('should persist the session (isAuthenticated) after a successful login', () => {
       const req = submitAndExpectLoginRequest();
 
-      req.flush({ token: 'fake-jwt-token' });
+      req.flush(null);
       fixture.detectChanges();
 
       expect(sessionService.isAuthenticated).toBe(true);
-      expect(sessionService.getToken()).toBe('fake-jwt-token');
     });
 
   });
@@ -332,7 +331,7 @@ describe('Login', () => {
       harness.detectChanges();
 
       const loginReq = routingHttpMock.expectOne({ url: `${environment.apiUrl}/auth/login` });
-      loginReq.flush({ token: 'fake-jwt-token' });
+      loginReq.flush(null);
 
       await harness.fixture.whenStable();
       harness.detectChanges();
@@ -344,7 +343,7 @@ describe('Login', () => {
     });
 
     it('should redirect an already authenticated user away from /login to /feed via GuestGuard', async () => {
-      TestBed.inject(SessionService).logIn('existing-token');
+      TestBed.inject(SessionService).logIn();
 
       await RouterTestingHarness.create('/login');
 

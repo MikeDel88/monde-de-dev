@@ -25,13 +25,9 @@ describe('Auth Login', () => {
   })
 
   describe('Submit Form', () => {
-    it("should redirect to /feed and must have a token on successful login", () => {
+    it("should redirect to /feed and set the auth cookie on successful login", () => {
       cy.login(registeredUser.name, registeredUser.password);
-      cy.getAllLocalStorage().then((result) => {
-        const originStorage = result[Cypress.config('baseUrl')!]
-        expect(originStorage).to.have.property('token')
-        expect(originStorage.token).to.be.a('string').and.not.be.empty
-      })
+      cy.getCookie('access_token').should('exist').its('value').should('not.be.empty')
     })
 
     it('should display an error message on invalid credentials', () => {

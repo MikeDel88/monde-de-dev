@@ -69,10 +69,7 @@ describe('Page Feed', () => {
     it("should logout when click logout button", () => {
       cy.getBySelector("btn-logout").should('exist').click()
       cy.url().should('include', '/login')
-      cy.getAllLocalStorage().then((result) => {
-        const originStorage = result[Cypress.config('baseUrl')!]
-        expect(originStorage?.token).to.be.undefined
-      })
+      cy.getCookie('access_token').should('not.exist')
     })
   })
 });

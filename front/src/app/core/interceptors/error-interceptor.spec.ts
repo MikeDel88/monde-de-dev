@@ -31,11 +31,10 @@ describe('errorInterceptor', () => {
 
   afterEach(() => {
     httpMock.verify();
-    localStorage.clear();
   });
 
-  it('should log out and redirect to /login on a 401 while a token exists', () => {
-    sessionService.logIn('abc');
+  it('should log out and redirect to /login on a 401', () => {
+    sessionService.logIn();
     const logOutSpy = jest.spyOn(sessionService, 'logOut');
     const onError = jest.fn();
 
@@ -48,21 +47,8 @@ describe('errorInterceptor', () => {
     expect(onError).toHaveBeenCalled();
   });
 
-  it('should not log out nor redirect on a 401 when there is no token', () => {
-    const logOutSpy = jest.spyOn(sessionService, 'logOut');
-    const onError = jest.fn();
-
-    httpClient.get('/api/test').subscribe({ error: onError });
-
-    httpMock.expectOne('/api/test').flush(null, { status: 401, statusText: 'Unauthorized' });
-
-    expect(logOutSpy).not.toHaveBeenCalled();
-    expect(router.navigateByUrl).not.toHaveBeenCalled();
-    expect(onError).toHaveBeenCalled();
-  });
-
   it('should not log out nor redirect on a non-401 error', () => {
-    sessionService.logIn('abc');
+    sessionService.logIn();
     const logOutSpy = jest.spyOn(sessionService, 'logOut');
     const onError = jest.fn();
 

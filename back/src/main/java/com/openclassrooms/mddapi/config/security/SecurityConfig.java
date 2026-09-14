@@ -18,6 +18,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -37,15 +40,19 @@ public class SecurityConfig {
 
     /**
      * Construit la chaîne de filtres de sécurité appliquée aux requêtes HTTP :
-     * CSRF et form-login désactivés (API stateless sans cookies), sessions
-     * stateless, CORS via {@link #corsConfigurationSource()}, routes publiques
-     * (Swagger, {@code /auth/register}, {@code /auth/login})
-     * et routes protégées nécessitant un JWT valide, avec gestion des erreurs
+     * protection CSRF basée sur un cookie {@code XSRF-TOKEN} (le JWT étant
+     * désormais transporté par un cookie {@code HttpOnly}, il est exposé aux
+     * requêtes cross-site), form-login désactivé, sessions stateless, CORS via
+     * {@link #corsConfigurationSource()}, routes publiques (Swagger,
+     * {@code /auth/register}, {@code /auth/login}, {@code /auth/logout})
+     * et routes protégées nécessitant un JWT valide résolu depuis le cookie
+     * via {@link CookieBearerTokenResolver}, avec gestion des erreurs
      * d'authentification et d'accès refusé via les handlers dédiés.
      * @param http le builder de configuration de la sécurité HTTP.
      * @param jwtAuthenticationEntryPoint gère les erreurs d'authentification (401).
      * @param jwtAccessDeniedHandler gère les erreurs d'accès refusé (403).
      * @param jwtAuthenticationConverter mappe le claim {@code role} du JWT en autorités.
+     * @param cookieBearerTokenResolver lit le JWT depuis le cookie {@code access_token}.
      * @return SecurityFilterChain la chaîne de filtres de sécurité configurée.
      */
     @Bean
@@ -53,11 +60,16 @@ public class SecurityConfig {
             HttpSecurity http,
             JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
             JwtAccessDeniedHandler jwtAccessDeniedHandler,
-            JwtAuthenticationConverter jwtAuthenticationConverter
-    ) {
+            JwtAuthenticationConverter jwtAuthenticationConverter,
+            CookieBearerTokenResolver cookieBearerTokenResolver
+    ) throws Exception {
         log.info("Security Filter Chain");
         return http
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                )
+                .addFilterAfter(new CsrfCookieFilter(), CsrfFilter.class)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -72,10 +84,12 @@ public class SecurityConfig {
                                 ).permitAll()
                                 .requestMatchers("/auth/register").permitAll()
                                 .requestMatchers("/auth/login").permitAll()
+                                .requestMatchers("/auth/logout").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter))
+                        .bearerTokenResolver(cookieBearerTokenResolver)
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
                 .exceptionHandling(ex -> ex
@@ -157,7 +171,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(appConfigProperties.getListOfDomains());
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-XSRF-TOKEN"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -6,10 +6,10 @@ L'authentification repose sur un serveur de ressources OAuth2 (`spring-boot-star
 
 - **Clés RSA** (`KeyConfig`) : une paire de clés 2048 bits fixe est chargée au démarrage depuis les variables d'environnement `RSA_PRIVATE_KEY`/`RSA_PUBLIC_KEY` (via `.env.properties` en local, secret manager en production). Elle est stable entre redémarrages et partageable entre plusieurs instances, les tokens émis restent donc valides après un restart.
 - **Génération du token** (`JwtServiceImpl`) : un seul type de token, l'access token, est généré. Il contient uniquement le `subject` (id de l'utilisateur), une date d'émission et une expiration fixée à **30 jours**. Aucun claim de rôle ou de scope n'est inclus.
-- **Transport du token** : le client envoie le token via le header `Authorization: Bearer <token>`. Aucun cookie n'est utilisé.
+- **Transport du token** : le client ne manipule plus le token en JavaScript. `POST /auth/login` le pose dans un cookie `access_token` (`HttpOnly`, `SameSite=Lax`, `Secure` en production via `app.cookie.secure`), lu côté serveur par `CookieBearerTokenResolver` (au lieu du header `Authorization`). `POST /auth/logout` invalide ce cookie (`Max-Age=0`).
 - **Session** : l'API est stateless (`SessionCreationPolicy.STATELESS`), aucune session serveur n'est conservée.
-- **CSRF** : désactivé (`csrf(AbstractHttpConfigurer::disable)`). Cohérent avec une API purement stateless sans cookie, mais devra être revu si les tokens passent un jour par un cookie.
-- **CORS** : configuration par défaut de Spring (`Customizer.withDefaults()`), aucune restriction de domaine explicite.
+- **CSRF** : réactivé (`CookieCsrfTokenRepository.withHttpOnlyFalse()` + `CsrfCookieFilter`), nécessaire dès lors que le JWT est porté par un cookie (contrairement au header `Authorization`, un cookie est envoyé automatiquement par le navigateur sur les requêtes cross-site). Le front envoie le token CSRF via le header `X-XSRF-TOKEN`, lu depuis le cookie `XSRF-TOKEN`.
+- **CORS** : configuration explicite par domaine (`app.domains.allows`), `allowCredentials(true)` pour permettre l'envoi des cookies, headers autorisés incluant `X-XSRF-TOKEN`.
 - **Autorisations** : pas de notion de rôle. Toute requête authentifiée est acceptée (`anyRequest().authenticated()`), il n'existe pas de distinction admin/utilisateur au niveau de l'entité `User` ni des endpoints.
 - **Routes publiques** : documentation Swagger/OpenAPI (`/v3/api-docs`, `/swagger-ui.html`, non versionnée), ainsi que `/api/v1/auth/register` et `/api/v1/auth/login`.
 - **Gestion des erreurs** : `JwtAuthenticationEntryPoint` renvoie un 401 JSON en cas d'authentification manquante/invalide, `JwtAccessDeniedHandler` renvoie un 403 JSON en cas d'accès refusé.
@@ -33,16 +33,19 @@ Ce fonctionnement est volontairement simple et suffisant pour un MVP, mais prés
 
 ## À prévoir avant une mise en production
 
-### Cookies + access token / refresh token
-Remplacer le token porté par le client (ex. localStorage) par un cookie `httpOnly`, `Secure` et `SameSite` approprié, afin de le protéger des accès via JavaScript (XSS). Mettre en place deux tokens :
+### ~~Cookie HttpOnly/Secure/SameSite~~ (corrigé)
+Résolu : le token n'est plus porté par le client (`localStorage`) mais par un cookie `HttpOnly`, `Secure` (en production) et `SameSite=Lax`, voir "Transport du token" ci-dessus.
+
+### Access token / refresh token
+Il reste un seul type de token (l'access token actuel, durée de vie 30 jours), toujours sans révocation possible avant expiration. À prévoir :
 - un **access token** de courte durée (ex. 15 minutes),
-- un **refresh token** de durée plus longue, permettant de renouveler l'access token via un endpoint dédié, avec possibilité de révocation/rotation et un endpoint de logout invalidant le refresh token.
+- un **refresh token** de durée plus longue, permettant de renouveler l'access token via un endpoint dédié, avec possibilité de révocation/rotation et un endpoint de logout invalidant le refresh token (persistance nécessaire côté serveur).
 
-### Configuration CSRF
-Dès lors qu'un cookie transporte le token d'authentification, la protection CSRF doit être réactivée (par exemple via `CookieCsrfTokenRepository`), car le mode "header Bearer" actuel n'y est pas exposé mais un cookie l'est.
+### ~~Configuration CSRF~~ (corrigé)
+Résolu : la protection CSRF est réactivée via `CookieCsrfTokenRepository`, voir "CSRF" ci-dessus.
 
-### Configuration CORS par domaine
-Remplacer la configuration CORS par défaut par une configuration explicite (`CorsConfigurationSource`) listant précisément les domaines autorisés (front de production, environnements de preview/staging si besoin), les méthodes HTTP et headers autorisés, ainsi que `allowCredentials(true)` pour permettre l'envoi des cookies.
+### ~~Configuration CORS par domaine~~ (corrigé)
+Résolu : configuration CORS explicite par domaine (`app.domains.allows`), voir "CORS" ci-dessus.
 
 ### Gestion des rôles
 Ajouter une notion de rôle sur l'utilisateur (ex. enum `USER` / `ADMIN` sur l'entité `User`), la propager dans les claims du JWT (ou via les `GrantedAuthority` de Spring Security), puis sécuriser les endpoints sensibles avec `hasRole(...)` ou `@PreAuthorize` selon le rôle requis.

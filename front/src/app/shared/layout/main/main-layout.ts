@@ -1,7 +1,7 @@
 import {Component, inject} from '@angular/core';
 import {NgTemplateOutlet} from "@angular/common";
 import {Router, RouterLink, RouterLinkActive, RouterOutlet} from "@angular/router";
-import {SessionService} from "../../../core/services/session-service";
+import {AuthService} from "../../../features/auth/services/auth-service";
 import {MenuBehavior} from "../../directives/menu-behavior";
 import {Logo} from "../../components/logo/logo";
 
@@ -22,14 +22,16 @@ export class MainLayout {
   readonly postsText = "Articles";
   readonly topicsText = "Thèmes";
 
-  private readonly sessionService = inject(SessionService);
+  private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
   readonly menu = inject(MenuBehavior, {self: true});
 
   onLogout(): void {
     this.menu.close();
-    this.sessionService.logOut();
-    this.router.navigateByUrl('/login');
+    this.authService.logout$().subscribe({
+      complete: () => this.router.navigateByUrl('/login'),
+      error: () => this.router.navigateByUrl('/login'),
+    });
   }
 }

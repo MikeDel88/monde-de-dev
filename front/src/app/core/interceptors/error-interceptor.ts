@@ -10,7 +10,7 @@ export function errorInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn)
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401 && sessionService.getToken()) {
+      if (error.status === 401) {
         sessionService.logOut();
         router.navigateByUrl('/login');
       }

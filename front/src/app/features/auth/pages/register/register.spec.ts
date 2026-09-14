@@ -350,7 +350,7 @@ describe('Register', () => {
     });
 
     it('should redirect an already authenticated user away from /register to /feed via GuestGuard', async () => {
-      TestBed.inject(SessionService).logIn('existing-token');
+      TestBed.inject(SessionService).logIn();
 
       await RouterTestingHarness.create('/register');
 

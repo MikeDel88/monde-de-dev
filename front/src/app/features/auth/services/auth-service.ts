@@ -6,7 +6,6 @@ import {LoginData} from "../models/login-data";
 import {FieldError} from "../../../core/models/field-error";
 import {ApiProblemDetail} from "../../../core/models/api-problem-detail";
 import {SessionService} from "../../../core/services/session-service";
-import {AuthResponse} from "../models/auth-response";
 import {environment} from "../../../../environments/environment";
 
 @Service()
@@ -21,10 +20,15 @@ export class AuthService {
    }
 
    login$(datas: LoginData): Observable<boolean> {
-    return this.httpClient.post<AuthResponse>(`${environment.apiUrl}/auth/login`, datas)
-      .pipe(tap((authResponse: AuthResponse) => this.sessionService.logIn(authResponse.token)))
+    return this.httpClient.post<void>(`${environment.apiUrl}/auth/login`, datas)
+      .pipe(tap(() => this.sessionService.logIn()))
       .pipe(map(() => this.sessionService.isAuthenticated))
       .pipe(catchError((err: HttpErrorResponse) => throwError(() => new Error(this.buildLoginErrorMessage(err)))));
+   }
+
+   logout$(): Observable<void> {
+     return this.httpClient.post<void>(`${environment.apiUrl}/auth/logout`, {})
+       .pipe(tap(() => this.sessionService.logOut()));
    }
 
    private buildLoginErrorMessage(err: HttpErrorResponse): string {

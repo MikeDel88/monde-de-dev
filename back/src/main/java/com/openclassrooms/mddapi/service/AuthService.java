@@ -2,7 +2,6 @@ package com.openclassrooms.mddapi.service;
 
 import com.openclassrooms.mddapi.dto.request.LoginRequest;
 import com.openclassrooms.mddapi.dto.request.RegisterRequest;
-import com.openclassrooms.mddapi.dto.response.AuthResponse;
 
 /**
  * Service qui permet la gestion de l'authentification de l'utilisateur.
@@ -17,6 +16,7 @@ public interface AuthService {
     /**
      * Authentification de l'utilisateur
      * @param request Dto LoginRequest qui contient emailOrUsername et le password.
+     * @return le JWT généré pour l'utilisateur authentifié.
      */
-    AuthResponse login(LoginRequest request);
+    String login(LoginRequest request);
 }

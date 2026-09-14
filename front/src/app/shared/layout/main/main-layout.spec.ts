@@ -71,7 +71,7 @@ describe('MainLayout', () => {
         ],
       }).compileComponents();
 
-      TestBed.inject(SessionService).logIn('existing-token');
+      TestBed.inject(SessionService).logIn();
       httpMock = TestBed.inject(HttpTestingController);
     });
 
@@ -139,6 +139,8 @@ describe('MainLayout', () => {
       harness.fixture.detectChanges();
 
       harness.fixture.debugElement.query(By.css('[data-test="btn-logout"]')).nativeElement.click();
+      await flushMicrotasks();
+      httpMock.expectOne(`${environment.apiUrl}/auth/logout`).flush(null);
       await flushMicrotasks();
       harness.fixture.detectChanges();
 
