@@ -80,7 +80,7 @@ Couches transverses, utilisées à plusieurs niveaux :
 
 ## Persistance & migrations
 
-Base MySQL unique, schéma géré exclusivement par des migrations Flyway versionnées dans `back/src/main/resources/db/migrations/` (`V1` à `V8` au moment de la rédaction). `spring.jpa.hibernate.ddl-auto=validate` garantit qu'Hibernate ne modifie jamais le schéma en dehors des migrations — il vérifie seulement au démarrage que les entités JPA correspondent au schéma réellement présent en base.
+Base MySQL unique, schéma géré exclusivement par des migrations Flyway versionnées dans `back/src/main/resources/db/migrations/` (`V1` à `V10` au moment de la rédaction). `spring.jpa.hibernate.ddl-auto=validate` garantit qu'Hibernate ne modifie jamais le schéma en dehors des migrations — il vérifie seulement au démarrage que les entités JPA correspondent au schéma réellement présent en base.
 
 ## Sécurité
 

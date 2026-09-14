@@ -21,9 +21,9 @@ POST /topics/subscribe
 DELETE /topics/:id/subscribe
 
 ## FEED
-# Liste paginée et triée du fil d'actualité (posts des topics auxquels l'utilisateur est abonné).
-# Pagination/tri portés par le Pageable standard Spring Data : page, size, sort=date,asc|desc (défaut : date,desc).
-GET /posts?page=0&size=20&sort=date,desc
+# Liste du fil d'actualité (posts des topics auxquels l'utilisateur est abonné), triée par id (ordre de création).
+# Pagination par curseur : cursor (id du dernier post reçu, absent pour la 1ère page), direction=asc|desc (défaut : desc).
+GET /posts?cursor=123&direction=desc
 
 ## POSTS
 # Detail d'un article avec ses commentaires.
@@ -54,7 +54,7 @@ POST /posts/:id/comments
 | GET /topics | 200, 401, 500 | pas de 404 |
 | POST /topics/subscribe | 200, 400, 401, 404, 500 | 404 = topic ou user introuvable |
 | DELETE /topics/:id/subscribe | 200, 400, 401, 404, 500 | |
-| GET /posts | 200, 401, 500 | pagination/tri via Pageable (page, size, sort), pas de validation custom |
+| GET /posts | 200, 400, 401, 500 | pagination par curseur (cursor, direction) ; 400 = direction invalide (DIRECTION_INVALID) |
 | GET /posts/:id | 200, 400, 401, 403, 500 | 403 = post introuvable **ou** non abonné au topic (TopicNotSubscribedException, mêmes symptômes volontairement) |
 | POST /posts | 201, 400, 401, 403, 404, 500 | 404 = user introuvable ; 403 = topic non abonné (TopicNotSubscribedException) |
 | POST /posts/:id/comments | 201, 400, 401, 403, 404, 500 | 404 = user introuvable ; 403 = post introuvable ou non abonné au topic (TopicNotSubscribedException) |
@@ -75,6 +75,7 @@ POST /posts/:id/comments
 | PATCH /profile | UpdateProfilRequest | email | EMAIL_INVALID |
 | PATCH /profile/password | UpdateProfilPasswordRequest | newPassword | PASSWORD_REQUIRED |
 | PATCH /profile/password | UpdateProfilPasswordRequest | currentPassword | CURRENT_PASSWORD_REQUIRED (validation) ; CURRENT_PASSWORD_INVALID (métier, 400 via InvalidCurrentPasswordException) |
+| GET /posts | @RequestParam direction | direction | DIRECTION_INVALID |
 | POST /topics/subscribe | SubscribeRequest | topicId | TOPIC_REQUIRED, TOPIC_POSITIVE |
 | DELETE /topics/:id/subscribe | @PathVariable topicId | topicId | TOPIC_POSITIVE |
 | POST /posts | PostRequest | topicId | TOPIC_REQUIRED, TOPIC_POSITIVE |

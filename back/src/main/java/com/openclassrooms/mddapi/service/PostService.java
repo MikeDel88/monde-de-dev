@@ -2,25 +2,26 @@ package com.openclassrooms.mddapi.service;
 
 import com.openclassrooms.mddapi.dto.request.CommentRequest;
 import com.openclassrooms.mddapi.dto.request.PostRequest;
+import com.openclassrooms.mddapi.dto.response.CursorPageResponse;
 import com.openclassrooms.mddapi.dto.response.PostFeedResponse;
 import com.openclassrooms.mddapi.dto.response.PostResponse;
 import com.openclassrooms.mddapi.exception.TopicNotSubscribedException;
 import com.openclassrooms.mddapi.exception.UserNotFoundException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 /**
  * Service qui permet la gestion des posts.
  */
 public interface PostService {
     /**
-     * Permet de récupérer le fil d'actualité paginé et trié (tri porté par {@code pageable}).
-     * @param pageable la pagination et le tri à appliquer.
+     * Permet de récupérer le fil d'actualité (posts des topics auxquels l'utilisateur
+     * est abonné), trié par id et paginé par curseur.
+     * @param cursor l'id du dernier post reçu par le client, {@code null} pour la première page.
+     * @param direction le sens du tri, {@code asc} ou {@code desc} (défaut : {@code desc}).
      * @param userId l'identifiant de l'utilisateur authentifié.
-     * @return liste des Posts spécialement adaptée pour un fil d'actualité.
+     * @return la page de posts correspondante, adaptée pour un fil d'actualité.
      * @throws UserNotFoundException si l'utilisateur est introuvable.
      */
-    Page<PostFeedResponse> getPosts(Pageable pageable, Long userId);
+    CursorPageResponse<PostFeedResponse> getPosts(Long cursor, String direction, Long userId);
 
     /**
      * Crée un post pour l'utilisateur donné sur le topic indiqué dans la requête.

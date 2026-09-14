@@ -2,6 +2,7 @@ package com.openclassrooms.mddapi.service;
 
 import com.openclassrooms.mddapi.dto.request.CommentRequest;
 import com.openclassrooms.mddapi.dto.request.PostRequest;
+import com.openclassrooms.mddapi.dto.response.CursorPageResponse;
 import com.openclassrooms.mddapi.dto.response.PostFeedResponse;
 import com.openclassrooms.mddapi.dto.response.PostResponse;
 import com.openclassrooms.mddapi.exception.TopicNotSubscribedException;
@@ -16,17 +17,18 @@ import com.openclassrooms.mddapi.repository.PostRepository;
 import com.openclassrooms.mddapi.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
  * Implémentation de {@link PostService} : construit le fil d'actualité d'un
  * utilisateur en agrégeant les posts de tous les topics auxquels il est
- * abonné, triés par date.
+ * abonné, triés par id (ordre de création) et paginés par curseur.
  */
 @Log4j2
 @AllArgsConstructor
@@ -43,12 +45,29 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<PostFeedResponse> getPosts(Pageable pageable, Long userId) {
+    public CursorPageResponse<PostFeedResponse> getPosts(Long cursor, String direction, Long userId) {
         log.info("service: getPosts");
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Page<Post> posts = postRepository.findByTopicIn(user.getTopics(), pageable);
 
-        return posts.map(postMapper::toPostFeedResponse);
+        int pageSize = 20;
+
+        Pageable pageable = PageRequest.of(0, pageSize);
+
+        boolean ascending = "asc".equalsIgnoreCase(direction);
+
+        List<Post> posts = ascending
+                ? postRepository.fetchNextPageAsc(user.getTopics(), cursor, pageable)
+                : postRepository.fetchNextPageDesc(user.getTopics(), cursor, pageable);
+
+        boolean hasNext = posts.size() == pageSize;
+
+        Long nextCursor = hasNext ? posts.get(posts.size() - 1).getId() : null;
+
+        return new CursorPageResponse<>(
+                posts.stream().map(postMapper::toPostFeedResponse).toList(),
+                hasNext,
+                nextCursor
+        );
     }
 
     /**

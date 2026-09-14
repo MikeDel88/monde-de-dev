@@ -3,6 +3,7 @@ package com.openclassrooms.mddapi.controller;
 import com.openclassrooms.mddapi.documentation.comment.ApiCommentCreateResponse;
 import com.openclassrooms.mddapi.documentation.comment.ApiCommentCreateValidationErrorResponse;
 import com.openclassrooms.mddapi.documentation.post.ApiFeedResponse;
+import com.openclassrooms.mddapi.documentation.post.ApiFeedValidationErrorResponse;
 import com.openclassrooms.mddapi.documentation.post.ApiPostCreateResponse;
 import com.openclassrooms.mddapi.documentation.post.ApiPostCreateValidationErrorResponse;
 import com.openclassrooms.mddapi.documentation.post.ApiPostDetailResponse;
@@ -11,17 +12,16 @@ import com.openclassrooms.mddapi.documentation.topic.ApiTopicNotSubscribedRespon
 import com.openclassrooms.mddapi.documentation.user.ApiUserNotFoundResponse;
 import com.openclassrooms.mddapi.dto.request.CommentRequest;
 import com.openclassrooms.mddapi.dto.request.PostRequest;
+import com.openclassrooms.mddapi.dto.response.CursorPageResponse;
 import com.openclassrooms.mddapi.dto.response.PostFeedResponse;
 import com.openclassrooms.mddapi.dto.response.PostResponse;
 import com.openclassrooms.mddapi.service.PostService;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -38,15 +38,22 @@ public class PostController {
     private final PostService postService;
 
     @ApiFeedResponse
+    @ApiFeedValidationErrorResponse
     @ApiUserNotFoundResponse
     @GetMapping
-    public Page<PostFeedResponse> posts(
+    public CursorPageResponse<PostFeedResponse> posts(
             Principal principal,
-            @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC)
-            Pageable pageable
+            @Parameter(description = "Id du dernier post reçu par le client, absent pour la première page.")
+            @Validated
+            @Positive()
+            @RequestParam(required = false) Long cursor,
+            @Parameter(description = "Sens du tri du fil d'actualité (par id).")
+            @Validated
+            @Pattern(regexp = "^(asc|desc)$", message = "DIRECTION_INVALID")
+            @RequestParam(defaultValue = "desc") String direction
     ) {
         log.info("call /posts");
-        return postService.getPosts(pageable, Long.valueOf(principal.getName()));
+        return postService.getPosts(cursor, direction, Long.valueOf(principal.getName()));
     }
 
     @ApiPostDetailResponse
