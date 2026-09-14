@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(exception = MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BodyProblemDetail handleValidation(MethodArgumentNotValidException ex) {
-        log.error("handleValidation : {}", ex.getMessage());
+        log.info("handleValidation : {}", ex.getMessage());
         List<FieldError> errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(fieldError -> new FieldError(fieldError.getField(), fieldError.getDefaultMessage()))
                 .toList();
@@ -74,7 +74,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(UserNotFoundException.class)
     public ProblemDetail handleUserNotFound(UserNotFoundException ex) {
-        log.error("handleUserNotFound : {}", ex.getMessage());
+        log.info("handleUserNotFound : {}", ex.getMessage());
         return ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
     }
 
@@ -85,7 +85,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(TopicNotFoundException.class)
     public ProblemDetail handleTopicNotFound(TopicNotFoundException ex) {
-        log.error("handleTopicNotFound : {}", ex.getMessage());
+        log.info("handleTopicNotFound : {}", ex.getMessage());
         return ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
     }
 
@@ -98,7 +98,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(InvalidCredentialsException.class)
     public ProblemDetail handleInvalidCredentials(InvalidCredentialsException ex) {
-        log.error("handleInvalidCredentials : {}", ex.getMessage());
+        log.info("handleInvalidCredentials : {}", ex.getMessage());
         return ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
     }
 
@@ -112,7 +112,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(AuthenticationException.class)
     public ProblemDetail handleAuthenticationException(AuthenticationException ex) {
-        log.error("handleAuthenticationException : {}", ex.getMessage());
+        log.info("handleAuthenticationException : {}", ex.getMessage());
         return ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
     }
 
@@ -123,7 +123,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(TopicNotSubscribedException.class)
     public ProblemDetail handleTopicNotSubscribed(TopicNotSubscribedException ex) {
-        log.error("handleTopicNotSubscribed : {}", ex.getMessage());
+        log.info("handleTopicNotSubscribed : {}", ex.getMessage());
         return ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
     }
 
@@ -136,7 +136,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidCurrentPasswordException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BodyProblemDetail handleInvalidCurrentPassword(InvalidCurrentPasswordException ex) {
-        log.error("handleInvalidCurrentPassword : {}", ex.getMessage());
+        log.info("handleInvalidCurrentPassword : {}", ex.getMessage());
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         BodyProblemDetail bpd = BodyProblemDetail.from(pd);
         bpd.setErrors(List.of(new FieldError("currentPassword", "CURRENT_PASSWORD_INVALID")));
@@ -153,7 +153,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HandlerMethodValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BodyProblemDetail handleHandlerMethodValidation(HandlerMethodValidationException ex) {
-        log.error("handleHandlerMethodValidation : {}", ex.getMessage());
+        log.info("handleHandlerMethodValidation : {}", ex.getMessage());
         List<FieldError> errors = ex.getParameterValidationResults().stream()
                 .flatMap(result -> result.getResolvableErrors().stream()
                         .map(error -> new FieldError(result.getMethodParameter().getParameterName(), error.getDefaultMessage())))
@@ -175,7 +175,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ProblemDetail handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
-        log.error("handleMethodArgumentTypeMismatch : {}", ex.getMessage());
+        log.info("handleMethodArgumentTypeMismatch : {}", ex.getMessage());
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
                 "Le paramètre '" + ex.getName() + "' est invalide.");
     }
@@ -188,7 +188,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ProblemDetail handleMessageNotReadable(HttpMessageNotReadableException ex) {
-        log.error("handleMessageNotReadable : {}", ex.getMessage());
+        log.info("handleMessageNotReadable : {}", ex.getMessage());
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Malformed JSON request");
     }
 
