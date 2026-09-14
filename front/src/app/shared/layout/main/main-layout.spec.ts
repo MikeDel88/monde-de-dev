@@ -11,10 +11,10 @@ import {HttpTestingController, provideHttpClientTesting} from "@angular/common/h
 import {provideHttpClient} from "@angular/common/http";
 import {SessionService} from "../../../core/services/session-service";
 import {environment} from "../../../../environments/environment";
-import {Page} from "../../models/page";
+import {CursorPage} from "../../models/cursor-page";
 import {PostFeed} from "../../../features/feed/models/post-feed";
 
-const EMPTY_PAGE: Page<PostFeed> = { content: [], totalElements: 0, totalPages: 0, number: 0, size: 20 };
+const EMPTY_PAGE: CursorPage<PostFeed> = { content: [], hasNext: false, nextCursor: null };
 
 describe('MainLayout', () => {
   let component: MainLayout;

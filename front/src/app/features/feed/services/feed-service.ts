@@ -1,33 +1,27 @@
 import {Service, signal, WritableSignal, Signal, computed, effect} from '@angular/core';
 import {httpResource, HttpResourceRef} from "@angular/common/http";
 import {PostFeed} from "../models/post-feed";
-import {Page} from "../../../shared/models/page";
+import {CursorPage} from "../../../shared/models/cursor-page";
 import {environment} from "../../../../environments/environment";
-
-const PAGE_SIZE = 20;
 
 @Service()
 export class FeedService {
 
   sortByAsc: WritableSignal<boolean> = signal<boolean>(false);
-  private page: WritableSignal<number> = signal<number>(0);
+  private cursor: WritableSignal<number | undefined> = signal<number | undefined>(undefined);
   private accumulatedPosts: WritableSignal<PostFeed[]> = signal<PostFeed[]>([]);
 
-  posts: HttpResourceRef<Page<PostFeed> | undefined> = httpResource<Page<PostFeed>>(() => ({
+  posts: HttpResourceRef<CursorPage<PostFeed> | undefined> = httpResource<CursorPage<PostFeed>>(() => ({
     url: `${environment.apiUrl}/posts`,
     params: {
-      sort: `date,${this.sortByAsc() ? "asc" : "desc"}`,
-      page: this.page(),
-      size: PAGE_SIZE
+      direction: this.sortByAsc() ? "asc" : "desc",
+      ...(this.cursor() !== undefined ? {cursor: this.cursor()!} : {})
     }
   }));
 
   readonly loadedPosts: Signal<PostFeed[]> = computed(() => this.accumulatedPosts());
 
-  readonly hasMore: Signal<boolean> = computed(() => {
-    const currentPage = this.posts.value();
-    return currentPage ? currentPage.number < currentPage.totalPages - 1 : false;
-  });
+  readonly hasMore: Signal<boolean> = computed(() => this.posts.value()?.hasNext ?? false);
 
   constructor() {
     effect(() => {
@@ -35,7 +29,7 @@ export class FeedService {
         return;
       }
       const currentPage = this.posts.value();
-      if (currentPage.number === 0) {
+      if (this.cursor() === undefined) {
         this.accumulatedPosts.set(currentPage.content);
       } else {
         this.accumulatedPosts.update((posts) => [...posts, ...currentPage.content]);
@@ -45,14 +39,17 @@ export class FeedService {
 
   toggleFilterByAsc(): void {
     this.sortByAsc.set(!this.sortByAsc());
-    this.page.set(0);
+    this.cursor.set(undefined);
   }
 
   loadMore(): void {
     if (this.posts.isLoading() || !this.hasMore()) {
       return;
     }
-    this.page.update((current) => current + 1);
+    const nextCursor = this.posts.value()?.nextCursor;
+    if (nextCursor != null) {
+      this.cursor.set(nextCursor);
+    }
   }
 
 }

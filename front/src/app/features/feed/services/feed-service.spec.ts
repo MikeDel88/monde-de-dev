@@ -6,7 +6,7 @@ import {provideHttpClient} from "@angular/common/http";
 import {HttpTestingController, provideHttpClientTesting, TestRequest} from "@angular/common/http/testing";
 import {environment} from "../../../../environments/environment";
 import {PostFeed} from "../models/post-feed";
-import {Page} from "../../../shared/models/page";
+import {CursorPage} from "../../../shared/models/cursor-page";
 
 const buildPost = (id: number): PostFeed => ({
   id,
@@ -16,12 +16,10 @@ const buildPost = (id: number): PostFeed => ({
   author: 'John Doe',
 });
 
-const buildPage = (posts: PostFeed[], number: number, totalPages: number): Page<PostFeed> => ({
+const buildCursorPage = (posts: PostFeed[], hasNext: boolean, nextCursor: number | null): CursorPage<PostFeed> => ({
   content: posts,
-  totalElements: totalPages * posts.length,
-  totalPages,
-  number,
-  size: 20,
+  hasNext,
+  nextCursor,
 });
 
 describe('FeedService', () => {
@@ -36,11 +34,11 @@ describe('FeedService', () => {
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  const expectRequest = (page: number, sort: 'asc' | 'desc'): TestRequest =>
+  const expectRequest = (sort: 'asc' | 'desc', cursor?: number): TestRequest =>
     httpMock.expectOne(
       (r) => r.url === `${environment.apiUrl}/posts`
-        && r.params.get('sort') === `date,${sort}`
-        && r.params.get('page') === String(page)
+        && r.params.get('direction') === sort
+        && r.params.get('cursor') === (cursor === undefined ? null : String(cursor))
     );
 
   const flushMicrotasks = () => new Promise((resolve) => setTimeout(resolve, 0));
@@ -59,11 +57,11 @@ describe('FeedService', () => {
   })
 
   it('should return posts on success', async () => {
-    const pageMock = buildPage([buildPost(1)], 0, 1);
+    const pageMock = buildCursorPage([buildPost(1)], false, null);
 
     TestBed.tick();
 
-    const req = expectRequest(0, 'desc');
+    const req = expectRequest('desc');
     expect(req.request.method).toBe('GET');
     req.flush(pageMock);
 
@@ -77,7 +75,7 @@ describe('FeedService', () => {
 
   it('should append the next page content to loadedPosts when loadMore is called', async () => {
     TestBed.tick();
-    expectRequest(0, 'desc').flush(buildPage([buildPost(1)], 0, 2));
+    expectRequest('desc').flush(buildCursorPage([buildPost(1)], true, 1));
     await flushMicrotasks();
     TestBed.tick();
 
@@ -86,7 +84,7 @@ describe('FeedService', () => {
     service.loadMore();
     TestBed.tick();
 
-    expectRequest(1, 'desc').flush(buildPage([buildPost(2)], 1, 2));
+    expectRequest('desc', 1).flush(buildCursorPage([buildPost(2)], false, null));
     await flushMicrotasks();
     TestBed.tick();
 
@@ -96,7 +94,7 @@ describe('FeedService', () => {
 
   it('should not fetch another page when loadMore is called and hasMore is false', async () => {
     TestBed.tick();
-    expectRequest(0, 'desc').flush(buildPage([buildPost(1)], 0, 1));
+    expectRequest('desc').flush(buildCursorPage([buildPost(1)], false, null));
     await flushMicrotasks();
     TestBed.tick();
 
@@ -105,18 +103,18 @@ describe('FeedService', () => {
     service.loadMore();
     TestBed.tick();
 
-    httpMock.expectNone((r) => r.url === `${environment.apiUrl}/posts` && r.params.get('page') === '1');
+    httpMock.expectNone((r) => r.url === `${environment.apiUrl}/posts` && r.params.has('cursor'));
   });
 
   it('should reset the accumulated posts to the new first page when toggling the sort order', async () => {
     TestBed.tick();
-    expectRequest(0, 'desc').flush(buildPage([buildPost(1)], 0, 2));
+    expectRequest('desc').flush(buildCursorPage([buildPost(1)], true, 1));
     await flushMicrotasks();
     TestBed.tick();
 
     service.loadMore();
     TestBed.tick();
-    expectRequest(1, 'desc').flush(buildPage([buildPost(2)], 1, 2));
+    expectRequest('desc', 1).flush(buildCursorPage([buildPost(2)], false, null));
     await flushMicrotasks();
     TestBed.tick();
 
@@ -124,7 +122,7 @@ describe('FeedService', () => {
 
     service.toggleFilterByAsc();
     TestBed.tick();
-    expectRequest(0, 'asc').flush(buildPage([buildPost(3)], 0, 1));
+    expectRequest('asc').flush(buildCursorPage([buildPost(3)], false, null));
     await flushMicrotasks();
     TestBed.tick();
 

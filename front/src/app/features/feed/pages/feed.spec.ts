@@ -4,7 +4,7 @@ import { Feed } from './feed';
 import {afterEach, beforeEach, describe, it, expect, jest} from "@jest/globals";
 import {Router} from "@angular/router";
 import {PostFeed} from "../models/post-feed";
-import {Page} from "../../../shared/models/page";
+import {CursorPage} from "../../../shared/models/cursor-page";
 import {By} from "@angular/platform-browser";
 import {HttpTestingController, provideHttpClientTesting, TestRequest} from "@angular/common/http/testing";
 import {provideHttpClient} from "@angular/common/http";
@@ -48,12 +48,10 @@ describe('Feed', () => {
     author: 'John Doe'
   };
 
-  const MOCK_PAGE: Page<PostFeed> = {
+  const MOCK_CURSOR_PAGE: CursorPage<PostFeed> = {
     content: [MOCK_POST, { ...MOCK_POST, id: 2}],
-    totalElements: 1,
-    totalPages: 1,
-    number: 0,
-    size: 20,
+    hasNext: false,
+    nextCursor: null,
   };
 
   beforeEach(async () => {
@@ -93,7 +91,7 @@ describe('Feed', () => {
     });
 
     it('should display the posts correctly', () => {
-      component.posts.set(MOCK_PAGE);
+      component.posts.set(MOCK_CURSOR_PAGE);
       TestBed.tick();
       fixture.detectChanges();
       const postCard = fixture.nativeElement.querySelector('app-post-card');
@@ -136,8 +134,10 @@ describe('Feed', () => {
       httpMock.verify();
     });
 
-    const expectFeedRequest = (sort: 'asc' | 'desc', page = 0): TestRequest => {
-      return httpMock.expectOne(req => req.url === `${environment.apiUrl}/posts` && req.params.get('sort') === `date,${sort}` && req.params.get('page') === String(page));
+    const expectFeedRequest = (sort: 'asc' | 'desc', cursor?: number): TestRequest => {
+      return httpMock.expectOne(req => req.url === `${environment.apiUrl}/posts`
+        && req.params.get('direction') === sort
+        && req.params.get('cursor') === (cursor === undefined ? null : String(cursor)));
     }
 
     const flushMicrotasks = () => new Promise((resolve) => setTimeout(resolve, 0));
@@ -146,7 +146,7 @@ describe('Feed', () => {
       const req = expectFeedRequest('desc');
       expect(req.request.method).toBe('GET');
 
-      req.flush(MOCK_PAGE);
+      req.flush(MOCK_CURSOR_PAGE);
       await flushMicrotasks();
       TestBed.tick();
       fixture.detectChanges();
@@ -167,7 +167,7 @@ describe('Feed', () => {
     });
 
     it('should trigger a new request sorted ascending when toggle is called', async () => {
-      expectFeedRequest('desc').flush(MOCK_PAGE);
+      expectFeedRequest('desc').flush(MOCK_CURSOR_PAGE);
       await flushMicrotasks();
       TestBed.tick();
       fixture.detectChanges();
@@ -176,7 +176,7 @@ describe('Feed', () => {
       fixture.detectChanges();
 
       const secondReq = expectFeedRequest('asc');
-      secondReq.flush(MOCK_PAGE);
+      secondReq.flush(MOCK_CURSOR_PAGE);
       await flushMicrotasks();
       TestBed.tick();
       fixture.detectChanges();
@@ -186,7 +186,7 @@ describe('Feed', () => {
     });
 
     it('should not show the infinite scroll sentinel when there is no more page to load', async () => {
-      expectFeedRequest('desc').flush(MOCK_PAGE);
+      expectFeedRequest('desc').flush(MOCK_CURSOR_PAGE);
       await flushMicrotasks();
       TestBed.tick();
       fixture.detectChanges();
@@ -196,7 +196,7 @@ describe('Feed', () => {
     });
 
     it('should load and append the next page when onLoadMore is called', async () => {
-      const firstPage: Page<PostFeed> = { ...MOCK_PAGE, totalPages: 2 };
+      const firstPage: CursorPage<PostFeed> = { ...MOCK_CURSOR_PAGE, hasNext: true, nextCursor: 2 };
       expectFeedRequest('desc').flush(firstPage);
       await flushMicrotasks();
       TestBed.tick();
@@ -209,7 +209,7 @@ describe('Feed', () => {
       fixture.detectChanges();
 
       const thirdPost: PostFeed = { ...MOCK_POST, id: 3 };
-      expectFeedRequest('desc', 1).flush({ ...MOCK_PAGE, content: [thirdPost], number: 1, totalPages: 2 });
+      expectFeedRequest('desc', 2).flush({ ...MOCK_CURSOR_PAGE, content: [thirdPost], hasNext: false, nextCursor: null });
       await flushMicrotasks();
       TestBed.tick();
       fixture.detectChanges();

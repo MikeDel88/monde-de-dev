@@ -22,14 +22,6 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     /**
-     * Recherche paginée des posts appartenant à l'un des topics fournis.
-     * @param topics les topics dont on veut récupérer les posts.
-     * @param pageable la pagination et le tri à appliquer.
-     * @return Page&lt;Post&gt; la page de posts correspondante.
-     */
-    Page<Post> findByTopicIn(Collection<Topic> topics, Pageable pageable);
-
-    /**
      * Recherche un post par id, en le restreignant à l'un des topics fournis.
      * Utilisé pour vérifier que l'utilisateur est bien abonné au topic du post
      * avant de l'exposer (un post introuvable et un post hors abonnement
@@ -40,8 +32,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * @return Optional&lt;Post&gt; le post s'il existe et appartient à l'un des topics fournis.
      */
     Optional<Post> findByIdAndTopicIn(Long id, Collection<Topic> topics);
-
-
 
     /**
      * Récupère la page suivante de posts (du plus récent au plus ancien) parmi
