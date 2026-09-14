@@ -13,7 +13,8 @@ import java.util.List;
  */
 @ConfigurationProperties(prefix = "app")
 public record AppConfigProperties(
-    @Name("domains.allows") String domains
+    @Name("domains.allows") String domains,
+    @Name("token.expiration") int tokenExpiration
 ) {
     /**
      * @return la liste des domaines autorisés pour CORS, obtenue en
