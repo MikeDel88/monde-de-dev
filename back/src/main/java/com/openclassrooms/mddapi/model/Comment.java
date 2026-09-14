@@ -26,19 +26,22 @@ public class Comment extends BaseEntity {
 
     /**
      * Post commenté.
-     * Cascade limité à la persistance (CascadeType.PERSIST) : supprimer ce
-     * commentaire n'entraîne jamais la suppression du post.
+     * Aucun cascade : le post doit déjà exister en base avant de persister
+     * ce commentaire (vérifié explicitement dans PostServiceImpl), pour
+     * éviter qu'un post transitoire ne soit inséré accidentellement.
      */
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false, updatable = false)
     private Post post;
 
     /**
      * Auteur du commentaire.
-     * Cascade limité à la persistance (CascadeType.PERSIST) : supprimer ce
-     * commentaire n'entraîne jamais la suppression de l'utilisateur.
+     * Aucun cascade : l'utilisateur doit déjà exister en base avant de
+     * persister ce commentaire (vérifié explicitement dans
+     * PostServiceImpl), pour éviter qu'un utilisateur transitoire ne soit
+     * inséré accidentellement.
      */
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
     private User user;
 

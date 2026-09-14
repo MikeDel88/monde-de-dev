@@ -31,19 +31,15 @@ public class Post extends BaseEntity {
 
 	/**
 	 * Topic auquel appartient le post.
-	 * Cascade limité à la persistance (CascadeType.PERSIST) : supprimer ce post
-	 * n'entraîne jamais la suppression du topic.
 	 */
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "topic_id", nullable = false, updatable = false)
 	private Topic topic;
 
     /**
      * Auteur du post.
-     * Cascade limité à la persistance (CascadeType.PERSIST) : supprimer ce post
-     * n'entraîne jamais la suppression de l'utilisateur.
      */
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
     private User user;
 
