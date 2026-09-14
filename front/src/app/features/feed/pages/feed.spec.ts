@@ -58,7 +58,8 @@ describe('Feed', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Feed]
+      imports: [Feed],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     })
     .compileComponents();
 
@@ -135,8 +136,9 @@ describe('Feed', () => {
       httpMock.verify();
     });
 
-    const expectFeedRequest = (sort: 'asc' | 'desc', page = 0): TestRequest =>
-      httpMock.expectOne(req => req.url === `${environment.apiUrl}/posts` && req.params.get('sort') === `date,${sort}` && req.params.get('page') === String(page));
+    const expectFeedRequest = (sort: 'asc' | 'desc', page = 0): TestRequest => {
+      return httpMock.expectOne(req => req.url === `${environment.apiUrl}/posts` && req.params.get('sort') === `date,${sort}` && req.params.get('page') === String(page));
+    }
 
     const flushMicrotasks = () => new Promise((resolve) => setTimeout(resolve, 0));
 

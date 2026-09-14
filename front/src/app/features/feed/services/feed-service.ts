@@ -31,10 +31,10 @@ export class FeedService {
 
   constructor() {
     effect(() => {
-      const currentPage = this.posts.value();
-      if (!currentPage) {
+      if (!this.posts.hasValue()) {
         return;
       }
+      const currentPage = this.posts.value();
       if (currentPage.number === 0) {
         this.accumulatedPosts.set(currentPage.content);
       } else {
