@@ -2,9 +2,11 @@ package com.openclassrooms.mddapi.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Classe de base fournissant l'identifiant technique et les dates d'audit
@@ -30,4 +32,28 @@ public abstract class BaseEntity {
     @Column(name = "updated_at", nullable = false)
     @UpdateTimestamp
     protected LocalDateTime updatedAt;
+
+    /**
+     * Égalité basée sur l'identifiant technique, sûre vis-à-vis des proxies
+     * Hibernate (comparaison de classe via {@link Hibernate#getClass}) et des
+     * entités transitoires (id {@code null}, jamais égales entre elles).
+     */
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        BaseEntity other = (BaseEntity) o;
+        return id != null && Objects.equals(id, other.getId());
+    }
+
+    /**
+     * Constante par classe réelle, indépendante de l'id : reste stable pour
+     * une entité déjà insérée dans un {@code Set} avant sa persistance
+     * (id passant de {@code null} à une valeur générée).
+     */
+    @Override
+    public final int hashCode() {
+        return Hibernate.getClass(this).hashCode();
+    }
 }
