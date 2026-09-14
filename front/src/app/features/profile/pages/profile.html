@@ -1,7 +1,7 @@
 <div class="flex flex-col p-4 gap-4 items-center">
   <app-toast
-    [message]="profilHasBeenUpdated"
-    [visible]="showToastSuccessed()"
+    [message]="showToastSuccess().message"
+    [visible]="showToastSuccess().visible"
     (buttonClick)="onCloseToastSuccessed()"
   />
   @if (profile.hasValue()) {

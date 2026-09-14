@@ -58,9 +58,8 @@ export class Profile {
   readonly titleProfilUser: string = "Profil utilisateur";
   readonly btnSaveProfilUser: string = "Sauvegarder";
   readonly placeholderPassword: string = "Nouveau mot de passe"
-  readonly profilHasBeenUpdated: string = "Le profil a bien été mis à jour!"
 
-  showToastSuccessed = signal(false)
+  showToastSuccess = signal({message: "", visible: false})
   error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
   showPasswordModal: WritableSignal<boolean> = signal(false);
   private pendingNewPassword = '';
@@ -81,7 +80,15 @@ export class Profile {
   }
 
   onCloseToastSuccessed() {
-    this.showToastSuccessed.set(false);
+    this.showToastSuccess.set({message: "", visible: false});
+  }
+
+  onUpdateProfilSuccess(message: string) {
+    this.error.set(undefined);
+    this.showToastSuccess.set({message, visible: true});
+    setTimeout(() => {
+      this.showToastSuccess.set({message: "", visible: false});
+    }, 2000)
   }
 
   onFocus(): void {
@@ -102,9 +109,8 @@ export class Profile {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: value => {
-            this.error.set(undefined);
             this.profile.set(value);
-            this.showToastSuccessed.set(true);
+            this.onUpdateProfilSuccess("Le profil a bien été mis à jour!");
           },
           error: () => {
             this.error.set("Une erreur est survenue, le profil n'a pas été mis à jour.");
@@ -123,7 +129,10 @@ export class Profile {
     this.profilService.updatePassword$(this.pendingNewPassword, currentPassword)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => { this.profileForm.password().reset("") },
+        next: () => {
+          this.profileForm.password().reset("")
+          this.onUpdateProfilSuccess("Le mot de passe a bien été changé!");
+        },
         error: () => {
           this.error.set("Une erreur est survenue, le mot de passe n'a pas été mis à jour.");
         }
