@@ -7,6 +7,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -98,6 +99,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidCredentialsException.class)
     public ProblemDetail handleInvalidCredentials(InvalidCredentialsException ex) {
         log.error("handleInvalidCredentials : {}", ex.getMessage());
+        return ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
+    }
+
+    /**
+     * Gère les échecs d'authentification levés par Spring Security lors du
+     * login (ex. BadCredentialsException). Volontairement générique pour ne
+     * pas permettre à un client de deviner si c'est le compte ou le mot de
+     * passe qui est en cause.
+     * @param ex l'exception d'authentification levée par l'AuthenticationManager.
+     * @return ProblemDetail 401.
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    public ProblemDetail handleAuthenticationException(AuthenticationException ex) {
+        log.error("handleAuthenticationException : {}", ex.getMessage());
         return ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
     }
 

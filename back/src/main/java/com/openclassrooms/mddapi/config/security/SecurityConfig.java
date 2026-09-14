@@ -1,14 +1,20 @@
 package com.openclassrooms.mddapi.config.security;
 
 import com.openclassrooms.mddapi.config.properties.AppConfigProperties;
+import com.openclassrooms.mddapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -86,6 +92,54 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         log.info("password encoder");
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * Fournit le chargement des utilisateurs par email ou nom d'utilisateur,
+     * adapté au contrat UserDetails via {@link AuthenticatedUser}.
+     * @param userRepository le repository JPA des utilisateurs.
+     * @return UserDetailsService le service de chargement des utilisateurs.
+     */
+    @Bean
+    public UserDetailsService userDetailsService(UserRepository userRepository) {
+        log.info("user details service");
+        return value -> userRepository
+                .findUsersByEmailOrName(value, value)
+                .map(AuthenticatedUser::new)
+                .orElseThrow(() -> new UsernameNotFoundException("Utilisateur introuvable"));
+    }
+
+    /**
+     * Fournit le provider d'authentification DAO, combinant le chargement des
+     * utilisateurs et la vérification du mot de passe. Comparé à une
+     * vérification manuelle, il compare toujours le mot de passe fourni à un
+     * hash (réel ou factice si l'utilisateur est introuvable), ce qui évite
+     * une attaque temporelle permettant de deviner si un compte existe.
+     * @param userDetailsService le service de chargement des utilisateurs.
+     * @param passwordEncoder l'encodeur de mot de passe.
+     * @return DaoAuthenticationProvider le provider d'authentification.
+     */
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider(
+            UserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder
+    ) {
+        log.info("dao authentication provider");
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder);
+        return provider;
+    }
+
+    /**
+     * Fournit l'AuthenticationManager utilisé lors du login pour authentifier
+     * les identifiants fournis via le {@link DaoAuthenticationProvider}.
+     * @param daoAuthenticationProvider le provider d'authentification DAO.
+     * @return AuthenticationManager le gestionnaire d'authentification.
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(DaoAuthenticationProvider daoAuthenticationProvider) {
+        log.info("authentication manager");
+        return new ProviderManager(daoAuthenticationProvider);
     }
 
     /**
