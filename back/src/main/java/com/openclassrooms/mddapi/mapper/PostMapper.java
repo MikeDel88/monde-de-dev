@@ -10,7 +10,6 @@ import com.openclassrooms.mddapi.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -23,14 +22,14 @@ public interface PostMapper {
     /**
      * Convertit un post en réponse pour le fil d'actualité.
      * @param post l'entité post source.
-     * @return PostFeedResponse la réponse mappée (date → postDate, user.name → name).
+     * @return PostFeedResponse la réponse mappée (createdAt → postDate, user.name → name).
      */
-    @Mapping(target = "postDate", source = "date")
+    @Mapping(target = "postDate", source = "createdAt")
     @Mapping(target = "name", source = "user.name")
     PostFeedResponse toPostFeedResponse(Post post);
 
     /**
-     * Convertit une requête de création de post en entité {@link Post}, avec la date de publication fixée au moment de l'appel.
+     * Convertit une requête de création de post en entité {@link Post}.
      * Implémentation manuelle (pas de génération MapStruct) : {@link Post}
      * n'expose pas de setters, la construction passe donc par son
      * constructeur dédié.
@@ -40,15 +39,15 @@ public interface PostMapper {
      * @return Post l'entité prête à être persistée.
      */
     default Post toPost(PostRequest postRequest, User user, Topic topic) {
-        return new Post(postRequest.title(), postRequest.content(), LocalDateTime.now(), topic, user);
+        return new Post(postRequest.title(), postRequest.content(), topic, user);
     }
 
     /**
      * Convertit un post en réponse détaillée pour l'affichage d'un post unique.
      * @param post l'entité post source.
-     * @return PostResponse la réponse mappée (date → postDate, user.name → name).
+     * @return PostResponse la réponse mappée (createdAt → postDate, user.name → name).
      */
-    @Mapping(target = "postDate", source = "post.date")
+    @Mapping(target = "postDate", source = "post.createdAt")
     @Mapping(target = "name", source = "post.user.name")
     @Mapping(target = "topicName", source = "post.topic.title")
     @Mapping(target = "comments", source = "commentResponses")

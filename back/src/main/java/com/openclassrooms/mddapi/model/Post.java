@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,10 +25,6 @@ public class Post extends BaseEntity {
     @Column(nullable = false, updatable = false)
     private String content;
 
-    /** Date de publication du post, non modifiable. */
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime date;
-
 	/**
 	 * Topic auquel appartient le post.
 	 */
@@ -49,7 +44,7 @@ public class Post extends BaseEntity {
      * Suppression en cascade (CascadeType.ALL) : supprimer ce post supprime
      * tous ses commentaires.
      */
-    @OrderBy("date DESC")
+    @OrderBy("createdAt DESC")
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
 
@@ -58,14 +53,12 @@ public class Post extends BaseEntity {
      * (colonnes {@code updatable = false}).
      * @param title titre du post.
      * @param content contenu du post.
-     * @param date date de publication.
      * @param topic topic auquel le post est rattaché.
      * @param user auteur du post.
      */
-    public Post(String title, String content, LocalDateTime date, Topic topic, User user) {
+    public Post(String title, String content, Topic topic, User user) {
         this.title = title;
         this.content = content;
-        this.date = date;
         this.topic = topic;
         this.user = user;
     }

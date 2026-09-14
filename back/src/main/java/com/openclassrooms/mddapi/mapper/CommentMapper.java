@@ -8,7 +8,6 @@ import com.openclassrooms.mddapi.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -41,9 +40,9 @@ public interface CommentMapper {
      * @param commentRequest les données du commentaire à créer.
      * @param user l'auteur du commentaire.
      * @param post le post commenté.
-     * @return Comment l'entité commentaire mappée, datée du moment de l'appel.
+     * @return Comment l'entité commentaire mappée.
      */
     default Comment toComment(CommentRequest commentRequest, User user, Post post) {
-        return new Comment(commentRequest.content(), LocalDateTime.now(), post, user);
+        return new Comment(commentRequest.content(), post, user);
     }
 }

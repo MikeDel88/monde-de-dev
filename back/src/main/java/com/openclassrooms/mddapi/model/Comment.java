@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 /**
  * Entité représentant un commentaire laissé sur un post.
  */
@@ -19,10 +17,6 @@ public class Comment extends BaseEntity {
     /** Contenu du commentaire, non modifiable. */
     @Column(nullable = false, updatable = false)
     private String content;
-
-    /** Date du commentaire, non modifiable. */
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime date;
 
     /**
      * Post commenté.
@@ -49,13 +43,11 @@ public class Comment extends BaseEntity {
      * Crée un nouveau commentaire, entièrement immuable après création
      * (colonnes {@code updatable = false}).
      * @param content contenu du commentaire.
-     * @param date date du commentaire.
      * @param post post commenté (doit déjà exister en base).
      * @param user auteur du commentaire (doit déjà exister en base).
      */
-    public Comment(String content, LocalDateTime date, Post post, User user) {
+    public Comment(String content, Post post, User user) {
         this.content = content;
-        this.date = date;
         this.post = post;
         this.user = user;
     }

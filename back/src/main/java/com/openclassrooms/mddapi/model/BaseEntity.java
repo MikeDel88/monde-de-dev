@@ -23,12 +23,24 @@ public abstract class BaseEntity {
     @Setter(AccessLevel.PROTECTED)
     protected Long id;
 
-    /** Date de création, renseignée automatiquement et non modifiable. */
+    /**
+     * Date de création, renseignée automatiquement et non modifiable.
+     * Générée côté serveur applicatif (horloge JVM via {@link CreationTimestamp}),
+     * pas par le SGBD : si serveur et base de données sont sur des fuseaux
+     * horaires différents, c'est celui du serveur qui prévaut. Le
+     * {@code DEFAULT now()} SQL de la colonne n'est qu'un filet de sécurité,
+     * jamais déclenché en usage normal puisque Hibernate fournit toujours
+     * la valeur explicitement.
+     */
     @Column(name = "created_at", updatable = false, nullable = false)
     @CreationTimestamp
     protected LocalDateTime createdAt;
 
-    /** Date de dernière modification, renseignée automatiquement. */
+    /**
+     * Date de dernière modification, renseignée automatiquement.
+     * Même origine que {@link #createdAt} : horloge du serveur applicatif
+     * (via {@link UpdateTimestamp}), pas celle du SGBD.
+     */
     @Column(name = "updated_at", nullable = false)
     @UpdateTimestamp
     protected LocalDateTime updatedAt;
