@@ -2,7 +2,7 @@ package com.openclassrooms.mddapi.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Table(name = "comments")
 @AttributeOverride(name = "id", column = @Column(name = "comment_id"))
 @Getter
-@Setter
+@NoArgsConstructor
 public class Comment extends BaseEntity {
 
     /** Contenu du commentaire, non modifiable. */
@@ -45,4 +45,18 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
     private User user;
 
+    /**
+     * Crée un nouveau commentaire, entièrement immuable après création
+     * (colonnes {@code updatable = false}).
+     * @param content contenu du commentaire.
+     * @param date date du commentaire.
+     * @param post post commenté (doit déjà exister en base).
+     * @param user auteur du commentaire (doit déjà exister en base).
+     */
+    public Comment(String content, LocalDateTime date, Post post, User user) {
+        this.content = content;
+        this.date = date;
+        this.post = post;
+        this.user = user;
+    }
 }

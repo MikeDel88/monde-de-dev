@@ -2,9 +2,10 @@ package com.openclassrooms.mddapi.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,7 +15,7 @@ import java.util.List;
 @Table(name = "posts")
 @AttributeOverride(name = "id", column = @Column(name = "post_id"))
 @Getter
-@Setter
+@NoArgsConstructor
 public class Post extends BaseEntity {
 
     /** Titre du post, non modifiable. */
@@ -50,5 +51,27 @@ public class Post extends BaseEntity {
      */
     @OrderBy("date DESC")
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
+
+    /**
+     * Crée un nouveau post. Tous les champs sont figés à la création
+     * (colonnes {@code updatable = false}).
+     * @param title titre du post.
+     * @param content contenu du post.
+     * @param date date de publication.
+     * @param topic topic auquel le post est rattaché.
+     * @param user auteur du post.
+     */
+    public Post(String title, String content, LocalDateTime date, Topic topic, User user) {
+        this.title = title;
+        this.content = content;
+        this.date = date;
+        this.topic = topic;
+        this.user = user;
+    }
+
+    /** Ajoute un commentaire déjà rattaché à ce post à la liste des commentaires. */
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
+    }
 }

@@ -60,9 +60,9 @@ public class TopicServiceImpl implements TopicService {
 		User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
 		if(addSubscription) {
-			user.getTopics().add(topic);
+			user.subscribeTo(topic);
 		} else {
-			user.getTopics().remove(topic);
+			user.unsubscribeFrom(topic);
 		}
 	}
 

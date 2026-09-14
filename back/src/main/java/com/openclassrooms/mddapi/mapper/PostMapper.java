@@ -10,6 +10,7 @@ import com.openclassrooms.mddapi.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -30,19 +31,17 @@ public interface PostMapper {
 
     /**
      * Convertit une requête de création de post en entité {@link Post}, avec la date de publication fixée au moment de l'appel.
+     * Implémentation manuelle (pas de génération MapStruct) : {@link Post}
+     * n'expose pas de setters, la construction passe donc par son
+     * constructeur dédié.
      * @param postRequest les données du post à créer.
      * @param user l'auteur du post.
      * @param topic le topic auquel le post est rattaché.
      * @return Post l'entité prête à être persistée.
      */
-    @Mapping(target = "user", source = "user")
-    @Mapping(target = "topic", source = "topic")
-    @Mapping(target = "date", expression = "java(LocalDateTime.now())")
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "comments", ignore = true)
-    @Mapping(target = "title", source = "postRequest.title")
-    Post toPost(PostRequest postRequest, User user, Topic topic);
+    default Post toPost(PostRequest postRequest, User user, Topic topic) {
+        return new Post(postRequest.title(), postRequest.content(), LocalDateTime.now(), topic, user);
+    }
 
     /**
      * Convertit un post en réponse détaillée pour l'affichage d'un post unique.

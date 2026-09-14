@@ -45,10 +45,10 @@ public class ProfilServiceImpl implements ProfilService {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         if (request.name() != null) {
-            user.setName(request.name());
+            user.changeName(request.name());
         }
         if (request.email() != null) {
-            user.setEmail(request.email());
+            user.changeEmail(request.email());
         }
 
         return this.toProfileResponse(user);
@@ -63,7 +63,7 @@ public class ProfilServiceImpl implements ProfilService {
             throw new InvalidCurrentPasswordException();
         }
 
-        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        user.changePassword(passwordEncoder.encode(request.newPassword()));
     }
 
 

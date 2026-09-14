@@ -2,8 +2,9 @@ package com.openclassrooms.mddapi.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Set;
 @Table(name = "topics")
 @AttributeOverride(name = "id", column = @Column(name = "topic_id"))
 @Getter
-@Setter
+@NoArgsConstructor
 public class Topic extends BaseEntity {
 
 	/** Titre du topic, unique et non modifiable. */
@@ -30,7 +31,7 @@ public class Topic extends BaseEntity {
 	 * tous ses posts, et transitivement leurs commentaires.
 	 */
 	@OneToMany(mappedBy = "topic", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<Post> posts;
+	private Set<Post> posts = new HashSet<>();
 
 	/**
 	 * Ensemble des utilisateurs abonnés à ce topic (table subscriptions).
@@ -40,5 +41,14 @@ public class Topic extends BaseEntity {
 	 * contrainte fk_subscription_topic (voir V8__subscriptions_on_delete_cascade.sql).
 	 */
 	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "topics")
-	private Set<User> users;
+	private Set<User> users = new HashSet<>();
+
+	/**
+	 * Crée un nouveau topic. Titre et description sont figés à la création
+	 * (colonnes {@code updatable = false}).
+	 */
+	public Topic(String title, String description) {
+		this.title = title;
+		this.description = description;
+	}
 }

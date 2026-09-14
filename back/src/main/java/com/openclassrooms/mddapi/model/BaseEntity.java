@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @NoArgsConstructor
 @Getter
-@Setter
 public abstract class BaseEntity {
 
     /** Identifiant technique auto-généré. */

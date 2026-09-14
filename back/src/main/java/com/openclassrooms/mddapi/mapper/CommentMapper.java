@@ -8,6 +8,7 @@ import com.openclassrooms.mddapi.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -34,16 +35,15 @@ public interface CommentMapper {
 
     /**
      * Convertit une requête de création de commentaire en entité commentaire.
+     * Implémentation manuelle (pas de génération MapStruct) : {@link Comment}
+     * n'expose pas de setters, la construction passe donc par son
+     * constructeur dédié.
      * @param commentRequest les données du commentaire à créer.
      * @param user l'auteur du commentaire.
      * @param post le post commenté.
      * @return Comment l'entité commentaire mappée, datée du moment de l'appel.
      */
-    @Mapping(target = "user", source = "user")
-    @Mapping(target = "post", source = "post")
-    @Mapping(target = "date", expression = "java(java.time.LocalDateTime.now())")
-    @Mapping(target = "content", source = "commentRequest.content")
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    Comment toComment(CommentRequest commentRequest, User user, Post post);
+    default Comment toComment(CommentRequest commentRequest, User user, Post post) {
+        return new Comment(commentRequest.content(), LocalDateTime.now(), post, user);
+    }
 }

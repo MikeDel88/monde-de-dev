@@ -2,8 +2,9 @@ package com.openclassrooms.mddapi.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Set;
 @Table(name = "users")
 @AttributeOverride(name = "id", column = @Column(name = "user_id"))
 @Getter
-@Setter
+@NoArgsConstructor
 public class User extends BaseEntity {
 
     /** Nom d'utilisateur, unique. */
@@ -40,5 +41,50 @@ public class User extends BaseEntity {
             name = "subscriptions",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "topic_id"))
-    private Set<Topic> topics;
+    private Set<Topic> topics = new HashSet<>();
+
+    /**
+     * Crée un nouvel utilisateur.
+     * @param name nom d'utilisateur.
+     * @param email adresse email.
+     * @param password mot de passe déjà haché par l'appelant.
+     */
+    public User(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
+
+    /** Change le nom d'utilisateur. */
+    public void changeName(String newName) {
+        this.name = newName;
+    }
+
+    /** Change l'adresse email. */
+    public void changeEmail(String newEmail) {
+        this.email = newEmail;
+    }
+
+    /** @param encodedPassword le mot de passe déjà haché par l'appelant. */
+    public void changePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
+
+    /**
+     * Abonne l'utilisateur au topic, en synchronisant les deux faces de la
+     * relation many-to-many (subscriptions).
+     */
+    public void subscribeTo(Topic topic) {
+        this.topics.add(topic);
+        topic.getUsers().add(this);
+    }
+
+    /**
+     * Désabonne l'utilisateur du topic, en synchronisant les deux faces de
+     * la relation many-to-many (subscriptions).
+     */
+    public void unsubscribeFrom(Topic topic) {
+        this.topics.remove(topic);
+        topic.getUsers().remove(this);
+    }
 }

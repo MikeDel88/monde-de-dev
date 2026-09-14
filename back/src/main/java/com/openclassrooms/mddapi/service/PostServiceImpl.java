@@ -118,7 +118,7 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(TopicNotSubscribedException::new);
 
         Comment newComment = commentMapper.toComment(commentRequest, user, post);
-        post.getComments().add(newComment);
+        post.addComment(newComment);
         postRepository.save(post);
     }
 }
