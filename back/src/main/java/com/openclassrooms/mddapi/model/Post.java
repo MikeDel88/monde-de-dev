@@ -52,6 +52,7 @@ public class Post extends BaseEntity {
      * Suppression en cascade (CascadeType.ALL) : supprimer ce post supprime
      * tous ses commentaires.
      */
+    @OrderBy("date DESC")
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Comment> comments;
 }

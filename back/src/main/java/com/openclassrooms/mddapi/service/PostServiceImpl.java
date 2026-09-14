@@ -79,7 +79,7 @@ public class PostServiceImpl implements PostService {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
 
-        Post post = postRepository.findByIdAndTopicInOrderByCommentsDesc(postId, user.getTopics())
+        Post post = postRepository.findByIdAndTopicIn(postId, user.getTopics())
                 .orElseThrow(TopicNotSubscribedException::new);
 
         return postMapper.toPostResponse(post, commentMapper.toCommentResponseList(post.getComments()));
