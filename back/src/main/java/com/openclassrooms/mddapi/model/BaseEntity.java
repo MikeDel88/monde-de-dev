@@ -39,7 +39,12 @@ public abstract class BaseEntity {
     /**
      * Date de dernière modification, renseignée automatiquement.
      * Même origine que {@link #createdAt} : horloge du serveur applicatif
-     * (via {@link UpdateTimestamp}), pas celle du SGBD.
+     * (via {@link UpdateTimestamp}), pas celle du SGBD. Ici, contrairement à
+     * {@code created_at}, le {@code DEFAULT now()} SQL de la colonne n'est
+     * pas un filet de sécurité : un {@code DEFAULT} ne se déclenche qu'à
+     * l'INSERT, jamais sur UPDATE. L'ORM est donc la seule source de vérité
+     * pour cette colonne ; toute écriture SQL directe hors Hibernate (script,
+     * autre service, migration) laisse {@code updated_at} périmé sans erreur.
      */
     @Column(name = "updated_at", nullable = false)
     @UpdateTimestamp
