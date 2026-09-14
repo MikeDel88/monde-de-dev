@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Implémentation de {@link ProfilService} : construit le profil de l'utilisateur connecté
@@ -45,10 +46,10 @@ public class ProfilServiceImpl implements ProfilService {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         if (request.name() != null) {
-            user.changeName(request.name());
+            user.changeName(request.name().trim());
         }
         if (request.email() != null) {
-            user.changeEmail(request.email());
+            user.changeEmail(request.email().trim().toLowerCase(Locale.ROOT));
         }
 
         return this.toProfileResponse(user);

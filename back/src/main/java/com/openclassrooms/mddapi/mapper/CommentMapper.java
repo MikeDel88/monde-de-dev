@@ -43,6 +43,6 @@ public interface CommentMapper {
      * @return Comment l'entité commentaire mappée.
      */
     default Comment toComment(CommentRequest commentRequest, User user, Post post) {
-        return new Comment(commentRequest.content(), post, user);
+        return new Comment(commentRequest.content().trim(), post, user);
     }
 }

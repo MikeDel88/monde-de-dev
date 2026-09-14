@@ -39,7 +39,7 @@ public interface PostMapper {
      * @return Post l'entité prête à être persistée.
      */
     default Post toPost(PostRequest postRequest, User user, Topic topic) {
-        return new Post(postRequest.title(), postRequest.content(), topic, user);
+        return new Post(postRequest.title().trim(), postRequest.content().trim(), topic, user);
     }
 
     /**

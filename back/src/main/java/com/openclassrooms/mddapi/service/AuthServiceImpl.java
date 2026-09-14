@@ -47,7 +47,7 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponse login(LoginRequest request) {
         log.info("service : login");
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.emailOrName(), request.password())
+                new UsernamePasswordAuthenticationToken(request.emailOrName().trim(), request.password())
         );
 
         User user = ((AuthenticatedUser) Objects.requireNonNull(authentication.getPrincipal())).user();

@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Mapper MapStruct qui construit l'entité {@link User} à partir de la requête
@@ -29,8 +30,8 @@ public interface UserMapper {
      */
     default User toUser(RegisterRequest registerRequest, @Context PasswordEncoder passwordEncoder) {
         return new User(
-                registerRequest.name(),
-                registerRequest.email(),
+                registerRequest.name().trim(),
+                registerRequest.email().trim().toLowerCase(Locale.ROOT),
                 passwordEncoder.encode(registerRequest.password())
         );
     }
