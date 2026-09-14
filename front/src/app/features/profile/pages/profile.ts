@@ -20,6 +20,7 @@ import {Input} from "../../../shared/components/input/input";
 import {Title} from "../../../shared/components/title/title";
 import {Loader} from "../../../shared/components/loader/loader";
 import {validatePasswordStrength} from "../../../shared/validators/password-strength-validator";
+import {Toast} from "../../../shared/components/toast/toast";
 
 
 export interface ProfileData {
@@ -41,7 +42,7 @@ const validationProfileForm = (schemaPath: SchemaPathTree<ProfileData>) => {
 
 @Component({
   selector: 'app-profile',
-  imports: [TopicCard, FormField, ConfirmPasswordModal, Button, Dividers, Error, Input, Title, Loader],
+  imports: [TopicCard, FormField, ConfirmPasswordModal, Button, Dividers, Error, Input, Title, Loader, Toast],
   templateUrl: './profile.html',
 })
 export class Profile {
@@ -57,7 +58,9 @@ export class Profile {
   readonly titleProfilUser: string = "Profil utilisateur";
   readonly btnSaveProfilUser: string = "Sauvegarder";
   readonly placeholderPassword: string = "Nouveau mot de passe"
+  readonly profilHasBeenUpdated: string = "Le profil a bien été mis à jour!"
 
+  showToastSuccessed = signal(false)
   error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
   showPasswordModal: WritableSignal<boolean> = signal(false);
   private pendingNewPassword = '';
@@ -75,6 +78,10 @@ export class Profile {
         this.profileModel.set({name: value.name, email: value.email, password: ''});
       }
     });
+  }
+
+  onCloseToastSuccessed() {
+    this.showToastSuccessed.set(false);
   }
 
   onFocus(): void {
@@ -97,6 +104,7 @@ export class Profile {
           next: value => {
             this.error.set(undefined);
             this.profile.set(value);
+            this.showToastSuccessed.set(true);
           },
           error: () => {
             this.error.set("Une erreur est survenue, le profil n'a pas été mis à jour.");
