@@ -63,6 +63,15 @@ describe('Page Feed', () => {
       cy.getBySelector('nav-menu-mobile').should('not.be.visible')
       cy.getBySelector('btn-burger').should('have.attr', 'aria-expanded', 'false')
     })
+
+    it('should stay closed after resizing from desktop to mobile', () => {
+      cy.viewport(1280, 720)
+      cy.getBySelector('nav-menu').should('be.visible')
+
+      cy.viewport('iphone-6')
+      cy.getBySelector('nav-menu-mobile').should('not.be.visible')
+      cy.getBySelector('btn-burger').should('have.attr', 'aria-expanded', 'false')
+    })
   })
 
   describe('Logout', () => {
