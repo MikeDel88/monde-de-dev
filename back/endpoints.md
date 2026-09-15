@@ -74,8 +74,8 @@ POST /posts/:id/comments
 | POST /auth/login | LoginRequest | password | PASSWORD_REQUIRED |
 | PATCH /profile | UpdateProfilRequest | name | NAME_INVALID (vide ou > 255, cf. users.name) |
 | PATCH /profile | UpdateProfilRequest | email | EMAIL_INVALID, EMAIL_TOO_LONG (max 255, cf. users.email) |
-| PATCH /profile/password | UpdateProfilPasswordRequest | newPassword | PASSWORD_REQUIRED |
-| PATCH /profile/password | UpdateProfilPasswordRequest | currentPassword | CURRENT_PASSWORD_REQUIRED (validation) ; CURRENT_PASSWORD_INVALID (métier, 400 via InvalidCurrentPasswordException) |
+| PATCH /profile | UpdateProfilRequest | newPassword | PASSWORD_REQUIRED |
+| PATCH /profile | UpdateProfilRequest | currentPassword | CURRENT_PASSWORD_REQUIRED (validation) ; CURRENT_PASSWORD_INVALID (métier, 400 via InvalidCurrentPasswordException) |
 | GET /posts | @RequestParam direction | direction | DIRECTION_INVALID |
 | POST /topics/subscribe | SubscribeRequest | topicId | TOPIC_REQUIRED, TOPIC_POSITIVE |
 | DELETE /topics/:id/subscribe | @PathVariable topicId | topicId | TOPIC_POSITIVE |

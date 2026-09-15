@@ -1,6 +1,5 @@
 package com.openclassrooms.mddapi.controller;
 
-import com.openclassrooms.mddapi.config.properties.AppConfigProperties;
 import com.openclassrooms.mddapi.documentation.database.ApiDabataseConflictResponse;
 import com.openclassrooms.mddapi.documentation.login.ApiInvalidCredentialsResponse;
 import com.openclassrooms.mddapi.documentation.login.ApiLoginValidResponse;

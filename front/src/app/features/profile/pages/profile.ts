@@ -65,8 +65,6 @@ export class Profile {
   showToastSuccess = signal({message: "", visible: false})
   error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
   showPasswordModal: WritableSignal<boolean> = signal(false);
-  private pendingNewPassword = '';
-
   profileModel: WritableSignal<ProfileData> = signal<ProfileData>(initialProfileData);
   profileForm: FieldTree<ProfileData> = form(this.profileModel, validationProfileForm);
 
@@ -99,44 +97,32 @@ export class Profile {
 
   onSubmit(event: Event): void {
     event.preventDefault();
-
-    const nameDirty = this.profileForm.name().dirty();
-    const emailDirty = this.profileForm.email().dirty();
-
-    if (nameDirty || emailDirty) {
-      const name = nameDirty ? this.profileForm.name().value() : null;
-      const email = emailDirty ? this.profileForm.email().value() : null;
-
-      this.profilService.updateProfile$(email, name)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe({
-          next: value => {
-            this.profile.set(value);
-            this.onUpdateProfilSuccess("Le profil a bien été mis à jour!");
-          },
-          error: () => {
-            this.error.set("Une erreur est survenue, le profil n'a pas été mis à jour.");
-          }
-        });
+    this.profileForm().markAsTouched()
+    if(this.profileForm().invalid()) {
+      return;
     }
-
-    if (this.checkHasNewPasswordToChange()) {
-      this.pendingNewPassword = this.profileForm.password().value();
-      this.showPasswordModal.set(true);
-    }
+    this.showPasswordModal.set(true);
   }
 
   onConfirmPassword(currentPassword: string): void {
     this.showPasswordModal.set(false);
-    this.profilService.updatePassword$(this.pendingNewPassword, currentPassword)
+    if(this.profileForm().invalid()) {
+      return;
+    }
+    const name: string | null = this.profileForm.name().dirty() ? this.profileForm.name().value() : null;
+    const email: string | null = this.profileForm.email().dirty() ? this.profileForm.email().value() : null;
+    const password: string | null = this.profileForm.password().dirty() ? this.profileForm.password().value() : null;
+    this.profilService.updateProfile$(email, name, password, currentPassword)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => {
-          this.profileForm.password().reset("")
-          this.onUpdateProfilSuccess("Le mot de passe a bien été changé!");
+        next: (value) => {
+          this.profile.set(value);
+          this.profileForm.password().reset("");
+          this.onUpdateProfilSuccess("Le profil a bien été mis à jour!");
         },
         error: () => {
-          this.error.set("Une erreur est survenue, le mot de passe n'a pas été mis à jour.");
+          this.profile.reload();
+          this.error.set("Une erreur est survenue, le profil n'a pas été mis à jour.");
         }
       });
   }
@@ -148,11 +134,4 @@ export class Profile {
         complete: () => this.profile.reload(),
       })
   }
-
-  private checkHasNewPasswordToChange(): boolean {
-    return this.profileForm.password().dirty()
-      && this.profileForm.password().valid()
-      && this.profileForm.password().value() !== '';
-  }
-
 }
