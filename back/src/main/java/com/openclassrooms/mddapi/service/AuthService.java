@@ -2,6 +2,7 @@ package com.openclassrooms.mddapi.service;
 
 import com.openclassrooms.mddapi.dto.request.LoginRequest;
 import com.openclassrooms.mddapi.dto.request.RegisterRequest;
+import org.springframework.http.ResponseCookie;
 
 /**
  * Service qui permet la gestion de l'authentification de l'utilisateur.
@@ -18,5 +19,7 @@ public interface AuthService {
      * @param request Dto LoginRequest qui contient emailOrUsername et le password.
      * @return le JWT généré pour l'utilisateur authentifié.
      */
-    String login(LoginRequest request);
+    ResponseCookie login(LoginRequest request, String requestPath);
+
+    ResponseCookie logout(String requestPath);
 }

@@ -1,7 +1,6 @@
 package com.openclassrooms.mddapi.controller;
 
 import com.openclassrooms.mddapi.config.properties.AppConfigProperties;
-import com.openclassrooms.mddapi.config.security.CookieBearerTokenResolver;
 import com.openclassrooms.mddapi.documentation.database.ApiDabataseConflictResponse;
 import com.openclassrooms.mddapi.documentation.login.ApiInvalidCredentialsResponse;
 import com.openclassrooms.mddapi.documentation.login.ApiLoginValidResponse;
@@ -27,8 +26,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Duration;
-
 @Log4j2
 @AllArgsConstructor
 @RestController
@@ -37,7 +34,6 @@ public class AuthController {
 
     private final AuthService authService;
     private final RateLimiterService rateLimiterService;
-    private final AppConfigProperties appConfigProperties;
 
     @SecurityRequirements()
     @ApiRegisterValidResponse
@@ -63,14 +59,7 @@ public class AuthController {
     public ResponseEntity<Void> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         log.info("call /login");
         rateLimiterService.checkLogin(request.getRemoteAddr(), loginRequest.emailOrName());
-        String token = authService.login(loginRequest);
-        ResponseCookie cookie = ResponseCookie.from(CookieBearerTokenResolver.ACCESS_TOKEN_COOKIE_NAME, token)
-                .httpOnly(true)
-                .secure(appConfigProperties.cookieSecure())
-                .sameSite("Lax")
-                .path(request.getContextPath())
-                .maxAge(Duration.ofDays(appConfigProperties.tokenExpiration()))
-                .build();
+        ResponseCookie cookie = authService.login(loginRequest, request.getContextPath());
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .build();
@@ -80,13 +69,7 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request) {
         log.info("call /logout");
-        ResponseCookie cookie = ResponseCookie.from(CookieBearerTokenResolver.ACCESS_TOKEN_COOKIE_NAME, "")
-                .httpOnly(true)
-                .secure(appConfigProperties.cookieSecure())
-                .sameSite("Lax")
-                .path(request.getContextPath())
-                .maxAge(0)
-                .build();
+        ResponseCookie cookie = this.authService.logout(request.getContextPath());
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .build();

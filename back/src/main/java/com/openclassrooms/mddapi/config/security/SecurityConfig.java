@@ -62,11 +62,13 @@ public class SecurityConfig {
             JwtAccessDeniedHandler jwtAccessDeniedHandler,
             JwtAuthenticationConverter jwtAuthenticationConverter,
             CookieBearerTokenResolver cookieBearerTokenResolver
-    ) throws Exception {
+    ) {
         log.info("Security Filter Chain");
+        CookieCsrfTokenRepository csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        csrfTokenRepository.setCookiePath("/");
         return http
                 .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRepository(csrfTokenRepository)
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                 )
                 .addFilterAfter(new CsrfCookieFilter(), CsrfFilter.class)
