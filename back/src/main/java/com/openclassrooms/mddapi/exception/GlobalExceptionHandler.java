@@ -75,7 +75,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public ProblemDetail handleUserNotFound(UserNotFoundException ex) {
         log.info("handleUserNotFound : {}", ex.getMessage());
-        return ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ErrorCodes.USER_NOT_FOUND);
     }
 
     /**
@@ -86,7 +86,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TopicNotFoundException.class)
     public ProblemDetail handleTopicNotFound(TopicNotFoundException ex) {
         log.info("handleTopicNotFound : {}", ex.getMessage());
-        return ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ErrorCodes.TOPIC_NOT_FOUND);
     }
 
     /**
@@ -99,7 +99,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidCredentialsException.class)
     public ProblemDetail handleInvalidCredentials(InvalidCredentialsException ex) {
         log.info("handleInvalidCredentials : {}", ex.getMessage());
-        return ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ErrorCodes.INVALID_CREDENTIALS);
     }
 
     /**
@@ -113,7 +113,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
     public ProblemDetail handleAuthenticationException(AuthenticationException ex) {
         log.info("handleAuthenticationException : {}", ex.getMessage());
-        return ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ErrorCodes.INVALID_CREDENTIALS);
     }
 
     /**
@@ -124,7 +124,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TopicNotSubscribedException.class)
     public ProblemDetail handleTopicNotSubscribed(TopicNotSubscribedException ex) {
         log.info("handleTopicNotSubscribed : {}", ex.getMessage());
-        return ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ErrorCodes.TOPIC_NOT_SUBSCRIBED);
     }
 
     /**
@@ -139,7 +139,7 @@ public class GlobalExceptionHandler {
         log.info("handleInvalidCurrentPassword : {}", ex.getMessage());
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         BodyProblemDetail bpd = BodyProblemDetail.from(pd);
-        bpd.setErrors(List.of(new FieldError("currentPassword", "CURRENT_PASSWORD_INVALID")));
+        bpd.setErrors(List.of(new FieldError("currentPassword", ErrorCodes.CURRENT_PASSWORD_INVALID)));
 
         return bpd;
     }
@@ -154,7 +154,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RateLimitExceededException.class)
     public ProblemDetail handleRateLimitExceeded(RateLimitExceededException ex) {
         log.info("handleRateLimitExceeded : {}", ex.getMessage());
-        return ProblemDetail.forStatus(HttpStatus.TOO_MANY_REQUESTS);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, ErrorCodes.RATE_LIMIT_EXCEEDED);
     }
 
     /**
@@ -188,9 +188,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ProblemDetail handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
-        log.info("handleMethodArgumentTypeMismatch : {}", ex.getMessage());
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
-                "Le paramètre '" + ex.getName() + "' est invalide.");
+        log.info("handleMethodArgumentTypeMismatch : {} ({})", ex.getMessage(), ex.getName());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ErrorCodes.PARAMETER_INVALID);
     }
 
     /**
@@ -202,7 +201,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ProblemDetail handleMessageNotReadable(HttpMessageNotReadableException ex) {
         log.info("handleMessageNotReadable : {}", ex.getMessage());
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Malformed JSON request");
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ErrorCodes.MALFORMED_JSON);
     }
 
     /**
@@ -215,7 +214,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ProblemDetail handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         log.error("handleDataIntegrityViolation : {}", ex.getMessage());
-        return ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ErrorCodes.DATA_CONFLICT);
     }
 
     /**
@@ -227,6 +226,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleGenericException(Exception ex) {
         log.error("handleGenericException : {}", ex.getMessage());
-        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,  "Internal server error");
+        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR);
     }
 }

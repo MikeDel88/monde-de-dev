@@ -1,5 +1,6 @@
 package com.openclassrooms.mddapi.config.security;
 
+import com.openclassrooms.mddapi.exception.ErrorCodes;
 import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,7 +32,7 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(@NonNull HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
         log.error("handle : {}", accessDeniedException.getMessage());
 
-        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, "Access denied");
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ErrorCodes.ACCESS_DENIED);
 
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

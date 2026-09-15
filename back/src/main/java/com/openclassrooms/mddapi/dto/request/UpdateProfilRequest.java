@@ -1,5 +1,6 @@
 package com.openclassrooms.mddapi.dto.request;
 
+import com.openclassrooms.mddapi.exception.ErrorCodes;
 import com.openclassrooms.mddapi.validation.ValidPassword;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
@@ -17,12 +18,12 @@ import jakarta.validation.constraints.Size;
  */
 public record UpdateProfilRequest(
 
-        @Size(min = 1, max = 255, message = "NAME_INVALID")
+        @Size(min = 1, max = 255, message = ErrorCodes.NAME_INVALID)
         @Schema(nullable = true, minLength = 1, maxLength = 255, description = "Nouveau nom, laisser vide/absent pour ne pas le modifier", example = "John")
         String name,
 
-        @Email(message = "EMAIL_INVALID")
-        @Size(max = 255, message = "EMAIL_TOO_LONG")
+        @Email(message = ErrorCodes.EMAIL_INVALID)
+        @Size(max = 255, message = ErrorCodes.EMAIL_TOO_LONG)
         @Schema(nullable = true, maxLength = 255, description = "Nouvel email, laisser vide/absent pour ne pas le modifier", example = "john@example.com")
         String email,
 
@@ -36,7 +37,7 @@ public record UpdateProfilRequest(
         )
                 String newPassword,
 
-        @NotBlank(message = "CURRENT_PASSWORD_REQUIRED")
+        @NotBlank(message = ErrorCodes.CURRENT_PASSWORD_REQUIRED)
         @Schema(description = "Mot de passe actuel de l'utilisateur, requis pour confirmer le changement", example = "Passw0rd!")
         String currentPassword
 ) {

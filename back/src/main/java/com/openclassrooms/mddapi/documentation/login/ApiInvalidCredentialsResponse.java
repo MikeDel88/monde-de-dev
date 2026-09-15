@@ -1,5 +1,6 @@
 package com.openclassrooms.mddapi.documentation.login;
 
+import com.openclassrooms.mddapi.exception.ErrorCodes;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,7 +15,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponse(
         responseCode = "401",
-        description = "les identifiants (email/nom d'utilisateur ou mot de passe) sont invalides",
+        description = "Les identifiants (email/nom d'utilisateur ou mot de passe) sont invalides. Code : "
+                + ErrorCodes.INVALID_CREDENTIALS,
         content = @Content(schema = @Schema(implementation = ProblemDetail.class))
 )
 public @interface ApiInvalidCredentialsResponse {

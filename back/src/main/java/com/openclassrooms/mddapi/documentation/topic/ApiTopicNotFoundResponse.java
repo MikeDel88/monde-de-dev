@@ -1,5 +1,6 @@
 package com.openclassrooms.mddapi.documentation.topic;
 
+import com.openclassrooms.mddapi.exception.ErrorCodes;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,7 +15,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponse(
         responseCode = "404",
-        description = "le thème demandé est introuvable",
+        description = "Le thème demandé est introuvable. Code : " + ErrorCodes.TOPIC_NOT_FOUND,
         content = @Content(schema = @Schema(implementation = ProblemDetail.class))
 )
 public @interface ApiTopicNotFoundResponse {

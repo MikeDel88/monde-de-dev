@@ -6,6 +6,7 @@ import java.util.List;
 import com.openclassrooms.mddapi.documentation.topic.*;
 import com.openclassrooms.mddapi.documentation.user.ApiUserNotFoundResponse;
 import com.openclassrooms.mddapi.dto.request.SubscribeRequest;
+import com.openclassrooms.mddapi.exception.ErrorCodes;
 import com.openclassrooms.mddapi.dto.response.TopicResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -42,7 +43,7 @@ public class TopicController {
 	@ApiTopicNotFoundResponse
 	@ApiUserNotFoundResponse
 	@DeleteMapping("/{topicId}/subscribe")
-	public void unsubscribe(@Validated @Positive(message = "TOPIC_POSITIVE") @PathVariable Long topicId, Principal principal) {
+	public void unsubscribe(@Validated @Positive(message = ErrorCodes.TOPIC_POSITIVE) @PathVariable Long topicId, Principal principal) {
 		topicService.unsubscribe(topicId, Long.valueOf(principal.getName()));
 	}
 }

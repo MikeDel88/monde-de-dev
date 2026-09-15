@@ -12,6 +12,7 @@ import com.openclassrooms.mddapi.documentation.topic.ApiTopicNotSubscribedRespon
 import com.openclassrooms.mddapi.documentation.user.ApiUserNotFoundResponse;
 import com.openclassrooms.mddapi.dto.request.CommentRequest;
 import com.openclassrooms.mddapi.dto.request.PostRequest;
+import com.openclassrooms.mddapi.exception.ErrorCodes;
 import com.openclassrooms.mddapi.dto.response.CursorPageResponse;
 import com.openclassrooms.mddapi.dto.response.PostFeedResponse;
 import com.openclassrooms.mddapi.dto.response.PostResponse;
@@ -45,11 +46,11 @@ public class PostController {
             Principal principal,
             @Parameter(description = "Id du dernier post reçu par le client, absent pour la première page.")
             @Validated
-            @Positive()
+            @Positive(message = ErrorCodes.CURSOR_POSITIVE)
             @RequestParam(required = false) Long cursor,
             @Parameter(description = "Sens du tri du fil d'actualité (par id).")
             @Validated
-            @Pattern(regexp = "^(asc|desc)$", message = "DIRECTION_INVALID")
+            @Pattern(regexp = "^(asc|desc)$", message = ErrorCodes.DIRECTION_INVALID)
             @RequestParam(defaultValue = "desc") String direction
     ) {
         log.info("call /posts");
@@ -62,7 +63,7 @@ public class PostController {
     @ApiUserNotFoundResponse
     @GetMapping("/{postId}")
     public PostResponse getPost(
-            @Validated @Positive @PathVariable Long postId,
+            @Validated @Positive(message = ErrorCodes.POST_ID_POSITIVE) @PathVariable Long postId,
             Principal principal) {
         log.info("call /posts/{}", postId);
         return postService.getPostById(postId, Long.valueOf(principal.getName()));
@@ -85,7 +86,7 @@ public class PostController {
     @ApiUserNotFoundResponse
     @PostMapping("/{postId}/comments")
     public ResponseEntity<Void> createComment(
-            @Validated @Positive @PathVariable Long postId,
+            @Validated @Positive(message = ErrorCodes.POST_ID_POSITIVE) @PathVariable Long postId,
             @Valid @RequestBody CommentRequest commentRequest,
             Principal principal) {
         log.info("call /posts/{}/comments create", postId);

@@ -1,5 +1,6 @@
 package com.openclassrooms.mddapi.documentation.topic;
 
+import com.openclassrooms.mddapi.exception.ErrorCodes;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,7 +15,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponse(
         responseCode = "403",
-        description = "l'utilisateur n'est pas abonné à ce thème",
+        description = "L'utilisateur n'est pas abonné à ce thème. Code : " + ErrorCodes.TOPIC_NOT_SUBSCRIBED,
         content = @Content(schema = @Schema(implementation = ProblemDetail.class))
 )
 public @interface ApiTopicNotSubscribedResponse {

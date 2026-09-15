@@ -1,5 +1,6 @@
 package com.openclassrooms.mddapi.documentation.ratelimit;
 
+import com.openclassrooms.mddapi.exception.ErrorCodes;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,7 +15,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponse(
         responseCode = "429",
-        description = "trop de tentatives depuis cette IP ou pour ce compte, réessayer plus tard",
+        description = "Trop de tentatives depuis cette IP ou pour ce compte, réessayer plus tard. Code : "
+                + ErrorCodes.RATE_LIMIT_EXCEEDED,
         content = @Content(schema = @Schema(implementation = ProblemDetail.class))
 )
 public @interface ApiRateLimitExceededResponse {
