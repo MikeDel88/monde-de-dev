@@ -17,14 +17,14 @@ export const routes: Routes = [
   {
     path: '',
     canActivate: [GuestGuard],
-    children: [
-      { path: '', component: Home, title: "Page d'accueil" },
+    loadChildren: () => [
+      { path: '', loadComponent:() => Home, title: "Page d'accueil" },
       {
         path: '',
-        component: AuthLayout,
-        children: [
-          { path: 'register', component: Register, title: "Inscription", data: { title: "Inscription" } },
-          { path: 'login', component: Login, title: "Se connecter", data: { title: "Se connecter" } },
+        loadComponent:() => AuthLayout,
+        loadChildren: () => [
+          { path: 'register', loadComponent:() => Register, title: "Inscription", data: { title: "Inscription" } },
+          { path: 'login', loadComponent:() => Login, title: "Se connecter", data: { title: "Se connecter" } },
         ],
       },
     ],
@@ -32,19 +32,19 @@ export const routes: Routes = [
   {
     path: '',
     canActivate: [AuthGuard],
-    children: [
+    loadChildren: () => [
       {
         path: '',
-        component: MainLayout,
-        children: [
-          { path: 'feed', component: Feed, title: "Fil d'actualité" },
-          { path: 'topics', component: Topic, title: "Thèmes" },
-          { path: 'profile', component: Profile, title: "Profil utilisateur" },
-          { path: 'post', component: Post, title: "Créer un nouvel article" },
-          { path: 'post/:id', component: PostDetail, title: "Voir un article" },
+        loadComponent: () => MainLayout,
+        loadChildren: () => [
+          { path: 'feed', loadComponent:() => Feed, title: "Fil d'actualité" },
+          { path: 'topics', loadComponent:() => Topic, title: "Thèmes" },
+          { path: 'profile', loadComponent:() => Profile, title: "Profil utilisateur" },
+          { path: 'post', loadComponent:() => Post, title: "Créer un nouvel article" },
+          { path: 'post/:id', loadComponent:() => PostDetail, title: "Voir un article" },
         ],
       },
     ],
   },
-  { path: '**', component: ErrorPage, title: "Page introuvable" },
+  { path: '**', loadComponent:() => ErrorPage, title: "Page introuvable" },
 ];
