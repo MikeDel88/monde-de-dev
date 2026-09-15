@@ -1,26 +1,20 @@
-import {inject, Service, signal, WritableSignal} from '@angular/core';
-import {HttpClient, httpResource, HttpResourceRef} from "@angular/common/http";
+import {inject, Service} from '@angular/core';
+import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {environment} from "../../../../environments/environment";
-import {Post} from "../models/post";
 
 @Service()
 export class PostService {
 
   private readonly httpClient = inject(HttpClient);
-  postId : WritableSignal<string | null> = signal(null);
+  readonly path = `${environment.apiUrl}/posts`
 
-  createPost$(topicId: string, title: string, content: string): Observable<void> {
-    return this.httpClient.post<void>(`${environment.apiUrl}/posts`, { topicId, title, content });
+  createPost$(topicId: number, title: string, content: string): Observable<void> {
+    return this.httpClient.post<void>(this.path, { topicId, title, content });
   }
 
-  post: HttpResourceRef<Post | undefined> = httpResource<Post>(() => {
-    const id: string | null = this.postId();
-    return id ? { url: `${environment.apiUrl}/posts/${id}` } : undefined;
-  });
-
-  createComment$(content: string): Observable<void> {
-    return this.httpClient.post<void>(`${environment.apiUrl}/posts/${this.postId()}/comments`, { content });
+  createComment$(postId: number, content: string): Observable<void> {
+    return this.httpClient.post<void>(`${this.path}/${postId}/comments`, { content });
   }
 
 }

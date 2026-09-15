@@ -1,6 +1,6 @@
 import {Component, computed, DestroyRef, inject, signal, Signal, WritableSignal} from '@angular/core';
 import {ProfileService} from "../../../profile/services/profile-service";
-import {HttpResourceRef} from "@angular/common/http";
+import {httpResource, HttpResourceRef} from "@angular/common/http";
 import {ProfileResponse} from "../../../profile/models/profile-response";
 import {Topic} from "../../../topic/models/topic";
 import {Router} from "@angular/router";
@@ -21,7 +21,7 @@ export interface CreatePost {
 }
 
 const initialPostData: CreatePost = {
-  topicId: "",
+  topicId: '',
   title: "",
   content: ""
 };
@@ -65,13 +65,14 @@ export class Post {
         return undefined;
       }
   });
-  profile!: HttpResourceRef<ProfileResponse | undefined>;
+  profile: HttpResourceRef<ProfileResponse | undefined> = httpResource<ProfileResponse>(() =>
+    ({ url: this.profilService.path })
+  );
 
   createPostModel: WritableSignal<CreatePost> = signal<CreatePost>(initialPostData);
   postForm: FieldTree<CreatePost> = form(this.createPostModel, validationCreatePostForm);
 
   constructor() {
-    this.profile = this.profilService.profile;
     this.profile.reload();
   }
 
@@ -85,12 +86,11 @@ export class Post {
 
   onSubmit(event: Event): void {
     event.preventDefault();
-    const postData: FieldState<CreatePost> = this.postForm();
-    postData.markAsTouched();
-    if(postData.invalid()) {
+    this.postForm().markAsTouched();
+    if(this.postForm().invalid()) {
       return;
     }
-    this.postService.createPost$(postData.value().topicId, postData.value().title, postData.value().content)
+    this.postService.createPost$(Number(this.postForm().value().topicId), this.postForm().value().title, this.postForm().value().content)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {

@@ -1,5 +1,5 @@
 import {inject, Service} from '@angular/core';
-import {HttpClient, httpResource, HttpResourceRef} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../../environments/environment";
 import {ProfileResponse} from "../models/profile-response";
 import {Observable} from "rxjs";
@@ -8,19 +8,16 @@ import {Observable} from "rxjs";
 export class ProfileService {
 
   private httpClient = inject(HttpClient);
-
-  profile: HttpResourceRef<ProfileResponse | undefined> = httpResource<ProfileResponse>(() => ({
-    url: `${environment.apiUrl}/profile`,
-  }));
+  readonly path = `${environment.apiUrl}/profile`;
 
   updateProfile$(email: string | null, name: string | null): Observable<ProfileResponse> {
-    return this.httpClient.patch<ProfileResponse>(`${environment.apiUrl}/profile`, {
+    return this.httpClient.patch<ProfileResponse>(this.path, {
       email: email,
       name: name,
     });
   }
 
   updatePassword$(newPassword: string, currentPassword: string): Observable<void> {
-    return this.httpClient.patch<void>(`${environment.apiUrl}/profile/password`, { newPassword, currentPassword });
+    return this.httpClient.patch<void>(`${this.path}/password`, { newPassword, currentPassword });
   }
 }

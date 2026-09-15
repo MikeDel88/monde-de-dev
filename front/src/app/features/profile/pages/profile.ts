@@ -1,5 +1,5 @@
 import {Component, DestroyRef, effect, inject, signal, WritableSignal} from '@angular/core';
-import {HttpResourceRef} from "@angular/common/http";
+import {httpResource, HttpResourceRef} from "@angular/common/http";
 import {ProfileService} from "../services/profile-service";
 import {ProfileResponse} from "../models/profile-response";
 import {TopicCard} from "../../../shared/components/topic-card/topic-card";
@@ -21,6 +21,7 @@ import {Title} from "../../../shared/components/title/title";
 import {Loader} from "../../../shared/components/loader/loader";
 import {validatePasswordStrength} from "../../../shared/validators/password-strength-validator";
 import {Toast} from "../../../shared/components/toast/toast";
+import {environment} from "../../../../environments/environment";
 
 
 export interface ProfileData {
@@ -48,7 +49,9 @@ const validationProfileForm = (schemaPath: SchemaPathTree<ProfileData>) => {
 export class Profile {
 
   private profilService: ProfileService = inject(ProfileService);
-  profile!: HttpResourceRef<ProfileResponse | undefined>;
+  profile: HttpResourceRef<ProfileResponse | undefined> = httpResource<ProfileResponse>(() =>
+    ({ url: this.profilService.path })
+  );
 
   private topicService: TopicService = inject(TopicService);
   private destroyRef: DestroyRef = inject(DestroyRef);
@@ -68,7 +71,6 @@ export class Profile {
   profileForm: FieldTree<ProfileData> = form(this.profileModel, validationProfileForm);
 
   constructor() {
-    this.profile = this.profilService.profile;
     this.profile.reload();
 
     effect(() => {

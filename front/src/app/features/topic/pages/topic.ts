@@ -1,5 +1,5 @@
 import {Component, DestroyRef, inject} from "@angular/core";
-import {HttpResourceRef} from "@angular/common/http";
+import {httpResource, HttpResourceRef} from "@angular/common/http";
 import {TopicService} from "../services/topic-service";
 import {Topic as TopicModel} from "../models/topic";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
@@ -20,7 +20,7 @@ export class Topic {
 
   private topicService = inject(TopicService);
   private destroyRef = inject(DestroyRef);
-  topics: HttpResourceRef<TopicModel[] | undefined> = this.topicService.topics;
+  topics: HttpResourceRef<TopicModel[] | undefined> = httpResource<TopicModel[]>(() => this.topicService.path);
 
   constructor() {
     this.topics.reload();
