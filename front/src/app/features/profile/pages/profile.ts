@@ -21,7 +21,6 @@ import {Title} from "../../../shared/components/title/title";
 import {Loader} from "../../../shared/components/loader/loader";
 import {validatePasswordStrength} from "../../../shared/validators/password-strength-validator";
 import {Toast} from "../../../shared/components/toast/toast";
-import {environment} from "../../../../environments/environment";
 
 
 export interface ProfileData {
