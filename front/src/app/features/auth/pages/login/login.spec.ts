@@ -261,11 +261,11 @@ describe('Login', () => {
       req.flush(null, { status: 401, statusText: 'Unauthorized' });
       fixture.detectChanges();
 
-      expect(component.error()).toBe("Une erreur est survenue. Vérifier le couple email ou nom d'utilisateur et mot de passe");
+      expect(component.error()).toBe('Session expirée ou identifiants invalides.');
       expect(router.navigate).not.toHaveBeenCalled();
 
       const errorElement = fixture.debugElement.query(By.css('[data-test="error"]'));
-      expect(errorElement.nativeElement.textContent).toContain("Vérifier le couple email ou nom d'utilisateur et mot de passe");
+      expect(errorElement.nativeElement.textContent).toContain('Session expirée ou identifiants invalides.');
     });
 
     it('should display a generic error message and not navigate on a server error (500)', () => {
@@ -274,11 +274,11 @@ describe('Login', () => {
       req.flush(null, { status: 500, statusText: 'Internal Server Error' });
       fixture.detectChanges();
 
-      expect(component.error()).toBe('Une erreur est survenue, veuillez réessayer plus tard');
+      expect(component.error()).toBe('Une erreur est survenue, veuillez réessayer plus tard.');
       expect(router.navigate).not.toHaveBeenCalled();
 
       const errorElement = fixture.debugElement.query(By.css('[data-test="error"]'));
-      expect(errorElement.nativeElement.textContent).toContain('Une erreur est survenue, veuillez réessayer plus tard');
+      expect(errorElement.nativeElement.textContent).toContain('Une erreur est survenue, veuillez réessayer plus tard.');
     });
 
     it('should persist the session (isAuthenticated) after a successful login', () => {

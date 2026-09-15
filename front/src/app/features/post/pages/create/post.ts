@@ -4,13 +4,14 @@ import {httpResource, HttpResourceRef} from "@angular/common/http";
 import {ProfileResponse} from "../../../profile/models/profile-response";
 import {Topic} from "../../../topic/models/topic";
 import {Router} from "@angular/router";
-import {FieldState, FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
+import {FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
 import {FormsModule} from "@angular/forms";
 import {PostService} from "../../services/post-service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Button} from "../../../../shared/components/button/button";
 import {Error} from "../../../../shared/components/error/error";
 import {Input} from "../../../../shared/components/input/input";
+import {AppError} from "../../../../core/models/app-error";
 import {Title} from "../../../../shared/components/title/title";
 import {Back} from "../../../../shared/components/back/back";
 
@@ -97,8 +98,8 @@ export class Post {
           this.postForm().reset(initialPostData);
           this.router.navigate(['/feed']);
         },
-        error: () => {
-          this.error.set('Erreur lors de la création du post.');
+        error: (err: AppError) => {
+          this.error.set(err.message);
         }
       });
   }

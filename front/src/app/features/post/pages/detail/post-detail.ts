@@ -8,6 +8,7 @@ import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Dividers} from "../../../../shared/components/divider/dividers";
 import {Error} from "../../../../shared/components/error/error";
 import {Title} from "../../../../shared/components/title/title";
+import {AppError} from "../../../../core/models/app-error";
 import {Back} from "../../../../shared/components/back/back";
 import {Loader} from "../../../../shared/components/loader/loader";
 import {Post} from "../../models/post";
@@ -75,8 +76,8 @@ export class PostDetail {
           this.commentForm().reset(commentInitialData);
           this.post.reload();
         },
-        error: () => {
-          this.error.set('Erreur lors de la création du commentaire.');
+        error: (err: AppError) => {
+          this.error.set(err.message);
         }
       });
   }

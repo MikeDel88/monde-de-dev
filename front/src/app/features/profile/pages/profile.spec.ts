@@ -221,7 +221,7 @@ describe('Profile', () => {
         submit();
 
         const errorElement = fixture.debugElement.query(By.css('p[data-test="error"]'));
-        expect(errorElement.nativeElement.textContent).toContain("Une erreur est survenue, le profil n'a pas été mis à jour.");
+        expect(errorElement.nativeElement.textContent).toContain('fail');
       });
     });
 
@@ -308,6 +308,16 @@ describe('Profile', () => {
         expect(mockTopicService.unsubscribe$).toHaveBeenCalledWith(MOCK_TOPIC.id);
         expect(mockProfileService.profile.reload).toHaveBeenCalled();
         expect(fixture.debugElement.query(By.directive(TopicCard))).toBeFalsy();
+      });
+
+      it('should display an error message when unsubscribe$ fails', () => {
+        mockTopicService.unsubscribe$.mockReturnValue(throwError(() => new Error('fail')));
+
+        component.onUnsubscribe(MOCK_TOPIC.id);
+        fixture.detectChanges();
+
+        const errorElement = fixture.debugElement.query(By.css('p[data-test="error"]'));
+        expect(errorElement.nativeElement.textContent).toContain('fail');
       });
     });
   });

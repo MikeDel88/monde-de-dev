@@ -17,6 +17,7 @@ import {Button} from "../../../shared/components/button/button";
 import {Dividers} from "../../../shared/components/divider/dividers";
 import {Error} from "../../../shared/components/error/error";
 import {Input} from "../../../shared/components/input/input";
+import {AppError} from "../../../core/models/app-error";
 import {Title} from "../../../shared/components/title/title";
 import {Loader} from "../../../shared/components/loader/loader";
 import {validatePasswordStrength} from "../../../shared/validators/password-strength-validator";
@@ -119,9 +120,9 @@ export class Profile {
           this.profileForm.password().reset("");
           this.onUpdateProfilSuccess("Le profil a bien été mis à jour!");
         },
-        error: () => {
+        error: (err: AppError) => {
           this.profile.reload();
-          this.error.set("Une erreur est survenue, le profil n'a pas été mis à jour.");
+          this.error.set(err.message);
         }
       });
   }
@@ -130,7 +131,11 @@ export class Profile {
     this.topicService.unsubscribe$(topicId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        complete: () => this.profile.reload(),
+        complete: () => {
+          this.error.set(undefined);
+          this.profile.reload();
+        },
+        error: (err: AppError) => this.error.set(err.message),
       })
   }
 }

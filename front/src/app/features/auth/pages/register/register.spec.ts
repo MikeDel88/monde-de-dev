@@ -313,7 +313,7 @@ describe('Register', () => {
       req.flush(null, { status: 409, statusText: 'Conflict' });
       fixture.detectChanges();
 
-      expect(component.error()).toBe("Une erreur est survenue, l'utilisateur n'a pas été enregistré");
+      expect(component.error()).toBe('Un conflit est survenu.');
     });
 
     it('should display a generic error message on a server error (500)', () => {
@@ -322,7 +322,7 @@ describe('Register', () => {
       req.flush(null, { status: 500, statusText: 'Internal Server Error' });
       fixture.detectChanges();
 
-      expect(component.error()).toBe('Une erreur est survenue, veuillez réessayer plus tard');
+      expect(component.error()).toBe('Une erreur est survenue, veuillez réessayer plus tard.');
     });
   });
 

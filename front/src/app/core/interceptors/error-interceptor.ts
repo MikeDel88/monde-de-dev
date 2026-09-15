@@ -3,6 +3,8 @@ import {inject} from "@angular/core";
 import {Router} from "@angular/router";
 import {catchError, throwError} from "rxjs";
 import {SessionService} from "../services/session-service";
+import {AppError} from "../models/app-error";
+import {mapHttpErrorToMessage} from "../utils/http-error-message";
 
 export function errorInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn) {
   const sessionService = inject(SessionService);
@@ -14,7 +16,7 @@ export function errorInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn)
         sessionService.logOut();
         router.navigateByUrl('/login');
       }
-      return throwError(() => error);
+      return throwError(() => new AppError(mapHttpErrorToMessage(error), error.status, error));
     })
   );
 }

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import {describe, it, expect, beforeEach, afterEach, jest} from "@jest/globals";
+import {throwError} from "rxjs";
 import {HttpTestingController, provideHttpClientTesting} from "@angular/common/http/testing";
 import {provideHttpClient} from "@angular/common/http";
 import {TopicService} from "../services/topic-service";
@@ -93,6 +94,16 @@ describe('Topic', () => {
       TestBed.tick();
       const topicCard = fixture.debugElement.query(By.directive(TopicCard));
       expect(topicCard).toBeFalsy();
+    });
+
+    it("should display an error message when subscribe$ fails", () => {
+      mockTopicService.subscribe$.mockReturnValue(throwError(() => new Error('fail')));
+
+      component.onSubscribe(MOCK_TOPICS[1].id);
+      fixture.detectChanges();
+
+      const error = fixture.debugElement.query(By.css('[data-test="subscribe-error"]'));
+      expect(error.nativeElement.textContent).toContain('fail');
     });
   });
 

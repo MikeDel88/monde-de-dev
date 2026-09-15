@@ -70,7 +70,7 @@ describe('AuthService', () => {
   it('should return a dedicated message on 409', (done) => {
     service.register$(registerData).subscribe({
       error: (error: Error) => {
-        expect(error.message).toBe("Une erreur est survenue, l'utilisateur n'a pas été enregistré");
+        expect(error.message).toBe('Un conflit est survenu.');
         done();
       },
     });
@@ -79,15 +79,27 @@ describe('AuthService', () => {
     req.flush({ status: 409 }, { status: 409, statusText: 'Conflict' });
   });
 
-  it('should return a generic message on 500', (done) => {
+  it('should use the server-provided detail on 500 when present', (done) => {
     service.register$(registerData).subscribe({
       error: (error: Error) => {
-        expect(error.message).toBe('Une erreur est survenue, veuillez réessayer plus tard');
+        expect(error.message).toBe('Internal server error');
         done();
       },
     });
 
     const req = httpMock.expectOne(`${environment.apiUrl}/auth/register`);
     req.flush({ status: 500, detail: 'Internal server error' }, { status: 500, statusText: 'Internal Server Error' });
+  });
+
+  it('should return the generic fallback message when no detail is available', (done) => {
+    service.register$(registerData).subscribe({
+      error: (error: Error) => {
+        expect(error.message).toBe('Une erreur est survenue, veuillez réessayer plus tard.');
+        done();
+      },
+    });
+
+    const req = httpMock.expectOne(`${environment.apiUrl}/auth/register`);
+    req.flush(null, { status: 500, statusText: 'Internal Server Error' });
   });
 });
