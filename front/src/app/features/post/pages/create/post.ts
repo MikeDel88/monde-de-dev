@@ -22,7 +22,7 @@ export interface CreatePost {
 }
 
 const initialPostData: CreatePost = {
-  topicId: '',
+  topicId: "",
   title: "",
   content: ""
 };
@@ -56,7 +56,7 @@ export class Post {
 
   readonly router = inject(Router);
   private destroyRef = inject(DestroyRef);
-  private readonly profilService = inject(ProfileService);
+  private readonly profileService = inject(ProfileService);
   private readonly postService = inject(PostService);
   error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
   topics: Signal<Topic[] | undefined> = computed(() => {
@@ -67,7 +67,7 @@ export class Post {
       }
   });
   profile: HttpResourceRef<ProfileResponse | undefined> = httpResource<ProfileResponse>(() =>
-    ({ url: this.profilService.path })
+    ({ url: this.profileService.path })
   );
 
   createPostModel: WritableSignal<CreatePost> = signal<CreatePost>(initialPostData);
@@ -88,7 +88,7 @@ export class Post {
   onSubmit(event: Event): void {
     event.preventDefault();
     this.postForm().markAsTouched();
-    if(this.postForm().invalid()) {
+    if(this.postForm().invalid() || this.postForm().value().topicId.trim() === "") {
       return;
     }
     this.postService.createPost$(Number(this.postForm().value().topicId), this.postForm().value().title, this.postForm().value().content)

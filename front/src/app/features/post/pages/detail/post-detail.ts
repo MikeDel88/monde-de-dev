@@ -49,9 +49,9 @@ export class PostDetail {
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
   private readonly postService = inject(PostService);
-  private readonly postId: number | null = this.activatedRoute.snapshot.params['id'];
+  private readonly postId: string = this.activatedRoute.snapshot.params['id'];
   post: HttpResourceRef<Post | undefined> = httpResource<Post>(() => {
-    const id: number | null = this.postId;
+    const id: string = this.postId;
     return id ? { url: `${this.postService.path}/${id}` } : undefined;
   });
   error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);

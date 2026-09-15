@@ -48,9 +48,9 @@ const validationProfileForm = (schemaPath: SchemaPathTree<ProfileData>) => {
 })
 export class Profile {
 
-  private profilService: ProfileService = inject(ProfileService);
+  private profileService: ProfileService = inject(ProfileService);
   profile: HttpResourceRef<ProfileResponse | undefined> = httpResource<ProfileResponse>(() =>
-    ({ url: this.profilService.path })
+    ({ url: this.profileService.path })
   );
 
   private topicService: TopicService = inject(TopicService);
@@ -112,7 +112,7 @@ export class Profile {
     const name: string | null = this.profileForm.name().dirty() ? this.profileForm.name().value() : null;
     const email: string | null = this.profileForm.email().dirty() ? this.profileForm.email().value() : null;
     const password: string | null = this.profileForm.password().dirty() ? this.profileForm.password().value() : null;
-    this.profilService.updateProfile$(email, name, password, currentPassword)
+    this.profileService.updateProfile$(email, name, password, currentPassword)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (value) => {
