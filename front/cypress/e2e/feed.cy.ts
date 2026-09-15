@@ -57,10 +57,10 @@ describe('Page Feed', () => {
       cy.getBySelector('btn-burger').click()
       cy.getBySelector('btn-burger').should('have.attr', 'aria-expanded', 'true')
       cy.getBySelector('nav-menu-mobile').should('be.visible')
-      cy.getBySelector('menu-backdrop').should('exist')
 
-      cy.getBySelector('menu-backdrop').click({ force: true })
-      cy.getBySelector('nav-menu-mobile').should('not.exist')
+      // Escape closes the native <dialog> (fires the `cancel` event)
+      cy.getBySelector('nav-menu-mobile').type('{esc}')
+      cy.getBySelector('nav-menu-mobile').should('not.be.visible')
       cy.getBySelector('btn-burger').should('have.attr', 'aria-expanded', 'false')
     })
   })

@@ -6,7 +6,7 @@
       type="button"
       class="self-center"
       data-test="btn-subscribe"
-      [ariaLabel]="topic.subscribed ? 'unsubcribe topic' : 'subcribe topic'"
+      [ariaLabel]="topic.subscribed ? 'Désabonnement' : 'Abonnement'"
       (click)="onClick(topic.id)"
       [disabled]="topic.subscribed ? btnUnsubscribed().disabled : false"
       [text]="topic.subscribed ? btnUnsubscribed().text : btnSubscribeText"/>

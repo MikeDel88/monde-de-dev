@@ -73,7 +73,7 @@ describe('Toast', () => {
     let emittedEvent: Event | undefined;
     component.buttonClick.subscribe((event) => (emittedEvent = event));
 
-    const closeButton = fixture.debugElement.query(By.css('button[aria-label="Close"]')).nativeElement as HTMLButtonElement;
+    const closeButton = fixture.debugElement.query(By.css('button[data-test="btn-close"]')).nativeElement as HTMLButtonElement;
     closeButton.click();
 
     expect(emittedEvent).toBeInstanceOf(Event);
