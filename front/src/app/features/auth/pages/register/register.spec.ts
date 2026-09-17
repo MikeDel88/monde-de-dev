@@ -11,7 +11,8 @@ import {By} from "@angular/platform-browser";
 import {RegisterData} from "../../models/register-data";
 import {HttpTestingController, provideHttpClientTesting, TestRequest} from "@angular/common/http/testing";
 import {environment} from "../../../../../environments/environment";
-import {provideHttpClient} from "@angular/common/http";
+import {provideHttpClient, withInterceptors} from "@angular/common/http";
+import {errorInterceptor} from "../../../../core/interceptors/error-interceptor";
 import {Location} from "@angular/common";
 import {RouterTestingHarness} from "@angular/router/testing";
 import {SessionService} from "../../../../core/services/session-service";
@@ -245,7 +246,7 @@ describe('Register', () => {
       TestBed.resetTestingModule();
 
       await configureRegister([
-        provideHttpClient(),
+        provideHttpClient(withInterceptors([errorInterceptor])),
         provideHttpClientTesting(),
       ]);
 

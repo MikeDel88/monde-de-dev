@@ -11,7 +11,8 @@ import {By} from "@angular/platform-browser";
 import {LoginData} from "../../models/login-data";
 import {HttpTestingController, provideHttpClientTesting, TestRequest} from "@angular/common/http/testing";
 import {environment} from "../../../../../environments/environment";
-import {provideHttpClient} from "@angular/common/http";
+import {provideHttpClient, withInterceptors} from "@angular/common/http";
+import {errorInterceptor} from "../../../../core/interceptors/error-interceptor";
 import {Location} from "@angular/common";
 import {RouterTestingHarness} from "@angular/router/testing";
 import {SessionService} from "../../../../core/services/session-service";
@@ -222,7 +223,7 @@ describe('Login', () => {
       await configureLogin([
         SessionService,
         provideRouter(routes),
-        provideHttpClient(),
+        provideHttpClient(withInterceptors([errorInterceptor])),
         provideHttpClientTesting(),
       ]);
 

@@ -1,14 +1,18 @@
 import { TestBed } from '@angular/core/testing';
-import { beforeEach, describe, expect, it } from '@jest/globals';
-import { provideHttpClient } from '@angular/common/http';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { Router } from '@angular/router';
 
 import { AuthService } from './auth-service';
 import {RegisterData} from "../models/register-data";
 import {environment} from "../../../../environments/environment";
+import {errorInterceptor} from "../../../core/interceptors/error-interceptor";
+import {SessionService} from "../../../core/services/session-service";
 
 describe('AuthService', () => {
   let service: AuthService;
+  let sessionService: SessionService;
   let httpMock: HttpTestingController;
 
   const registerData: RegisterData = {
@@ -19,9 +23,15 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [
+        SessionService,
+        { provide: Router, useValue: { navigateByUrl: jest.fn() } },
+        provideHttpClient(withInterceptors([errorInterceptor])),
+        provideHttpClientTesting(),
+      ],
     });
     service = TestBed.inject(AuthService);
+    sessionService = TestBed.inject(SessionService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
@@ -101,5 +111,18 @@ describe('AuthService', () => {
 
     const req = httpMock.expectOne(`${environment.apiUrl}/auth/register`);
     req.flush(null, { status: 500, statusText: 'Internal Server Error' });
+  });
+
+  it('should clear the session even when logout fails', () => {
+    sessionService.logIn();
+    const onError = jest.fn();
+
+    service.logout$().subscribe({ error: onError });
+
+    const req = httpMock.expectOne(`${environment.apiUrl}/auth/logout`);
+    req.flush(null, { status: 500, statusText: 'Internal Server Error' });
+
+    expect(onError).toHaveBeenCalled();
+    expect(sessionService.isAuthenticated).toBe(false);
   });
 });
