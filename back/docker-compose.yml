@@ -1,0 +1,72 @@
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${DB_USER}", "-p${DB_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DOMAINS: ${DOMAINS}
+      TOKEN_EXPIRATION: ${TOKEN_EXPIRATION}
+      RSA_PRIVATE_KEY: ${RSA_PRIVATE_KEY}
+      RSA_PUBLIC_KEY: ${RSA_PUBLIC_KEY}
+    ports:
+      - "9001:9001"
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/9001"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  seed:
+    image: mysql:8.4
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    volumes:
+      - ./src/main/resources/db/seed:/seed:ro
+    entrypoint: ["sh", "-c"]
+    command:
+      - >
+        mysql -h db -u"$$DB_USER" -p"$$DB_PASSWORD" "$$DB_NAME" < /seed/seed_user.sql &&
+        mysql -h db -u"$$DB_USER" -p"$$DB_PASSWORD" "$$DB_NAME" < /seed/seed_java_posts.sql
+    restart: "no"
+
+  backend-test:
+    build:
+      context: .
+      target: build
+    profiles: ["test"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DOMAINS: ${DOMAINS}
+      TOKEN_EXPIRATION: ${TOKEN_EXPIRATION}
+      RSA_PRIVATE_KEY: ${RSA_PRIVATE_KEY}
+      RSA_PUBLIC_KEY: ${RSA_PUBLIC_KEY}
+    command: ["mvn", "test"]
