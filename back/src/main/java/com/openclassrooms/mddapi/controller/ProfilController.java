@@ -7,6 +7,7 @@ import com.openclassrooms.mddapi.documentation.profil.ApiProfilUpdateValidationE
 import com.openclassrooms.mddapi.documentation.user.ApiUserNotFoundResponse;
 import com.openclassrooms.mddapi.dto.request.UpdateProfilRequest;
 import com.openclassrooms.mddapi.dto.response.ProfileResponse;
+import com.openclassrooms.mddapi.config.security.PrincipalUtils;
 import com.openclassrooms.mddapi.service.ProfilService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -32,7 +33,7 @@ public class ProfilController {
     @ApiUserNotFoundResponse
     @GetMapping
     public ProfileResponse profile(Principal principal) {
-        return profilService.getProfil(Long.parseLong(principal.getName()));
+        return profilService.getProfil(PrincipalUtils.userId(principal));
     }
 
     @ApiProfilUpdateValidResponse
@@ -41,6 +42,6 @@ public class ProfilController {
     @ApiDabataseConflictResponse
     @PatchMapping
     public ProfileResponse patch(@Valid @RequestBody UpdateProfilRequest request, Principal principal) {
-        return profilService.updateProfil(Long.parseLong(principal.getName()), request);
+        return profilService.updateProfil(PrincipalUtils.userId(principal), request);
     }
 }

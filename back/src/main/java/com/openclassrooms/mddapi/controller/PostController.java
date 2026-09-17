@@ -16,6 +16,7 @@ import com.openclassrooms.mddapi.exception.ErrorCodes;
 import com.openclassrooms.mddapi.dto.response.CursorPageResponse;
 import com.openclassrooms.mddapi.dto.response.PostFeedResponse;
 import com.openclassrooms.mddapi.dto.response.PostResponse;
+import com.openclassrooms.mddapi.config.security.PrincipalUtils;
 import com.openclassrooms.mddapi.service.PostService;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
@@ -26,7 +27,13 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 
@@ -54,7 +61,7 @@ public class PostController {
             @RequestParam(defaultValue = "desc") String direction
     ) {
         log.info("call /posts");
-        return postService.getPosts(cursor, direction, Long.valueOf(principal.getName()));
+        return postService.getPosts(cursor, direction, PrincipalUtils.userId(principal));
     }
 
     @ApiPostDetailResponse
@@ -66,7 +73,7 @@ public class PostController {
             @Validated @Positive(message = ErrorCodes.POST_ID_POSITIVE) @PathVariable Long postId,
             Principal principal) {
         log.info("call /posts/{}", postId);
-        return postService.getPostById(postId, Long.valueOf(principal.getName()));
+        return postService.getPostById(postId, PrincipalUtils.userId(principal));
     }
 
     @ApiPostCreateResponse
@@ -76,7 +83,7 @@ public class PostController {
     @PostMapping
     public ResponseEntity<Void> create(@Valid @RequestBody PostRequest postRequest, Principal principal) {
         log.info("call /posts create");
-        this.postService.createPost(postRequest, Long.valueOf(principal.getName()));
+        this.postService.createPost(postRequest, PrincipalUtils.userId(principal));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -90,7 +97,7 @@ public class PostController {
             @Valid @RequestBody CommentRequest commentRequest,
             Principal principal) {
         log.info("call /posts/{}/comments create", postId);
-        this.postService.createComment(postId, commentRequest, Long.valueOf(principal.getName()));
+        this.postService.createComment(postId, commentRequest, PrincipalUtils.userId(principal));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
