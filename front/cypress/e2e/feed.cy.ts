@@ -58,8 +58,8 @@ describe('Page Feed', () => {
       cy.getBySelector('btn-burger').should('have.attr', 'aria-expanded', 'true')
       cy.getBySelector('nav-menu-mobile').should('be.visible')
 
-      // Escape closes the native <dialog> (fires the `cancel` event)
-      cy.getBySelector('nav-menu-mobile').type('{esc}')
+      // Escape closes the menu via MenuBehavior's document:keydown.escape listener
+      cy.get('body').type('{esc}')
       cy.getBySelector('nav-menu-mobile').should('not.be.visible')
       cy.getBySelector('btn-burger').should('have.attr', 'aria-expanded', 'false')
     })

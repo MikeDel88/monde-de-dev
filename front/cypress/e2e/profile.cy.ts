@@ -41,31 +41,39 @@ describe('Page Profile', () => {
   })
 
   describe('Update profile', () => {
-    it('updates the name and does not send the password', () => {
+    it('updates the name after confirming the current password, without sending a new password', () => {
       const newName = `Updated-${Date.now()}`;
       cy.intercept('PATCH', '**/profile').as('updateProfile');
 
       cy.findBySelector('name', 'input').clear().type(newName);
       cy.getBySelector('btn-submit').click();
 
+      cy.findBySelector('current-password', 'input').type(user.password);
+      cy.getBySelector('btn-confirm').click();
+
       cy.wait('@updateProfile').its('request.body').should((body) => {
-        expect(body).to.not.have.property('password');
+        expect(body.password).to.be.null;
         expect(body.name).to.eq(newName);
         expect(body.email).to.be.null;
+        expect(body.currentPassword).to.eq(user.password);
       });
     });
 
-    it('updates the email and does not send the password', () => {
+    it('updates the email after confirming the current password, without sending a new password', () => {
       const newEmail = `updated-${Date.now()}@test.com`;
       cy.intercept('PATCH', '**/profile').as('updateProfile');
 
       cy.findBySelector('email', 'input').clear().type(newEmail);
       cy.getBySelector('btn-submit').click();
 
+      cy.findBySelector('current-password', 'input').type(user.password);
+      cy.getBySelector('btn-confirm').click();
+
       cy.wait('@updateProfile').its('request.body').should((body) => {
-        expect(body).to.not.have.property('password');
+        expect(body.password).to.be.null;
         expect(body.email).to.eq(newEmail);
         expect(body.name).to.be.null;
+        expect(body.currentPassword).to.eq(user.password);
       });
     });
   })
@@ -73,9 +81,8 @@ describe('Page Profile', () => {
   describe('Update password', () => {
     const newPassword = 'NewPassword1!';
 
-    it('opens the confirmation modal and sends the password only after confirming the current password', () => {
+    it('opens the confirmation modal and sends the new password only after confirming the current password', () => {
       cy.intercept('PATCH', '**/profile').as('updateProfile');
-      cy.intercept('PATCH', '**/profile/password').as('updatePassword');
 
       cy.findBySelector('password', 'input').clear().type(newPassword);
       cy.getBySelector('btn-submit').click();
@@ -83,21 +90,23 @@ describe('Page Profile', () => {
       cy.findBySelector('current-password', 'input').type(user.password);
       cy.getBySelector('btn-confirm').click();
 
-      cy.wait('@updatePassword').its('request.body').should((body) => {
-        expect(body).to.deep.equal({ newPassword, currentPassword: user.password });
+      cy.wait('@updateProfile').its('request.body').should((body) => {
+        expect(body.password).to.eq(newPassword);
+        expect(body.name).to.be.null;
+        expect(body.email).to.be.null;
+        expect(body.currentPassword).to.eq(user.password);
       });
-      cy.get('@updateProfile.all').should('have.length', 0);
     });
 
-    it('does not send the password when the confirmation modal is cancelled', () => {
-      cy.intercept('PATCH', '**/profile/password').as('updatePassword');
+    it('does not send the update when the confirmation modal is cancelled', () => {
+      cy.intercept('PATCH', '**/profile').as('updateProfile');
 
       cy.findBySelector('password', 'input').clear().type(newPassword);
       cy.getBySelector('btn-submit').click();
 
       cy.getBySelector('btn-cancel').click();
 
-      cy.get('@updatePassword.all').should('have.length', 0);
+      cy.get('@updateProfile.all').should('have.length', 0);
     });
   })
 

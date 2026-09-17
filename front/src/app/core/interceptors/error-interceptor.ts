@@ -1,4 +1,4 @@
-import {HttpErrorResponse, HttpHandlerFn, HttpRequest} from "@angular/common/http";
+import {HttpContextToken, HttpErrorResponse, HttpHandlerFn, HttpRequest} from "@angular/common/http";
 import {inject} from "@angular/core";
 import {Router} from "@angular/router";
 import {catchError, throwError} from "rxjs";
@@ -6,13 +6,15 @@ import {SessionService} from "../services/session-service";
 import {AppError} from "../models/app-error";
 import {mapHttpErrorToMessage} from "../utils/http-error-message";
 
+export const SKIP_AUTH_REDIRECT = new HttpContextToken<boolean>(() => false);
+
 export function errorInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn) {
   const sessionService = inject(SessionService);
   const router = inject(Router);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401) {
+      if (error.status === 401 && !req.context.get(SKIP_AUTH_REDIRECT)) {
         sessionService.logOut();
         router.navigateByUrl('/login');
       }
