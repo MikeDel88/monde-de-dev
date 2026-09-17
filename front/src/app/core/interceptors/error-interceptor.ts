@@ -16,7 +16,7 @@ export function errorInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn)
         sessionService.logOut();
         router.navigateByUrl('/login');
       }
-      return throwError(() => new AppError(mapHttpErrorToMessage(error), error.status, error));
+      return throwError(() => new AppError(mapHttpErrorToMessage(error), error.status));
     })
   );
 }

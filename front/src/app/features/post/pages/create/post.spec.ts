@@ -34,11 +34,7 @@ describe('Post', () => {
   let router: Router;
 
   const mockProfileService = {
-    profile: {
-      hasValue: jest.fn(() => true),
-      value: jest.fn(() => ({ topics: [MOCK_TOPIC] }) as ProfileResponse),
-      reload: jest.fn(),
-    },
+    path: `${environment.apiUrl}/profile`,
   };
 
   const mockPostService = {
@@ -76,19 +72,29 @@ describe('Post', () => {
     fixture.detectChanges();
   };
 
-  beforeEach(async () => {
-    mockProfileService.profile.hasValue.mockReturnValue(true);
-    mockProfileService.profile.value.mockReturnValue({ topics: [MOCK_TOPIC] } as ProfileResponse);
-    mockProfileService.profile.reload.mockReset();
-    mockPostService.createPost$.mockReset();
-
-    await configurePost([
-      { provide: ProfileService, useValue: mockProfileService },
-      { provide: PostService, useValue: mockPostService },
-    ]);
-  });
-
   describe('Unit Test', () => {
+    let httpMock: HttpTestingController;
+
+    beforeEach(async () => {
+      mockPostService.createPost$.mockReset();
+
+      await configurePost([
+        { provide: ProfileService, useValue: mockProfileService },
+        { provide: PostService, useValue: mockPostService },
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ]);
+
+      httpMock = TestBed.inject(HttpTestingController);
+      const req = httpMock.expectOne(`${environment.apiUrl}/profile`);
+      req.flush({ name: 'John', email: 'john@test.com', topics: [MOCK_TOPIC] } as ProfileResponse);
+      await flushMicrotasks();
+      fixture.detectChanges();
+    });
+
+    afterEach(() => {
+      httpMock.verify();
+    });
 
     it('should create', () => {
       expect(component).toBeTruthy();
@@ -197,7 +203,7 @@ describe('Post', () => {
         submit();
 
         expect(mockPostService.createPost$).toHaveBeenCalledWith(
-          VALID_POST_DATA.topicId,
+          Number(VALID_POST_DATA.topicId),
           VALID_POST_DATA.title,
           VALID_POST_DATA.content
         );
@@ -268,7 +274,7 @@ describe('Post', () => {
 
       const req: TestRequest = httpMock.expectOne({ url: `${environment.apiUrl}/posts` });
       expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual(VALID_POST_DATA);
+      expect(req.request.body).toEqual({...VALID_POST_DATA, topicId: Number(VALID_POST_DATA.topicId)});
 
       req.flush(null, { status: 201, statusText: 'Created' });
       fixture.detectChanges();

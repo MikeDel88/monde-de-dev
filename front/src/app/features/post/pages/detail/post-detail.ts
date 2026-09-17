@@ -69,7 +69,7 @@ export class PostDetail {
     if(this.postId == null || this.commentForm().invalid()) {
       return;
     }
-    this.postService.createComment$(this.postId, this.commentForm().value().content)
+    this.postService.createComment$(Number(this.postId), this.commentForm().value().content)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {

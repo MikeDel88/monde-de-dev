@@ -19,6 +19,7 @@ describe('Button', () => {
     fixture.componentRef.setInput('type', 'button');
     fixture.componentRef.setInput('text', 'Valider');
     fixture.componentRef.setInput('disabled', false);
+    fixture.componentRef.setInput('ariaLabel', 'Valider');
     fixture.detectChanges();
   });
 

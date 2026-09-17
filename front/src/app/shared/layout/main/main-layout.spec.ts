@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import { MainLayout } from './main-layout';
-import {describe, beforeEach, afterEach, it, expect} from "@jest/globals";
+import {describe, beforeEach, afterEach, it, expect, jest} from "@jest/globals";
 import {By} from "@angular/platform-browser";
 import {RouterTestingHarness} from "@angular/router/testing";
 import {Location} from "@angular/common";
@@ -56,6 +56,117 @@ describe('MainLayout', () => {
     expect(btnProfile).toBeTruthy();
   });
 
+  describe('Mobile menu dialog', () => {
+    const setViewportWidth = (width: number) => {
+      Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: width });
+      window.dispatchEvent(new Event('resize'));
+    };
+
+    const getDialog = () => fixture.debugElement.query(By.css('dialog')).nativeElement as HTMLDialogElement;
+
+    beforeEach(() => {
+      HTMLDialogElement.prototype.showModal = jest.fn(function (this: HTMLDialogElement) {
+        this.open = true;
+      });
+      HTMLDialogElement.prototype.close = jest.fn(function (this: HTMLDialogElement) {
+        this.open = false;
+      });
+
+      setViewportWidth(375);
+      fixture.detectChanges();
+    });
+
+    afterEach(() => {
+      setViewportWidth(1024);
+    });
+
+    it('should render the dialog on a mobile viewport', () => {
+      expect(component.menu.isMobile()).toBe(true);
+      expect(getDialog()).toBeTruthy();
+    });
+
+    it('should call showModal and mark the dialog open when the menu is toggled open', () => {
+      const dialog = getDialog();
+
+      component.menu.toggle();
+      fixture.detectChanges();
+
+      expect(dialog.showModal).toHaveBeenCalled();
+      expect(dialog.open).toBe(true);
+    });
+
+    it('should call close and mark the dialog closed when the menu is toggled closed again', () => {
+      const dialog = getDialog();
+
+      component.menu.toggle();
+      fixture.detectChanges();
+      expect(dialog.open).toBe(true);
+
+      component.menu.toggle();
+      fixture.detectChanges();
+
+      expect(dialog.close).toHaveBeenCalled();
+      expect(dialog.open).toBe(false);
+    });
+
+    it('should open and then close the dialog when the burger button is clicked twice', () => {
+      const burgerButton = fixture.debugElement.query(By.css('[data-test="btn-burger"]')).nativeElement;
+      const dialog = getDialog();
+
+      burgerButton.click();
+      fixture.detectChanges();
+      expect(component.menu.open()).toBe(true);
+      expect(dialog.open).toBe(true);
+
+      burgerButton.click();
+      fixture.detectChanges();
+      expect(component.menu.open()).toBe(false);
+      expect(dialog.open).toBe(false);
+    });
+
+    it('should close the dialog when a mobile nav link is clicked', () => {
+      const dialog = getDialog();
+
+      component.menu.toggle();
+      fixture.detectChanges();
+      expect(dialog.open).toBe(true);
+
+      fixture.debugElement.query(By.css('[data-test="link-feed"]')).nativeElement.click();
+      fixture.detectChanges();
+
+      expect(component.menu.open()).toBe(false);
+      expect(dialog.open).toBe(false);
+    });
+
+    it('should close the dialog when clicking the backdrop (outside the nav panel)', () => {
+      const dialog = getDialog();
+
+      component.menu.toggle();
+      fixture.detectChanges();
+      expect(dialog.open).toBe(true);
+
+      dialog.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      fixture.detectChanges();
+
+      expect(component.menu.open()).toBe(false);
+      expect(dialog.open).toBe(false);
+    });
+
+    it('should close the dialog when the native cancel event fires (Escape key)', () => {
+      const dialog = getDialog();
+
+      component.menu.toggle();
+      fixture.detectChanges();
+      expect(dialog.open).toBe(true);
+
+      dialog.dispatchEvent(new Event('cancel', { cancelable: true }));
+      fixture.detectChanges();
+
+      expect(component.menu.open()).toBe(false);
+      expect(dialog.open).toBe(false);
+    });
+  });
+
   describe('Routing integration (real Router + Guards)', () => {
     let httpMock: HttpTestingController;
 
@@ -91,6 +202,8 @@ describe('MainLayout', () => {
 
       harness.fixture.debugElement.query(By.css('[data-test="link-feed"]')).nativeElement.click();
       await flushMicrotasks();
+      harness.fixture.detectChanges();
+      await flushMicrotasks();
       httpMock.expectOne((req) => req.url === `${environment.apiUrl}/posts`).flush(EMPTY_PAGE);
       await flushMicrotasks();
       harness.fixture.detectChanges();
@@ -106,6 +219,8 @@ describe('MainLayout', () => {
       harness.fixture.detectChanges();
 
       harness.fixture.debugElement.query(By.css('[data-test="link-topic"]')).nativeElement.click();
+      await flushMicrotasks();
+      harness.fixture.detectChanges();
       await flushMicrotasks();
       httpMock.expectOne(`${environment.apiUrl}/topics`).flush([]);
       await flushMicrotasks();
@@ -123,8 +238,9 @@ describe('MainLayout', () => {
 
       harness.fixture.debugElement.query(By.css('[data-test="link-profile"]')).nativeElement.click();
       await flushMicrotasks();
+      harness.fixture.detectChanges();
+      await flushMicrotasks();
       httpMock.expectOne(`${environment.apiUrl}/profile`).flush({ name: '', email: '', topics: [] });
-      httpMock.expectOne(`${environment.apiUrl}/topics`).flush([]);
       await flushMicrotasks();
       harness.fixture.detectChanges();
 

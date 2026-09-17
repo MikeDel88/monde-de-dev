@@ -11,13 +11,7 @@ import {provideHttpClient} from "@angular/common/http";
 import {environment} from "../../../../environments/environment";
 
 class IntersectionObserverMock {
-  observe = () => {};
-  disconnect = () => {};
-  unobserve = () => {};
-  takeRecords = () => [];
   root = null;
-  rootMargin = '';
-  thresholds: ReadonlyArray<number> = [];
 }
 (window as any).IntersectionObserver = IntersectionObserverMock;
 
@@ -74,7 +68,7 @@ describe('Feed', () => {
 
     it('should toggle sortByAsc when toggle is called', () => {
       const initialSortByAsc = component.sortByAsc();
-      component.toggle();
+      component.onToggle();
       expect(component.sortByAsc()).toBe(!initialSortByAsc);
     });
 
@@ -148,7 +142,6 @@ describe('Feed', () => {
 
       req.flush(MOCK_CURSOR_PAGE);
       await flushMicrotasks();
-      TestBed.tick();
       fixture.detectChanges();
 
       const postCard = fixture.nativeElement.querySelector('app-post-card');
@@ -169,16 +162,14 @@ describe('Feed', () => {
     it('should trigger a new request sorted ascending when toggle is called', async () => {
       expectFeedRequest('desc').flush(MOCK_CURSOR_PAGE);
       await flushMicrotasks();
-      TestBed.tick();
       fixture.detectChanges();
 
-      component.toggle();
+      component.onToggle();
       fixture.detectChanges();
 
       const secondReq = expectFeedRequest('asc');
       secondReq.flush(MOCK_CURSOR_PAGE);
       await flushMicrotasks();
-      TestBed.tick();
       fixture.detectChanges();
 
       const postCard = fixture.nativeElement.querySelector('app-post-card');
@@ -188,7 +179,6 @@ describe('Feed', () => {
     it('should not show the infinite scroll sentinel when there is no more page to load', async () => {
       expectFeedRequest('desc').flush(MOCK_CURSOR_PAGE);
       await flushMicrotasks();
-      TestBed.tick();
       fixture.detectChanges();
 
       const sentinel = fixture.debugElement.query(By.css("[data-test='infinite-scroll-sentinel']"));
@@ -199,7 +189,6 @@ describe('Feed', () => {
       const firstPage: CursorPage<PostFeed> = { ...MOCK_CURSOR_PAGE, hasNext: true, nextCursor: 2 };
       expectFeedRequest('desc').flush(firstPage);
       await flushMicrotasks();
-      TestBed.tick();
       fixture.detectChanges();
 
       const sentinel = fixture.debugElement.query(By.css("[data-test='infinite-scroll-sentinel']"));
@@ -211,7 +200,6 @@ describe('Feed', () => {
       const thirdPost: PostFeed = { ...MOCK_POST, id: 3 };
       expectFeedRequest('desc', 2).flush({ ...MOCK_CURSOR_PAGE, content: [thirdPost], hasNext: false, nextCursor: null });
       await flushMicrotasks();
-      TestBed.tick();
       fixture.detectChanges();
 
       const postCards = fixture.nativeElement.querySelectorAll('app-post-card');

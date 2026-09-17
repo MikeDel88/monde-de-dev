@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { of, throwError } from 'rxjs';
-import { EnvironmentProviders, Provider, signal, WritableSignal } from '@angular/core';
+import { EnvironmentProviders, Provider } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
@@ -32,7 +32,7 @@ const MOCK_PROFIL: ProfileResponse = {
  * Vérifie que le titre est bien présent.
  * Vérifie que le formulaire est bien rempli (nom, email) mais pas password.
  * Vérifie le formulaire (nom, email, password)
- * Vérifie que password changé, alors on affiche le modal lors du click sauvegarder.
+ * Vérifie que la modale de confirmation du mot de passe s'affiche lors du submit d'un formulaire valide.
  * Vérifie l'affichage de la liste des topics
  * Vérifie que lors du click sur désabonnement, on reload et on ne voit plus le topic.
  */
@@ -40,22 +40,9 @@ describe('Profile', () => {
   let component: Profile;
   let fixture: ComponentFixture<Profile>;
 
-  let mockProfileValue: WritableSignal<ProfileResponse>;
-  let mockProfileHasValue: WritableSignal<boolean>;
-  let mockProfileIsLoading: WritableSignal<boolean>;
-  let mockProfileError: WritableSignal<Error | undefined>;
-
   const mockProfileService = {
-    profile: {
-      hasValue: () => mockProfileHasValue(),
-      value: () => mockProfileValue(),
-      isLoading: () => mockProfileIsLoading(),
-      error: () => mockProfileError(),
-      reload: jest.fn(),
-      set: jest.fn((value: ProfileResponse) => mockProfileValue.set(value)),
-    },
+    path: `${environment.apiUrl}/profile`,
     updateProfile$: jest.fn(),
-    updatePassword$: jest.fn(),
   };
 
   const mockTopicService = {
@@ -85,33 +72,43 @@ describe('Profile', () => {
     fixture.detectChanges();
   };
 
-  beforeEach(async () => {
+  beforeEach(() => {
     HTMLDialogElement.prototype.showModal = jest.fn(function (this: HTMLDialogElement) {
       this.open = true;
     });
     HTMLDialogElement.prototype.close = jest.fn(function (this: HTMLDialogElement) {
       this.open = false;
     });
-
-    mockProfileValue = signal(MOCK_PROFIL);
-    mockProfileHasValue = signal(true);
-    mockProfileIsLoading = signal(false);
-    mockProfileError = signal<Error | undefined>(undefined);
-
-    mockProfileService.profile.reload.mockReset();
-    mockProfileService.profile.set.mockReset();
-    mockProfileService.profile.set.mockImplementation((value: ProfileResponse) => mockProfileValue.set(value));
-    mockProfileService.updateProfile$.mockReset();
-    mockProfileService.updatePassword$.mockReset();
-    mockTopicService.unsubscribe$.mockReset();
-
-    await configureProfile([
-      { provide: ProfileService, useValue: mockProfileService },
-      { provide: TopicService, useValue: mockTopicService },
-    ]);
   });
 
   describe('Unit Test', () => {
+    let httpMock: HttpTestingController;
+
+    const flushProfile = async (profile: ProfileResponse = MOCK_PROFIL) => {
+      const req = httpMock.expectOne(`${environment.apiUrl}/profile`);
+      req.flush(profile);
+      await flushMicrotasks();
+      fixture.detectChanges();
+    };
+
+    beforeEach(async () => {
+      mockProfileService.updateProfile$.mockReset();
+      mockTopicService.unsubscribe$.mockReset();
+
+      await configureProfile([
+        { provide: ProfileService, useValue: mockProfileService },
+        { provide: TopicService, useValue: mockTopicService },
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ]);
+
+      httpMock = TestBed.inject(HttpTestingController);
+      await flushProfile();
+    });
+
+    afterEach(() => {
+      httpMock.verify();
+    });
 
     it('should create', () => {
       expect(component).toBeTruthy();
@@ -185,22 +182,25 @@ describe('Profile', () => {
     });
 
     describe('Submit name/email', () => {
-      it('should call updateProfil$ with dirty name and email', () => {
-        mockProfileService.updateProfile$.mockReturnValue(of({ ...MOCK_PROFIL, name: 'Jane', email: 'jane@test.com' }));
+      it('should open the password confirmation modal on submit without calling updateProfile$', () => {
         setDirtyValue(component.profileForm.name, 'Jane');
         setDirtyValue(component.profileForm.email, 'jane@test.com');
 
         submit();
 
-        expect(mockProfileService.updateProfile$).toHaveBeenCalledWith('jane@test.com', 'Jane');
+        expect(component.showPasswordModal()).toBe(true);
+        expect(mockProfileService.updateProfile$).not.toHaveBeenCalled();
       });
 
-      it('should not call updateProfil$ when only the password changed', () => {
-        setDirtyValue(component.profileForm.password, 'ValidPass1!');
+      it('should call updateProfile$ with the dirty name and email once the password is confirmed', () => {
+        mockProfileService.updateProfile$.mockReturnValue(of({ ...MOCK_PROFIL, name: 'Jane', email: 'jane@test.com' }));
+        setDirtyValue(component.profileForm.name, 'Jane');
+        setDirtyValue(component.profileForm.email, 'jane@test.com');
 
         submit();
+        component.onConfirmPassword('CurrentPass1!');
 
-        expect(mockProfileService.updateProfile$).not.toHaveBeenCalled();
+        expect(mockProfileService.updateProfile$).toHaveBeenCalledWith('jane@test.com', 'Jane', null, 'CurrentPass1!');
       });
 
       it('should update the profile value on successful submission', () => {
@@ -209,19 +209,24 @@ describe('Profile', () => {
         setDirtyValue(component.profileForm.name, 'Jane');
 
         submit();
+        component.onConfirmPassword('CurrentPass1!');
 
         expect(component.profile.value()).toEqual(updated);
         expect(component.error()).toBeUndefined();
       });
 
-      it('should display an error message when updateProfil$ fails', () => {
+      it('should display an error message when updateProfile$ fails', async () => {
         mockProfileService.updateProfile$.mockReturnValue(throwError(() => new Error('fail')));
         setDirtyValue(component.profileForm.name, 'Jane');
 
         submit();
+        component.onConfirmPassword('CurrentPass1!');
+        fixture.detectChanges();
 
         const errorElement = fixture.debugElement.query(By.css('p[data-test="error"]'));
         expect(errorElement.nativeElement.textContent).toContain('fail');
+
+        await flushProfile();
       });
     });
 
@@ -242,19 +247,19 @@ describe('Profile', () => {
         expect(component.showPasswordModal()).toBe(false);
       });
 
-      it('should call updatePassword$ with the pending and current password on confirmation', () => {
-        mockProfileService.updatePassword$.mockReturnValue(of(undefined));
+      it('should call updateProfile$ with the dirty password and current password on confirmation', () => {
+        mockProfileService.updateProfile$.mockReturnValue(of({ ...MOCK_PROFIL }));
         setDirtyValue(component.profileForm.password, 'ValidPass1!');
         submit();
 
         component.onConfirmPassword('CurrentPass1!');
 
-        expect(mockProfileService.updatePassword$).toHaveBeenCalledWith('ValidPass1!', 'CurrentPass1!');
+        expect(mockProfileService.updateProfile$).toHaveBeenCalledWith(null, null, 'ValidPass1!', 'CurrentPass1!');
         expect(component.showPasswordModal()).toBe(false);
       });
 
       it('should reset the password field on successful password update', () => {
-        mockProfileService.updatePassword$.mockReturnValue(of(undefined));
+        mockProfileService.updateProfile$.mockReturnValue(of({ ...MOCK_PROFIL }));
         setDirtyValue(component.profileForm.password, 'ValidPass1!');
         submit();
 
@@ -263,8 +268,8 @@ describe('Profile', () => {
         expect(component.profileForm.password().value()).toBe('');
       });
 
-      it('should display an error message when updatePassword$ fails', () => {
-        mockProfileService.updatePassword$.mockReturnValue(throwError(() => new Error('fail')));
+      it('should display an error message when updateProfile$ fails', async () => {
+        mockProfileService.updateProfile$.mockReturnValue(throwError(() => new Error('fail')));
         setDirtyValue(component.profileForm.password, 'ValidPass1!');
         submit();
 
@@ -272,7 +277,9 @@ describe('Profile', () => {
         fixture.detectChanges();
 
         const errorElement = fixture.debugElement.query(By.css('p[data-test="error"]'));
-        expect(errorElement.nativeElement.textContent).toContain("Une erreur est survenue, le mot de passe n'a pas été mis à jour.");
+        expect(errorElement.nativeElement.textContent).toContain('fail');
+
+        await flushProfile();
       });
     });
 
@@ -282,7 +289,7 @@ describe('Profile', () => {
       });
 
       it('should display the topics when there are some', () => {
-        mockProfileValue.set({ ...MOCK_PROFIL, topics: [MOCK_TOPIC] });
+        component.profile.set({ ...MOCK_PROFIL, topics: [MOCK_TOPIC] });
         fixture.detectChanges();
 
         const topicCard = fixture.debugElement.query(By.directive(TopicCard));
@@ -293,20 +300,19 @@ describe('Profile', () => {
         expect(text).toContain(MOCK_TOPIC.title);
       });
 
-      it('should call unsubscribe$ and reload, then remove the topic from the list', () => {
-        mockProfileValue.set({ ...MOCK_PROFIL, topics: [MOCK_TOPIC] });
+      it('should call unsubscribe$ and reload, then remove the topic from the list', async () => {
+        component.profile.set({ ...MOCK_PROFIL, topics: [MOCK_TOPIC] });
         fixture.detectChanges();
 
         mockTopicService.unsubscribe$.mockReturnValue(of(undefined));
-        mockProfileService.profile.reload.mockImplementation(() => {
-          mockProfileValue.set({ ...MOCK_PROFIL, topics: [] });
-        });
 
         fixture.debugElement.query(By.css('app-topic-card button')).nativeElement.click();
         fixture.detectChanges();
 
         expect(mockTopicService.unsubscribe$).toHaveBeenCalledWith(MOCK_TOPIC.id);
-        expect(mockProfileService.profile.reload).toHaveBeenCalled();
+
+        await flushProfile({ ...MOCK_PROFIL, topics: [] });
+
         expect(fixture.debugElement.query(By.directive(TopicCard))).toBeFalsy();
       });
 
@@ -326,16 +332,23 @@ describe('Profile', () => {
 
     let httpMock: HttpTestingController;
 
+    const configureIntegrationProfile = async () => {
+      await TestBed.configureTestingModule({
+        imports: [Profile],
+        providers: [provideHttpClient(), provideHttpClientTesting()],
+      }).compileComponents();
+
+      fixture = TestBed.createComponent(Profile);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+    };
+
     beforeEach(async () => {
       TestBed.resetTestingModule();
 
-      await configureProfile([
-        provideHttpClient(),
-        provideHttpClientTesting(),
-      ]);
+      await configureIntegrationProfile();
 
       httpMock = TestBed.inject(HttpTestingController);
-      httpMock.expectOne(`${environment.apiUrl}/topics`).flush([]);
     });
 
     afterEach(() => {
@@ -362,10 +375,11 @@ describe('Profile', () => {
       setDirtyValue(component.profileForm.name, 'Jane');
 
       submit();
+      component.onConfirmPassword('CurrentPass1!');
 
       const req = httpMock.expectOne({ url: `${environment.apiUrl}/profile` });
       expect(req.request.method).toBe('PATCH');
-      expect(req.request.body).toEqual({ email: null, name: 'Jane' });
+      expect(req.request.body).toEqual({ email: null, name: 'Jane', password: null, currentPassword: 'CurrentPass1!' });
 
       req.flush({ ...MOCK_PROFIL, name: 'Jane' });
     });
@@ -379,6 +393,7 @@ describe('Profile', () => {
       expect(req.request.method).toBe('DELETE');
       req.flush(null, { status: 204, statusText: 'No Content' });
       await flushMicrotasks();
+      fixture.detectChanges();
 
       await flushProfile({ ...MOCK_PROFIL, topics: [] });
 
