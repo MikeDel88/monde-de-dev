@@ -93,7 +93,9 @@ Cypress.Commands.add('registerUniqueUser', () => {
   const name = self.crypto.randomUUID()
   const user: TestUser = { name: name.substring(0, 10), email: `${name}@test.com`, password: "Test1234!" }
 
+  cy.intercept('POST', '**/auth/register').as('register')
   cy.register(user.name, user.email, user.password)
+  cy.wait("@register")
   cy.findBySelector("toast", "toast-success").should('exist')
 
   return cy.wrap(user)
