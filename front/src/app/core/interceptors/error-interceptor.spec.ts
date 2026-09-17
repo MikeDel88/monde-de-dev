@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 
 import { errorInterceptor } from './error-interceptor';
 import { SessionService } from '../services/session-service';
+import { AppError } from '../models/app-error';
 
 describe('errorInterceptor', () => {
   let httpClient: HttpClient;
@@ -31,11 +32,10 @@ describe('errorInterceptor', () => {
 
   afterEach(() => {
     httpMock.verify();
-    localStorage.clear();
   });
 
-  it('should log out and redirect to /login on a 401 while a token exists', () => {
-    sessionService.logIn('abc');
+  it('should log out and redirect to /login on a 401', () => {
+    sessionService.logIn();
     const logOutSpy = jest.spyOn(sessionService, 'logOut');
     const onError = jest.fn();
 
@@ -46,23 +46,14 @@ describe('errorInterceptor', () => {
     expect(logOutSpy).toHaveBeenCalled();
     expect(router.navigateByUrl).toHaveBeenCalledWith('/login');
     expect(onError).toHaveBeenCalled();
-  });
-
-  it('should not log out nor redirect on a 401 when there is no token', () => {
-    const logOutSpy = jest.spyOn(sessionService, 'logOut');
-    const onError = jest.fn();
-
-    httpClient.get('/api/test').subscribe({ error: onError });
-
-    httpMock.expectOne('/api/test').flush(null, { status: 401, statusText: 'Unauthorized' });
-
-    expect(logOutSpy).not.toHaveBeenCalled();
-    expect(router.navigateByUrl).not.toHaveBeenCalled();
-    expect(onError).toHaveBeenCalled();
+    const receivedError = onError.mock.calls[0][0] as AppError;
+    expect(receivedError).toBeInstanceOf(AppError);
+    expect(receivedError.status).toBe(401);
+    expect(receivedError.message).toBe('Session expirée ou identifiants invalides.');
   });
 
   it('should not log out nor redirect on a non-401 error', () => {
-    sessionService.logIn('abc');
+    sessionService.logIn();
     const logOutSpy = jest.spyOn(sessionService, 'logOut');
     const onError = jest.fn();
 
@@ -73,5 +64,8 @@ describe('errorInterceptor', () => {
     expect(logOutSpy).not.toHaveBeenCalled();
     expect(router.navigateByUrl).not.toHaveBeenCalled();
     expect(onError).toHaveBeenCalled();
+    const receivedError = onError.mock.calls[0][0] as AppError;
+    expect(receivedError).toBeInstanceOf(AppError);
+    expect(receivedError.status).toBe(500);
   });
 });

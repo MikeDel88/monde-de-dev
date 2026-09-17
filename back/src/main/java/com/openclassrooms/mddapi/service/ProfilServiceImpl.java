@@ -1,6 +1,5 @@
 package com.openclassrooms.mddapi.service;
 
-import com.openclassrooms.mddapi.dto.request.UpdateProfilPasswordRequest;
 import com.openclassrooms.mddapi.dto.request.UpdateProfilRequest;
 import com.openclassrooms.mddapi.dto.response.ProfileResponse;
 import com.openclassrooms.mddapi.dto.response.TopicResponse;
@@ -18,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Implémentation de {@link ProfilService} : construit le profil de l'utilisateur connecté
@@ -44,28 +44,23 @@ public class ProfilServiceImpl implements ProfilService {
     public ProfileResponse updateProfil(Long userId, UpdateProfilRequest request) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-        if (request.name() != null) {
-            user.setName(request.name());
-        }
-        if (request.email() != null) {
-            user.setEmail(request.email());
-        }
-
-        return this.toProfileResponse(user);
-    }
-
-    @Override
-    @Transactional
-    public void updatePassword(Long userId, UpdateProfilPasswordRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-
         if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
             throw new InvalidCurrentPasswordException();
         }
 
-        user.setPassword(passwordEncoder.encode(request.newPassword()));
-    }
+        if (request.name() != null) {
+            user.changeName(request.name().trim());
+        }
+        if (request.email() != null) {
+            user.changeEmail(request.email().trim().toLowerCase(Locale.ROOT));
+        }
 
+        if(request.newPassword() != null) {
+            user.changePassword(passwordEncoder.encode(request.newPassword()));
+        }
+
+        return this.toProfileResponse(user);
+    }
 
     private ProfileResponse toProfileResponse(User user) {
         List<TopicResponse> topics = topicMapper

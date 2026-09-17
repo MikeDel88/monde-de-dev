@@ -13,4 +13,7 @@
   } @else if (topics.error()) {
     <app-error data-test="error" [message]="topics.error()?.message"/>
   }
+  @if (error()) {
+    <app-error data-test="subscribe-error" [message]="error()"/>
+  }
 </div>

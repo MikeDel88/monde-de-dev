@@ -1,5 +1,6 @@
 package com.openclassrooms.mddapi.validation;
 
+import com.openclassrooms.mddapi.exception.ErrorCodes;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import jakarta.validation.constraints.Pattern;
@@ -25,14 +26,14 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Constraint(validatedBy = {})
-@Size(min = 8, max = 255, message = "PASSWORD_TOO_SHORT")
-@Pattern(regexp = "^(?=.*?[A-Z]).+$", message = "PASSWORD_MISSING_UPPERCASE")
-@Pattern(regexp = "^(?=.*?[a-z]).+$", message = "PASSWORD_MISSING_LOWERCASE")
-@Pattern(regexp = "^(?=.*?[0-9]).+$", message = "PASSWORD_MISSING_DIGIT")
-@Pattern(regexp = "^(?=.*?[#?!@$%^&*-]).+$", message = "PASSWORD_MISSING_SPECIAL_CHAR")
+@Size(min = 8, max = 255, message = ErrorCodes.PASSWORD_TOO_SHORT)
+@Pattern(regexp = "^(?=.*?[A-Z]).+$", message = ErrorCodes.PASSWORD_MISSING_UPPERCASE)
+@Pattern(regexp = "^(?=.*?[a-z]).+$", message = ErrorCodes.PASSWORD_MISSING_LOWERCASE)
+@Pattern(regexp = "^(?=.*?[0-9]).+$", message = ErrorCodes.PASSWORD_MISSING_DIGIT)
+@Pattern(regexp = "^(?=.*?[#?!@$%^&*-]).+$", message = ErrorCodes.PASSWORD_MISSING_SPECIAL_CHAR)
 public @interface ValidPassword {
     /** Message par défaut, retourné si aucune des règles composées n'est déclenchée individuellement. */
-    String message() default "PASSWORD_INVALID";
+    String message() default ErrorCodes.PASSWORD_INVALID;
 
     /** Groupes de validation Bean Validation (standard, non utilisé actuellement). */
     Class<?>[] groups() default {};

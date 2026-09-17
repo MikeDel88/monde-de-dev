@@ -57,10 +57,19 @@ describe('Page Feed', () => {
       cy.getBySelector('btn-burger').click()
       cy.getBySelector('btn-burger').should('have.attr', 'aria-expanded', 'true')
       cy.getBySelector('nav-menu-mobile').should('be.visible')
-      cy.getBySelector('menu-backdrop').should('exist')
 
-      cy.getBySelector('menu-backdrop').click({ force: true })
-      cy.getBySelector('nav-menu-mobile').should('not.exist')
+      // Escape closes the menu via MenuBehavior's document:keydown.escape listener
+      cy.get('body').type('{esc}')
+      cy.getBySelector('nav-menu-mobile').should('not.be.visible')
+      cy.getBySelector('btn-burger').should('have.attr', 'aria-expanded', 'false')
+    })
+
+    it('should stay closed after resizing from desktop to mobile', () => {
+      cy.viewport(1280, 720)
+      cy.getBySelector('nav-menu').should('be.visible')
+
+      cy.viewport('iphone-6')
+      cy.getBySelector('nav-menu-mobile').should('not.be.visible')
       cy.getBySelector('btn-burger').should('have.attr', 'aria-expanded', 'false')
     })
   })
@@ -69,10 +78,7 @@ describe('Page Feed', () => {
     it("should logout when click logout button", () => {
       cy.getBySelector("btn-logout").should('exist').click()
       cy.url().should('include', '/login')
-      cy.getAllLocalStorage().then((result) => {
-        const originStorage = result[Cypress.config('baseUrl')!]
-        expect(originStorage?.token).to.be.undefined
-      })
+      cy.getCookie('access_token').should('not.exist')
     })
   })
 });

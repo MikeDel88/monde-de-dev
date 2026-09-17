@@ -28,7 +28,7 @@ export class ConfirmPasswordModal {
   confirmPassword = output<string>();
   cancelModal = output<void>();
 
-  readonly confirmText = "Confimer";
+  readonly confirmText = "Confirmer";
   readonly cancelText = "Annuler";
   readonly title = "Confirmer le mot de passe";
   readonly description = "Veuillez saisir votre mot de passe actuel pour confirmer la modification.";

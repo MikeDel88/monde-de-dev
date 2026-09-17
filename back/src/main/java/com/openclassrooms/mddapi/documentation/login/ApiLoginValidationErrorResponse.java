@@ -1,6 +1,7 @@
 package com.openclassrooms.mddapi.documentation.login;
 
 import com.openclassrooms.mddapi.exception.BodyProblemDetail;
+import com.openclassrooms.mddapi.exception.ErrorCodes;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,9 +15,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponse(
         responseCode = "400",
-        description = "Un ou plusieurs champs sont invalides. Codes possibles : "
-                + "EMAIL_OR_NAME_REQUIRED, " +
-                "PASSWORD_REQUIRED, ",
+        description = "Un ou plusieurs champs sont invalides. Codes possibles :\n"
+                + "- " + ErrorCodes.EMAIL_OR_NAME_REQUIRED + " : l'email ou le nom d'utilisateur est requis\n"
+                + "- " + ErrorCodes.PASSWORD_REQUIRED + " : le mot de passe est requis",
         content = @Content(schema = @Schema(implementation = BodyProblemDetail.class))
 )
 public @interface ApiLoginValidationErrorResponse {

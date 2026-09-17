@@ -35,16 +35,20 @@
           <ng-container [ngTemplateOutlet]="navProfil"/>
         </ul>
       </nav>
-    } @else if (menu.open()) {
-      <button type="button" class="fixed inset-0 z-40 bg-black/40 border-0 p-0 cursor-default" data-test="menu-backdrop" aria-label="Fermer le menu" (click)="menu.close()"></button>
-      <nav class="fixed inset-y-0 right-0 z-50 flex h-full w-64 flex-col items-end flex-auto gap-4 bg-white px-6 py-12 shadow-lg" data-test="nav-menu-mobile">
+    } @else {
+      <dialog #mobileMenuDialog
+        class="open:block fixed inset-0 z-50 m-0 w-screen h-dvh max-w-none max-h-none border-0 p-0 bg-transparent backdrop:bg-black/40"
+        (cancel)="menu.close()"
+        (click)="onMobileMenuDialogClick($event)">
+        <nav class="fixed inset-y-0 right-0 z-50 flex h-full w-64 flex-col items-end flex-auto gap-4 bg-white px-6 py-12 shadow-lg" data-test="nav-menu-mobile">
           <ul class="contents">
             <ng-container [ngTemplateOutlet]="navLinks" />
           </ul>
           <ul class="mt-auto">
             <ng-container [ngTemplateOutlet]="navProfil"/>
           </ul>
-      </nav>
+        </nav>
+      </dialog>
     }
   </header>
   <main id="main-content">

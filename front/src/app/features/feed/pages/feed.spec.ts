@@ -4,10 +4,16 @@ import { Feed } from './feed';
 import {afterEach, beforeEach, describe, it, expect, jest} from "@jest/globals";
 import {Router} from "@angular/router";
 import {PostFeed} from "../models/post-feed";
+import {CursorPage} from "../../../shared/models/cursor-page";
 import {By} from "@angular/platform-browser";
 import {HttpTestingController, provideHttpClientTesting, TestRequest} from "@angular/common/http/testing";
 import {provideHttpClient} from "@angular/common/http";
 import {environment} from "../../../../environments/environment";
+
+class IntersectionObserverMock {
+  root = null;
+}
+(window as any).IntersectionObserver = IntersectionObserverMock;
 
 /**
  * Plan de test
@@ -36,9 +42,16 @@ describe('Feed', () => {
     author: 'John Doe'
   };
 
+  const MOCK_CURSOR_PAGE: CursorPage<PostFeed> = {
+    content: [MOCK_POST, { ...MOCK_POST, id: 2}],
+    hasNext: false,
+    nextCursor: null,
+  };
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Feed]
+      imports: [Feed],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     })
     .compileComponents();
 
@@ -55,20 +68,8 @@ describe('Feed', () => {
 
     it('should toggle sortByAsc when toggle is called', () => {
       const initialSortByAsc = component.sortByAsc();
-      component.toggle();
+      component.onToggle();
       expect(component.sortByAsc()).toBe(!initialSortByAsc);
-    });
-
-    it('should display the descending arrow when sortByAsc is false', () => {
-      const arrowDesc = fixture.debugElement.query(By.css("[data-test='desc']"));
-      expect(arrowDesc).toBeTruthy();
-    });
-
-    it('should display the ascending arrow when sortByAsc is true', () => {
-      component.sortByAsc.set(true);
-      fixture.detectChanges();
-      const arrowAsc = fixture.debugElement.query(By.css("[data-test='asc']"));
-      expect(arrowAsc).toBeTruthy();
     });
 
     it('should navigate to create post page when onClickCreatePost is called', () => {
@@ -84,7 +85,8 @@ describe('Feed', () => {
     });
 
     it('should display the posts correctly', () => {
-      component.posts.set([MOCK_POST]);
+      component.posts.set(MOCK_CURSOR_PAGE);
+      TestBed.tick();
       fixture.detectChanges();
       const postCard = fixture.nativeElement.querySelector('app-post-card');
       expect(postCard).toBeTruthy();
@@ -126,8 +128,11 @@ describe('Feed', () => {
       httpMock.verify();
     });
 
-    const expectFeedRequest = (sort: 'asc' | 'desc'): TestRequest =>
-      httpMock.expectOne(req => req.url === `${environment.apiUrl}/feed` && req.params.get('sort') === sort);
+    const expectFeedRequest = (sort: 'asc' | 'desc', cursor?: number): TestRequest => {
+      return httpMock.expectOne(req => req.url === `${environment.apiUrl}/posts`
+        && req.params.get('direction') === sort
+        && req.params.get('cursor') === (cursor === undefined ? null : String(cursor)));
+    }
 
     const flushMicrotasks = () => new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -135,7 +140,7 @@ describe('Feed', () => {
       const req = expectFeedRequest('desc');
       expect(req.request.method).toBe('GET');
 
-      req.flush([MOCK_POST]);
+      req.flush(MOCK_CURSOR_PAGE);
       await flushMicrotasks();
       fixture.detectChanges();
 
@@ -155,20 +160,50 @@ describe('Feed', () => {
     });
 
     it('should trigger a new request sorted ascending when toggle is called', async () => {
-      expectFeedRequest('desc').flush([MOCK_POST]);
+      expectFeedRequest('desc').flush(MOCK_CURSOR_PAGE);
       await flushMicrotasks();
       fixture.detectChanges();
 
-      component.toggle();
+      component.onToggle();
       fixture.detectChanges();
 
       const secondReq = expectFeedRequest('asc');
-      secondReq.flush([MOCK_POST]);
+      secondReq.flush(MOCK_CURSOR_PAGE);
       await flushMicrotasks();
       fixture.detectChanges();
 
       const postCard = fixture.nativeElement.querySelector('app-post-card');
       expect(postCard).toBeTruthy();
+    });
+
+    it('should not show the infinite scroll sentinel when there is no more page to load', async () => {
+      expectFeedRequest('desc').flush(MOCK_CURSOR_PAGE);
+      await flushMicrotasks();
+      fixture.detectChanges();
+
+      const sentinel = fixture.debugElement.query(By.css("[data-test='infinite-scroll-sentinel']"));
+      expect(sentinel).toBeFalsy();
+    });
+
+    it('should load and append the next page when onLoadMore is called', async () => {
+      const firstPage: CursorPage<PostFeed> = { ...MOCK_CURSOR_PAGE, hasNext: true, nextCursor: 2 };
+      expectFeedRequest('desc').flush(firstPage);
+      await flushMicrotasks();
+      fixture.detectChanges();
+
+      const sentinel = fixture.debugElement.query(By.css("[data-test='infinite-scroll-sentinel']"));
+      expect(sentinel).toBeTruthy();
+
+      component.onLoadMore();
+      fixture.detectChanges();
+
+      const thirdPost: PostFeed = { ...MOCK_POST, id: 3 };
+      expectFeedRequest('desc', 2).flush({ ...MOCK_CURSOR_PAGE, content: [thirdPost], hasNext: false, nextCursor: null });
+      await flushMicrotasks();
+      fixture.detectChanges();
+
+      const postCards = fixture.nativeElement.querySelectorAll('app-post-card');
+      expect(postCards.length).toBe(3);
     });
 
   });

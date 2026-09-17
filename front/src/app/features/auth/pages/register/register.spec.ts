@@ -15,6 +15,10 @@ import {provideHttpClient} from "@angular/common/http";
 import {Location} from "@angular/common";
 import {RouterTestingHarness} from "@angular/router/testing";
 import {SessionService} from "../../../../core/services/session-service";
+import {CursorPage} from "../../../../shared/models/cursor-page";
+import {PostFeed} from "../../../feed/models/post-feed";
+
+const EMPTY_PAGE: CursorPage<PostFeed> = { content: [], hasNext: false, nextCursor: null };
 
 const VALID_REGISTER_DATA: RegisterData = { name: 'john', email: 'john@test.com', password: 'Azerty123!' };
 
@@ -309,7 +313,7 @@ describe('Register', () => {
       req.flush(null, { status: 409, statusText: 'Conflict' });
       fixture.detectChanges();
 
-      expect(component.error()).toBe("Une erreur est survenue, l'utilisateur n'a pas été enregistré");
+      expect(component.error()).toBe('Un conflit est survenu.');
     });
 
     it('should display a generic error message on a server error (500)', () => {
@@ -318,7 +322,7 @@ describe('Register', () => {
       req.flush(null, { status: 500, statusText: 'Internal Server Error' });
       fixture.detectChanges();
 
-      expect(component.error()).toBe('Une erreur est survenue, veuillez réessayer plus tard');
+      expect(component.error()).toBe('Une erreur est survenue, veuillez réessayer plus tard.');
     });
   });
 
@@ -346,14 +350,14 @@ describe('Register', () => {
     });
 
     it('should redirect an already authenticated user away from /register to /feed via GuestGuard', async () => {
-      TestBed.inject(SessionService).logIn('existing-token');
+      TestBed.inject(SessionService).logIn();
 
       await RouterTestingHarness.create('/register');
 
       expect(TestBed.inject(Location).path()).toBe('/feed');
 
-      const feedReq = routingHttpMock.expectOne(req => req.url.startsWith(`${environment.apiUrl}/feed`));
-      feedReq.flush([]);
+      const feedReq = routingHttpMock.expectOne(req => req.url.startsWith(`${environment.apiUrl}/posts`));
+      feedReq.flush(EMPTY_PAGE);
     });
   });
 });

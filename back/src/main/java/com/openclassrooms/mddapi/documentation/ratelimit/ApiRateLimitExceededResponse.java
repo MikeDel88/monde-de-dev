@@ -1,5 +1,6 @@
-package com.openclassrooms.mddapi.documentation.post;
+package com.openclassrooms.mddapi.documentation.ratelimit;
 
+import com.openclassrooms.mddapi.exception.ErrorCodes;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,9 +14,10 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponse(
-        responseCode = "404",
-        description = "le post est introuvable, ou l'utilisateur n'est pas abonné à son topic",
+        responseCode = "429",
+        description = "Trop de tentatives depuis cette IP ou pour ce compte, réessayer plus tard. Code : "
+                + ErrorCodes.RATE_LIMIT_EXCEEDED,
         content = @Content(schema = @Schema(implementation = ProblemDetail.class))
 )
-public @interface ApiPostNotFoundResponse {
+public @interface ApiRateLimitExceededResponse {
 }

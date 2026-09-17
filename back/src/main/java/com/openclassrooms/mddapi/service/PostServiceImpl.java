@@ -2,10 +2,10 @@ package com.openclassrooms.mddapi.service;
 
 import com.openclassrooms.mddapi.dto.request.CommentRequest;
 import com.openclassrooms.mddapi.dto.request.PostRequest;
+import com.openclassrooms.mddapi.dto.response.CursorPageResponse;
 import com.openclassrooms.mddapi.dto.response.PostFeedResponse;
 import com.openclassrooms.mddapi.dto.response.PostResponse;
-import com.openclassrooms.mddapi.exception.PostNotFoundException;
-import com.openclassrooms.mddapi.exception.TopicNotFoundException;
+import com.openclassrooms.mddapi.exception.TopicNotSubscribedException;
 import com.openclassrooms.mddapi.exception.UserNotFoundException;
 import com.openclassrooms.mddapi.mapper.CommentMapper;
 import com.openclassrooms.mddapi.mapper.PostMapper;
@@ -17,18 +17,18 @@ import com.openclassrooms.mddapi.repository.PostRepository;
 import com.openclassrooms.mddapi.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
 /**
  * Implémentation de {@link PostService} : construit le fil d'actualité d'un
  * utilisateur en agrégeant les posts de tous les topics auxquels il est
- * abonné, triés par date.
+ * abonné, triés par id (ordre de création) et paginés par curseur.
  */
 @Log4j2
 @AllArgsConstructor
@@ -45,26 +45,29 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<PostFeedResponse> getPosts(String sort, Long userId) {
+    public CursorPageResponse<PostFeedResponse> getPosts(Long cursor, String direction, Long userId) {
         log.info("service: getPosts");
-        log.info("sort: {}", sort);
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-        Comparator<Post> comparator = Comparator.comparing(Post::getDate);
-        if ("desc".equalsIgnoreCase(sort)) {
-            comparator = comparator.reversed();
-        }
+        int pageSize = 20;
 
-        List<Post> posts = user
-                .getTopics()
-                .stream()
-                .map(Topic::getPosts)
-                .flatMap(Collection::stream)
-                .sorted(comparator)
-                .toList();
-        log.debug("posts size: {}", posts.size());
+        Pageable pageable = PageRequest.of(0, pageSize);
 
-        return this.postMapper.toPostFeedResponse(posts);
+        boolean ascending = "asc".equalsIgnoreCase(direction);
+
+        List<Post> posts = ascending
+                ? postRepository.fetchNextPageAsc(user.getTopics(), cursor, pageable)
+                : postRepository.fetchNextPageDesc(user.getTopics(), cursor, pageable);
+
+        boolean hasNext = posts.size() == pageSize;
+
+        Long nextCursor = hasNext ? posts.get(posts.size() - 1).getId() : null;
+
+        return new CursorPageResponse<>(
+                posts.stream().map(postMapper::toPostFeedResponse).toList(),
+                hasNext,
+                nextCursor
+        );
     }
 
     /**
@@ -80,7 +83,7 @@ public class PostServiceImpl implements PostService {
                 .stream()
                 .filter(t -> Objects.equals(t.getId(), postRequest.topicId()))
                 .findFirst()
-                .orElseThrow(TopicNotFoundException::new);
+                .orElseThrow(TopicNotSubscribedException::new);
         Post newPost = postMapper.toPost(postRequest, user, topic);
         postRepository.save(newPost);
     }
@@ -92,18 +95,13 @@ public class PostServiceImpl implements PostService {
     @Transactional(readOnly = true)
     public PostResponse getPostById(Long postId, Long userId) {
         log.info("service: getPostById {}", postId);
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
 
-        checkUserIsSubscribedToTopic(user, post.getTopic());
+        Post post = postRepository.findByIdAndTopicIn(postId, user.getTopics())
+                .orElseThrow(TopicNotSubscribedException::new);
 
-        // du plus ancien au plus récent, pour que le dernier commentaire soit en bas de la liste.
-        List<Comment> comments = post.getComments()
-                .stream()
-                .sorted(Comparator.comparing(Comment::getDate).reversed())
-                .toList();
-
-        return postMapper.toPostResponse(post, commentMapper.toCommentResponseList(comments));
+        return postMapper.toPostResponse(post, commentMapper.toCommentResponseList(post.getComments()));
     }
 
     /**
@@ -113,20 +111,14 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void createComment(Long postId, CommentRequest commentRequest, Long userId) {
         log.info("service: createComment");
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
 
-        checkUserIsSubscribedToTopic(user, post.getTopic());
+        Post post = postRepository.findByIdAndTopicIn(postId, user.getTopics())
+                .orElseThrow(TopicNotSubscribedException::new);
 
         Comment newComment = commentMapper.toComment(commentRequest, user, post);
-        post.getComments().add(newComment);
+        post.addComment(newComment);
         postRepository.save(post);
-    }
-
-    private void checkUserIsSubscribedToTopic(User user, Topic topic) {
-        // si l'utilisateur n'est pas abonné au topic du post, on lève une exception
-        if(user.getTopics().stream().noneMatch(topic::equals)) {
-            throw new PostNotFoundException();
-        }
     }
 }

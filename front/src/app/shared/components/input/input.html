@@ -8,6 +8,7 @@
       [placeholder]="placeholder()"
       [value]="value()"
       [attr.aria-invalid]="touched() && invalid()"
+      [attr.aria-label]="ariaLabel()"
       [attr.aria-describedby]="touched() && invalid() ? errorId : null"
       (input)="value.set($any($event.target).value)"
       (blur)="touch.emit()"

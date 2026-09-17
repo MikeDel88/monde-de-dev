@@ -15,6 +15,10 @@ import {provideHttpClient} from "@angular/common/http";
 import {Location} from "@angular/common";
 import {RouterTestingHarness} from "@angular/router/testing";
 import {SessionService} from "../../../../core/services/session-service";
+import {CursorPage} from "../../../../shared/models/cursor-page";
+import {PostFeed} from "../../../feed/models/post-feed";
+
+const EMPTY_PAGE: CursorPage<PostFeed> = { content: [], hasNext: false, nextCursor: null };
 
 const VALID_CREDENTIALS: LoginData = { emailOrName: 'test@test.com', password: 'azerty' };
 
@@ -245,7 +249,7 @@ describe('Login', () => {
     it('should connexion is success', () => {
       const req = submitAndExpectLoginRequest();
 
-      req.flush({ token: 'fake-jwt-token' });
+      req.flush(null);
       fixture.detectChanges();
 
       expect(router.navigate).toHaveBeenCalledWith(['/feed']);
@@ -257,11 +261,11 @@ describe('Login', () => {
       req.flush(null, { status: 401, statusText: 'Unauthorized' });
       fixture.detectChanges();
 
-      expect(component.error()).toBe("Une erreur est survenue. Vérifier le couple email ou nom d'utilisateur et mot de passe");
+      expect(component.error()).toBe('Session expirée ou identifiants invalides.');
       expect(router.navigate).not.toHaveBeenCalled();
 
       const errorElement = fixture.debugElement.query(By.css('[data-test="error"]'));
-      expect(errorElement.nativeElement.textContent).toContain("Vérifier le couple email ou nom d'utilisateur et mot de passe");
+      expect(errorElement.nativeElement.textContent).toContain('Session expirée ou identifiants invalides.');
     });
 
     it('should display a generic error message and not navigate on a server error (500)', () => {
@@ -270,21 +274,20 @@ describe('Login', () => {
       req.flush(null, { status: 500, statusText: 'Internal Server Error' });
       fixture.detectChanges();
 
-      expect(component.error()).toBe('Une erreur est survenue, veuillez réessayer plus tard');
+      expect(component.error()).toBe('Une erreur est survenue, veuillez réessayer plus tard.');
       expect(router.navigate).not.toHaveBeenCalled();
 
       const errorElement = fixture.debugElement.query(By.css('[data-test="error"]'));
-      expect(errorElement.nativeElement.textContent).toContain('Une erreur est survenue, veuillez réessayer plus tard');
+      expect(errorElement.nativeElement.textContent).toContain('Une erreur est survenue, veuillez réessayer plus tard.');
     });
 
-    it('should persist the session (token + isAuthenticated) after a successful login', () => {
+    it('should persist the session (isAuthenticated) after a successful login', () => {
       const req = submitAndExpectLoginRequest();
 
-      req.flush({ token: 'fake-jwt-token' });
+      req.flush(null);
       fixture.detectChanges();
 
       expect(sessionService.isAuthenticated).toBe(true);
-      expect(sessionService.getToken()).toBe('fake-jwt-token');
     });
 
   });
@@ -313,8 +316,8 @@ describe('Login', () => {
     });
 
     const flushFeedRequest = () => {
-      const feedReq = routingHttpMock.expectOne(req => req.url.startsWith(`${environment.apiUrl}/feed`));
-      feedReq.flush([]);
+      const feedReq = routingHttpMock.expectOne(req => req.url.startsWith(`${environment.apiUrl}/posts`));
+      feedReq.flush(EMPTY_PAGE);
     };
 
     it('should really navigate to /feed once AuthGuard allows it after a successful login', async () => {
@@ -328,7 +331,7 @@ describe('Login', () => {
       harness.detectChanges();
 
       const loginReq = routingHttpMock.expectOne({ url: `${environment.apiUrl}/auth/login` });
-      loginReq.flush({ token: 'fake-jwt-token' });
+      loginReq.flush(null);
 
       await harness.fixture.whenStable();
       harness.detectChanges();
@@ -340,7 +343,7 @@ describe('Login', () => {
     });
 
     it('should redirect an already authenticated user away from /login to /feed via GuestGuard', async () => {
-      TestBed.inject(SessionService).logIn('existing-token');
+      TestBed.inject(SessionService).logIn();
 
       await RouterTestingHarness.create('/login');
 

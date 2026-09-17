@@ -43,10 +43,6 @@ describe('Session', () => {
 
       cy.wait('@unauthorized')
       cy.url().should('include', '/login')
-      cy.getAllLocalStorage().then((result) => {
-        const originStorage = result[Cypress.config('baseUrl')!]
-        expect(originStorage?.token).to.be.undefined
-      })
     })
   })
 });

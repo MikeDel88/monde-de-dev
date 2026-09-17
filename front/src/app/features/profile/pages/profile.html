@@ -1,4 +1,9 @@
 <div class="flex flex-col p-4 gap-4 items-center">
+  <app-toast
+    [message]="showToastSuccess().message"
+    [visible]="showToastSuccess().visible"
+    (buttonClick)="onCloseToastSuccessed()"
+  />
   @if (profile.hasValue()) {
     <app-title class="font-bold" [content]="titleProfilUser" [level]="1" />
     <form (submit)="onSubmit($event)" (focusin)="onFocus()" class="flex flex-col gap-3.5 w-62.5 sm:w-70">
@@ -14,6 +19,7 @@
         type="submit"
         data-test="btn-submit"
         class="self-center"
+        ariaLabel="Soumet le formulaire de mise à jour du profil"
         [text]="btnSaveProfilUser"
         [disabled]="!profileForm().dirty()"
       />

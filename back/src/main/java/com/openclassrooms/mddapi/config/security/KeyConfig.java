@@ -11,10 +11,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
@@ -61,14 +69,44 @@ public class KeyConfig {
     }
 
     /**
-     * Vérifie la signature des JWT entrants lors de l'authentification.
+     * Vérifie la signature des JWT entrants lors de l'authentification, ainsi
+     * que les timestamps, l'issuer ({@code iss}) et l'audience ({@code aud}),
+     * pour s'assurer que le token a bien été émis par et pour cette API.
      * @param publicKey clé publique.
      * @return JwtDecoder la configuration du NimbusJwtDecoder
      */
     @Bean
     public JwtDecoder jwtDecoder(RSAPublicKey publicKey) {
         log.info("Creating JWT Decoder");
-        return NimbusJwtDecoder.withPublicKey(publicKey).build();
+        NimbusJwtDecoder decoder = NimbusJwtDecoder.withPublicKey(publicKey).build();
+
+        OAuth2TokenValidator<Jwt> defaultAndIssuer =
+                JwtValidators.createDefaultWithIssuer(JwtClaimsConstants.ISSUER);
+        OAuth2TokenValidator<Jwt> audienceValidator = jwt ->
+                jwt.getAudience().contains(JwtClaimsConstants.AUDIENCE)
+                        ? OAuth2TokenValidatorResult.success()
+                        : OAuth2TokenValidatorResult.failure(
+                                new OAuth2Error("invalid_token", "Audience invalide", null));
+
+        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(defaultAndIssuer, audienceValidator));
+        return decoder;
+    }
+
+    /**
+     * Convertit le claim {@code role} du JWT en autorité Spring Security
+     * (préfixée {@code ROLE_}), utilisé par {@code SecurityConfig} pour
+     * authentifier les requêtes.
+     * @return JwtAuthenticationConverter le convertisseur JWT vers autorités.
+     */
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        authoritiesConverter.setAuthoritiesClaimName(JwtClaimsConstants.ROLE_CLAIM);
+        authoritiesConverter.setAuthorityPrefix("ROLE_");
+
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
+        return converter;
     }
 
     /**

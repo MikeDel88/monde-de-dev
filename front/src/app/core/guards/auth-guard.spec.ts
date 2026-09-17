@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
-import { describe, beforeEach, afterEach, expect, it } from '@jest/globals';
+import { describe, beforeEach, expect, it } from '@jest/globals';
 
 import { AuthGuard } from './auth-guard';
 import { SessionService } from '../services/session-service';
@@ -20,12 +20,8 @@ describe('AuthGuard', () => {
     router = TestBed.inject(Router);
   });
 
-  afterEach(() => {
-    localStorage.clear();
-  });
-
   it('should allow activation when the user is authenticated', () => {
-    sessionService.logIn('token');
+    sessionService.logIn();
 
     expect(guard.canActivate()).toBe(true);
   });
