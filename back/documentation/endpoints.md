@@ -1,9 +1,14 @@
+# Endpoints
+
+Liste des routes de l'API, toutes relatives au préfixe suivant.
+
 ## PATH
 api/v1/
 
 ## AUTH
 POST /auth/register
 POST /auth/login
+POST /auth/logout
 
 ## PROFIL USER
 # charge le profil de l'utilisateur connecté avec la liste des topics abonnées.
@@ -26,9 +31,9 @@ DELETE /topics/:id/subscribe
 GET /posts?cursor=123&direction=desc
 
 ## POSTS
-# Detail d'un article avec ses commentaires.
+# Détail d'un article avec ses commentaires.
 GET /posts/:id
-# Création d'un articles.
+# Création d'un article.
 POST /posts
 
 ## COMMENTS
@@ -43,12 +48,13 @@ POST /posts/:id/comments
 # 409 Conflict            : contrainte unique violée en base (email/username déjà pris)
 # 429 Too Many Requests   : trop de tentatives (limite par IP ou par compte visé), uniquement sur POST /auth/register et POST /auth/login
 # 500 Internal Server Error : fallback générique
-# Toutes les réponses d'erreur (400/401/403/404/409/429/500) suivent désormais le format ProblemDetail (RFC 7807).
+# Toutes les réponses d'erreur (400/401/403/404/409/429/500) suivent le format ProblemDetail (RFC 7807).
 
 | Endpoint | Codes | Déclencheur spécifique |
 |---|---|---|
 | POST /auth/register | 201, 400, 409, 429, 500 | 409 = email/username déjà utilisé ; 429 = limite de tentatives IP ou email dépassée |
 | POST /auth/login | 200, 400, 401, 429, 500 | 401 = user inconnu **ou** mauvais mot de passe (message générique, ne révèle pas lequel) ; 429 = limite de tentatives IP ou compte dépassée |
+| POST /auth/logout | 200, 500 | endpoint public, pas de rate limit, invalide le cookie `access_token` |
 | GET /profile | 200, 401, 404, 500 | |
 | PATCH /profile | 200, 400, 401, 404, 409, 500 | 409 = email déjà pris par un autre compte |
 | PATCH /profile/password | 200, 400, 401, 404, 500 | 400 = mot de passe actuel invalide |

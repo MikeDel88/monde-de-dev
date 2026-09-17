@@ -27,7 +27,7 @@ Les exemples ci-dessous sont extraits du code existant du repo.
 
 Utilisé pour donner un nom accessible explicite, notamment sur les champs de formulaire et les boutons icône.
 
-⚠️ Poser un attribut `aria-label` (ou tout autre `aria-*`) directement sur le tag d'un composant custom (`<app-input aria-label="...">`) **n'a aucun effet** : Angular pose l'attribut sur l'élément hôte du composant, qui n'est pas forcément l'élément interactif réel, et rien ne le retransmet automatiquement à l'`<input>` interne. C'est ce qui s'est produit dans une précédente version de `login.html`. Le composant doit exposer explicitement un `input()` dédié et le lier dans son propre template via `[attr.aria-label]`.
+⚠️ Poser un attribut `aria-label` (ou tout autre `aria-*`) directement sur le tag d'un composant custom (`<app-input aria-label="...">`) **n'a aucun effet** : Angular pose l'attribut sur l'élément hôte du composant, qui n'est pas forcément l'élément interactif réel, et rien ne le retransmet automatiquement à l'`<input>` interne. Le composant doit exposer explicitement un `input()` dédié et le lier dans son propre template via `[attr.aria-label]`.
 
 ```html
 <!-- src/app/shared/components/input/input.ts -->
@@ -174,7 +174,7 @@ Quand une page n'a pas de titre visible naturel (ex. `feed`, `topic`, `home`), a
 ### Formulaires
 - Chaque champ a un `<label>` associé (via `for`/`id`, ou `aria-label`/`aria-labelledby` si le label n'est pas visible). Sur `app-input`, utiliser `[label]` (label visible) ou `ariaLabel` (nom accessible sans label visible) — jamais un attribut `aria-label` brut sur le tag `<app-input>`, qui n'a aucun effet.
 - `app-input` lie automatiquement le message d'erreur au champ via `aria-describedby`, et passe le champ en `aria-invalid="true"` quand il est en erreur (`touched() && invalid()`) — rien à faire côté appelant.
-- Le composant `app-error` du projet (`src/app/shared/components/error`) est rendu dans le conteneur référencé par `aria-describedby` pour que l'erreur soit annoncée en contexte.
+- Le composant `app-error` du projet (`app/shared/components/error`) est rendu dans le conteneur référencé par `aria-describedby` pour que l'erreur soit annoncée en contexte.
 
 ### Images et icônes
 - Icône **porteuse de sens** (aucun texte équivalent à proximité) → `aria-label` sur l'élément interactif, ou texte `sr-only`.
@@ -196,6 +196,27 @@ Quand une page n'a pas de titre visible naturel (ex. `feed`, `topic`, `home`), a
   ```
 - Si un `<div>` doit être utilisé à la place de `<dialog>` (cas rare), ajouter manuellement `role="dialog"` (ou `alertdialog`) + `aria-modal="true"` et gérer soi-même focus trap, restitution du focus et `Échap`.
 
+Le menu mobile (hamburger) de `MainLayout` suit le même principe pour un menu de navigation plutôt qu'une modale de confirmation : `<dialog>` natif piloté par un `effect()` qui appelle `showModal()`/`close()` selon un signal d'état (`menu.open()`), fermé au clic en dehors du contenu (comparaison `event.target === dialog`) et au clavier via `Échap` (géré par la directive `menu-behavior`, voir section 2). Ça évite de réimplémenter le focus trap et la fermeture clavier à la main.
+
+```html
+<!-- src/app/shared/layout/main/main-layout.html -->
+<dialog #mobileMenuDialog (click)="onMobileMenuDialogClick($event)">
+  ...
+</dialog>
+```
+
+```ts
+// src/app/shared/layout/main/main-layout.ts
+constructor() {
+  effect(() => {
+    const dialog = this.mobileMenuDialogRef()?.nativeElement;
+    if (!dialog) return;
+    if (this.menu.open() && !dialog.open) dialog.showModal();
+    if (!this.menu.open() && dialog.open) dialog.close();
+  });
+}
+```
+
 ## 4. Erreurs courantes à éviter
 
 - **ARIA redondant** : ajouter `role="button"` sur un `<button>`, ou `aria-label` identique au texte déjà visible — inutile, source de confusion en cas de désynchronisation future.
@@ -207,7 +228,7 @@ Quand une page n'a pas de titre visible naturel (ex. `feed`, `topic`, `home`), a
 
 ## 5. Outils de vérification
 
-- **`npx ng lint`** (angular-eslint + règles `@angular-eslint/template-accessibility`, configurées dans `eslint.config.js`) : audit statique automatisé à chaque build/CI, détecte entre autres `alt-text`, `click-events-have-key-events`, `mouse-events-have-key-events`, `no-autofocus`, `role-has-required-aria`, `valid-aria`, `interactive-supports-focus`.
+- **`npx ng lint`** (angular-eslint + règles `@angular-eslint/template-accessibility`, configurées dans `../eslint.config.js`) : audit statique automatisé à chaque build/CI, détecte entre autres `alt-text`, `click-events-have-key-events`, `mouse-events-have-key-events`, `no-autofocus`, `role-has-required-aria`, `valid-aria`, `interactive-supports-focus`.
 - **axe DevTools** (extension navigateur) : audit automatique de la page en cours, détecte la majorité des erreurs ARIA/contraste.
 - **Lighthouse** (onglet Accessibility, intégré à Chrome DevTools) : score global et liste des problèmes.
 - **Navigation clavier manuelle** : parcourir chaque page uniquement au clavier (`Tab`, `Shift+Tab`, `Entrée`, `Échap`) et vérifier que tout élément interactif est atteignable et que l'ordre est logique.
