@@ -9,7 +9,7 @@ import {FormsModule} from "@angular/forms";
 import {PostService} from "../../services/post-service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Button} from "../../../../shared/components/button/button";
-import {Error} from "../../../../shared/components/error/error";
+import {ErrorMessage} from "../../../../shared/components/error-message/error-message";
 import {Input} from "../../../../shared/components/input/input";
 import {Title} from "../../../../shared/components/title/title";
 import {Back} from "../../../../shared/components/back/back";
@@ -39,7 +39,7 @@ const validationCreatePostForm = (schemaPath: SchemaPathTree<CreatePost>) => {
     FormsModule,
     FormField,
     Button,
-    Error,
+    ErrorMessage,
     Input,
     Title,
     Back

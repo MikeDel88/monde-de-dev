@@ -5,9 +5,9 @@ import { Logo } from '../../../shared/components/logo/logo';
 @Component({
   selector: 'app-error-page',
   imports: [RouterLink, Logo],
-  templateUrl: './error.html',
+  templateUrl: './not-found-page.html',
 })
-export class Error {
+export class NotFoundPage {
   readonly btnText = "Retour à l'accueil"
   readonly errorMessage = "Page introuvable"
 }

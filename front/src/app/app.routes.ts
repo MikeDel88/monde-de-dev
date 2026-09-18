@@ -11,7 +11,7 @@ import {MainLayout} from "./shared/layout/main/main-layout";
 import {Profile} from "./features/profile/pages/profile";
 import {Post} from "./features/post/pages/create/post";
 import {PostDetail} from "./features/post/pages/detail/post-detail";
-import {Error as ErrorPage} from "./features/error/pages/error";
+import {NotFoundPage} from "./features/error/pages/not-found-page";
 
 export const routes: Routes = [
   {
@@ -46,5 +46,5 @@ export const routes: Routes = [
       },
     ],
   },
-  { path: '**', loadComponent:() => ErrorPage, title: "Page introuvable" },
+  { path: '**', loadComponent:() => NotFoundPage, title: "Page introuvable" },
 ];

@@ -5,8 +5,8 @@ import {httpResource, HttpResourceRef} from "@angular/common/http";
 import {DatePipe} from "@angular/common";
 import {FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {Dividers} from "../../../../shared/components/divider/dividers";
-import {Error} from "../../../../shared/components/error/error";
+import {Dividers} from "../../../../shared/components/dividers/dividers";
+import {ErrorMessage} from "../../../../shared/components/error-message/error-message";
 import {Title} from "../../../../shared/components/title/title";
 import {Back} from "../../../../shared/components/back/back";
 import {Loader} from "../../../../shared/components/loader/loader";
@@ -32,7 +32,7 @@ const validationCreateCommentForm = (schemaPath: SchemaPathTree<CreateComment>) 
     DatePipe,
     FormField,
     Dividers,
-    Error,
+    ErrorMessage,
     Title,
     Back,
     Loader,

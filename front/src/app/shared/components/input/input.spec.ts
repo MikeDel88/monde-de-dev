@@ -4,7 +4,7 @@ import { Input } from './input';
 import {describe, beforeEach, it, expect, jest} from "@jest/globals";
 import {By} from "@angular/platform-browser";
 import {ValidationError} from "@angular/forms/signals";
-import {Error} from "../error/error";
+import {ErrorMessage} from "../error-message/error-message";
 
 describe('Input', () => {
   let component: Input;
@@ -80,7 +80,7 @@ describe('Input', () => {
     fixture.componentRef.setInput('errors', [{ kind: 'required', message: 'Champ requis' } as ValidationError]);
     fixture.detectChanges();
 
-    const errors = fixture.debugElement.queryAll(By.directive(Error));
+    const errors = fixture.debugElement.queryAll(By.directive(ErrorMessage));
     expect(errors.length).toBe(1);
     expect(errors[0].componentInstance.message()).toBe('Champ requis');
   });
@@ -90,7 +90,7 @@ describe('Input', () => {
     fixture.componentRef.setInput('errors', [{ kind: 'required', message: 'Champ requis' } as ValidationError]);
     fixture.detectChanges();
 
-    expect(fixture.debugElement.queryAll(By.directive(Error)).length).toBe(0);
+    expect(fixture.debugElement.queryAll(By.directive(ErrorMessage)).length).toBe(0);
   });
 
   it('should focus the native input when focus() is called', () => {

@@ -3,8 +3,8 @@ import {Component, input, InputSignal} from '@angular/core';
 @Component({
   selector: 'app-error',
   imports: [],
-  templateUrl: './error.html',
+  templateUrl: './error-message.html',
 })
-export class Error {
+export class ErrorMessage {
    readonly message: InputSignal<string | undefined> = input.required();
 }

@@ -4,7 +4,7 @@ import {TopicService} from "../services/topic-service";
 import {Topic as TopicModel} from "../models/topic";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {TopicCard} from "../../../shared/components/topic-card/topic-card";
-import {Error} from "../../../shared/components/error/error";
+import {ErrorMessage} from "../../../shared/components/error-message/error-message";
 import {Loader} from "../../../shared/components/loader/loader";
 import {ToastService} from "../../../core/services/toast-service";
 
@@ -13,7 +13,7 @@ import {ToastService} from "../../../core/services/toast-service";
   templateUrl: './topic.html',
   imports: [
     TopicCard,
-    Error,
+    ErrorMessage,
     Loader
   ]
 })

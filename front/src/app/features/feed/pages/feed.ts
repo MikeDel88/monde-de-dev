@@ -6,7 +6,7 @@ import {CursorPage} from "../../../shared/models/cursor-page";
 import {InfiniteScroll} from "../../../shared/directives/infinite-scroll";
 import {Router} from "@angular/router";
 import {Button} from "../../../shared/components/button/button";
-import {Error} from "../../../shared/components/error/error";
+import {ErrorMessage} from "../../../shared/components/error-message/error-message";
 import {Loader} from "../../../shared/components/loader/loader";
 import {environment} from "../../../../environments/environment";
 
@@ -15,7 +15,7 @@ import {environment} from "../../../../environments/environment";
   imports: [
     PostCard,
     Button,
-    Error,
+    ErrorMessage,
     Loader,
     InfiniteScroll
   ],

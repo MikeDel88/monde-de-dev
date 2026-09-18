@@ -1,12 +1,12 @@
 import {Component, ElementRef, input, InputSignal, model, ModelSignal, output, OutputEmitterRef, Signal, viewChild} from '@angular/core';
 import {ValidationError} from '@angular/forms/signals';
-import {Error} from '../error/error';
+import {ErrorMessage} from '../error-message/error-message';
 
 let nextInputId = 0;
 
 @Component({
   selector: 'app-input',
-  imports: [Error],
+  imports: [ErrorMessage],
   templateUrl: './input.html',
 })
 export class Input {

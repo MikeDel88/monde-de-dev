@@ -14,8 +14,8 @@ import {
 import {TopicService} from "../../topic/services/topic-service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Button} from "../../../shared/components/button/button";
-import {Dividers} from "../../../shared/components/divider/dividers";
-import {Error} from "../../../shared/components/error/error";
+import {Dividers} from "../../../shared/components/dividers/dividers";
+import {ErrorMessage} from "../../../shared/components/error-message/error-message";
 import {Input} from "../../../shared/components/input/input";
 import {Title} from "../../../shared/components/title/title";
 import {Loader} from "../../../shared/components/loader/loader";
@@ -42,7 +42,7 @@ const validationProfileForm = (schemaPath: SchemaPathTree<ProfileData>) => {
 
 @Component({
   selector: 'app-profile',
-  imports: [TopicCard, FormField, ConfirmPasswordModal, Button, Dividers, Error, Input, Title, Loader],
+  imports: [TopicCard, FormField, ConfirmPasswordModal, Button, Dividers, ErrorMessage, Input, Title, Loader],
   templateUrl: './profile.html',
 })
 export class Profile {
@@ -57,8 +57,8 @@ export class Profile {
 
   readonly btnUnsubscribed: string = "Se désabonner";
   readonly titleSubscription: string= "Abonnements";
-  readonly titleProfilUser: string = "Profil utilisateur";
-  readonly btnSaveProfilUser: string = "Sauvegarder";
+  readonly titleProfileUser: string = "Profil utilisateur";
+  readonly btnSaveProfileUser: string = "Sauvegarder";
   readonly placeholderPassword: string = "Nouveau mot de passe"
 
   private readonly toastService = inject(ToastService);
@@ -75,7 +75,7 @@ export class Profile {
     });
   }
 
-  onUpdateProfilSuccess(message: string) {
+  onUpdateProfileSuccess(message: string) {
     this.toastService.showSuccess(message);
   }
 
@@ -106,7 +106,7 @@ export class Profile {
         next: (value) => {
           this.profile.set(value);
           this.profileForm().reset({name: value.name, email: value.email, password: ''});
-          this.onUpdateProfilSuccess("Le profil a bien été mis à jour!");
+          this.onUpdateProfileSuccess("Le profil a bien été mis à jour!");
         },
         error: (err) => {
           this.profile.reload();
