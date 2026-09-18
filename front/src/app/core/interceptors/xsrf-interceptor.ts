@@ -1,4 +1,5 @@
 import {HttpHandlerFn, HttpRequest} from "@angular/common/http";
+import {environment} from "../../../environments/environment";
 
 const XSRF_COOKIE_NAME = 'XSRF-TOKEN';
 const XSRF_HEADER_NAME = 'X-XSRF-TOKEN';
@@ -15,6 +16,9 @@ export function xsrfInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn) 
 
   const token = readCookie(XSRF_COOKIE_NAME);
   if (!token) {
+    if (!environment.production) {
+      console.warn(`[xsrfInterceptor] Cookie ${XSRF_COOKIE_NAME} absent pour ${req.method} ${req.url} : requête envoyée sans header ${XSRF_HEADER_NAME}.`);
+    }
     return next(req);
   }
 
