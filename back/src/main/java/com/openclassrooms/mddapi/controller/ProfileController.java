@@ -1,14 +1,14 @@
 package com.openclassrooms.mddapi.controller;
 
 import com.openclassrooms.mddapi.documentation.database.ApiDabataseConflictResponse;
-import com.openclassrooms.mddapi.documentation.profil.ApiProfileValidResponse;
-import com.openclassrooms.mddapi.documentation.profil.ApiProfilUpdateValidResponse;
-import com.openclassrooms.mddapi.documentation.profil.ApiProfilUpdateValidationErrorResponse;
+import com.openclassrooms.mddapi.documentation.profile.ApiProfileValidResponse;
+import com.openclassrooms.mddapi.documentation.profile.ApiProfileUpdateValidResponse;
+import com.openclassrooms.mddapi.documentation.profile.ApiProfileUpdateValidationErrorResponse;
 import com.openclassrooms.mddapi.documentation.user.ApiUserNotFoundResponse;
-import com.openclassrooms.mddapi.dto.request.UpdateProfilRequest;
+import com.openclassrooms.mddapi.dto.request.UpdateProfileRequest;
 import com.openclassrooms.mddapi.dto.response.ProfileResponse;
 import com.openclassrooms.mddapi.config.security.PrincipalUtils;
-import com.openclassrooms.mddapi.service.ProfilService;
+import com.openclassrooms.mddapi.service.ProfileService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -24,24 +24,24 @@ import java.security.Principal;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/profile")
-public class ProfilController {
+public class ProfileController {
 
-    private final ProfilService profilService;
+    private final ProfileService profileService;
 
 
     @ApiProfileValidResponse
     @ApiUserNotFoundResponse
     @GetMapping
     public ProfileResponse profile(Principal principal) {
-        return profilService.getProfil(PrincipalUtils.userId(principal));
+        return profileService.getProfile(PrincipalUtils.userId(principal));
     }
 
-    @ApiProfilUpdateValidResponse
-    @ApiProfilUpdateValidationErrorResponse
+    @ApiProfileUpdateValidResponse
+    @ApiProfileUpdateValidationErrorResponse
     @ApiUserNotFoundResponse
     @ApiDabataseConflictResponse
     @PatchMapping
-    public ProfileResponse patch(@Valid @RequestBody UpdateProfilRequest request, Principal principal) {
-        return profilService.updateProfil(PrincipalUtils.userId(principal), request);
+    public ProfileResponse patch(@Valid @RequestBody UpdateProfileRequest request, Principal principal) {
+        return profileService.updateProfile(PrincipalUtils.userId(principal), request);
     }
 }

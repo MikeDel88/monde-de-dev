@@ -1,6 +1,6 @@
 package com.openclassrooms.mddapi.service;
 
-import com.openclassrooms.mddapi.dto.request.UpdateProfilRequest;
+import com.openclassrooms.mddapi.dto.request.UpdateProfileRequest;
 import com.openclassrooms.mddapi.dto.response.ProfileResponse;
 import com.openclassrooms.mddapi.dto.response.TopicResponse;
 import com.openclassrooms.mddapi.exception.InvalidCurrentPasswordException;
@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Implémentation de {@link ProfilService} : construit le profil de l'utilisateur connecté
+ * Implémentation de {@link ProfileService} : construit le profil de l'utilisateur connecté
  * à partir de ses informations et de ses thèmes abonnés.
  */
 @AllArgsConstructor
 @Service
-public class ProfilServiceImpl implements ProfilService {
+public class ProfileServiceImpl implements ProfileService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -34,14 +34,14 @@ public class ProfilServiceImpl implements ProfilService {
 
     @Override
     @Transactional(readOnly = true)
-    public ProfileResponse getProfil(Long userId) {
+    public ProfileResponse getProfile(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         return this.toProfileResponse(user);
     }
 
     @Override
     @Transactional
-    public ProfileResponse updateProfil(Long userId, UpdateProfilRequest request) {
+    public ProfileResponse updateProfile(Long userId, UpdateProfileRequest request) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
@@ -69,6 +69,6 @@ public class ProfilServiceImpl implements ProfilService {
                         .stream()
                         .sorted(Comparator.comparing(Topic::getTitle))
                         .toList(), user.getId());
-        return userMapper.toProfilResponse(user, topics);
+        return userMapper.toProfileResponse(user, topics);
     }
 }

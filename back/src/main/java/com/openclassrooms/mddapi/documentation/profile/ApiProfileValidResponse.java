@@ -1,4 +1,4 @@
-package com.openclassrooms.mddapi.documentation.profil;
+package com.openclassrooms.mddapi.documentation.profile;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponse(
         responseCode = "200",
-        description = "le profil (nom/email) a bien été mis à jour"
+        description = "le profil de l'utilisateur a bien été récupéré"
 )
-public @interface ApiProfilUpdateValidResponse {
+public @interface ApiProfileValidResponse {
 }

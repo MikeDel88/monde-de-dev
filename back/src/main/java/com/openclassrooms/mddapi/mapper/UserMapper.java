@@ -40,8 +40,8 @@ public interface UserMapper {
      * Construit le DTO de profil à partir de l'entité User et des thèmes déjà mappés.
      * @param user l'entité utilisateur.
      * @param topicsResponses la liste des thèmes déjà mappée (via {@link TopicMapper}).
-     * @return ProfilResponse le profil mappé pour envoyer au client.
+     * @return ProfileResponse le profil mappé pour envoyer au client.
      */
     @Mapping(target = "topics", source = "topicsResponses")
-    ProfileResponse toProfilResponse(User user, List<TopicResponse> topicsResponses);
+    ProfileResponse toProfileResponse(User user, List<TopicResponse> topicsResponses);
 }

@@ -25,12 +25,12 @@ public class Post extends BaseEntity {
     @Column(nullable = false, updatable = false)
     private String content;
 
-	/**
-	 * Topic auquel appartient le post.
-	 */
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "topic_id", nullable = false, updatable = false)
-	private Topic topic;
+    /**
+     * Topic auquel appartient le post.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "topic_id", nullable = false, updatable = false)
+    private Topic topic;
 
     /**
      * Auteur du post.

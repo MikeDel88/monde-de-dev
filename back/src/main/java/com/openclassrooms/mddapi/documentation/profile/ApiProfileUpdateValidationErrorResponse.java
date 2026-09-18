@@ -1,4 +1,4 @@
-package com.openclassrooms.mddapi.documentation.profil;
+package com.openclassrooms.mddapi.documentation.profile;
 
 import com.openclassrooms.mddapi.exception.BodyProblemDetail;
 import com.openclassrooms.mddapi.exception.ErrorCodes;
@@ -29,5 +29,5 @@ import java.lang.annotation.Target;
                 + "- " + ErrorCodes.CURRENT_PASSWORD_INVALID + " : le mot de passe actuel ne correspond pas à celui enregistré",
         content = @Content(schema = @Schema(implementation = BodyProblemDetail.class))
 )
-public @interface ApiProfilUpdateValidationErrorResponse {
+public @interface ApiProfileUpdateValidationErrorResponse {
 }

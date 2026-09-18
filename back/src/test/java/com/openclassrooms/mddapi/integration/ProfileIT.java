@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * BCrypt lors d'un changement de mot de passe.
  */
 @Transactional
-class ProfilIT extends IntegrationTestSupport {
+class ProfileIT extends IntegrationTestSupport {
 
     @Autowired
     private UserRepository userRepository;

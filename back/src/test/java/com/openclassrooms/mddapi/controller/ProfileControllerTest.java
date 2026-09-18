@@ -13,7 +13,7 @@ import com.openclassrooms.mddapi.dto.response.ProfileResponse;
 import com.openclassrooms.mddapi.exception.ErrorCodes;
 import com.openclassrooms.mddapi.exception.InvalidCurrentPasswordException;
 import com.openclassrooms.mddapi.repository.UserRepository;
-import com.openclassrooms.mddapi.service.ProfilService;
+import com.openclassrooms.mddapi.service.ProfileService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -37,16 +37,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = ProfilController.class)
+@WebMvcTest(controllers = ProfileController.class)
 @EnableWebSecurity
 @Import({SecurityConfig.class, KeyConfig.class, CookieBearerTokenResolver.class,
         JwtAccessDeniedHandler.class, JwtAuthenticationEntryPoint.class})
 @EnableConfigurationProperties({AppConfigProperties.class, RsaConfigProperties.class, RateLimitConfigProperties.class})
 @ActiveProfiles("test")
-class ProfilControllerTest extends ControllerTestSupport {
+class ProfileControllerTest extends ControllerTestSupport {
 
     @MockitoBean
-    private ProfilService profilService;
+    private ProfileService profileService;
     @MockitoBean
     private UserRepository userRepository;
 
@@ -58,7 +58,7 @@ class ProfilControllerTest extends ControllerTestSupport {
 
     @Test
     void profile_authenticated_returnsProfile() throws Exception {
-        when(profilService.getProfil(7L)).thenReturn(new ProfileResponse("john", "john@mail.com", List.of()));
+        when(profileService.getProfile(7L)).thenReturn(new ProfileResponse("john", "john@mail.com", List.of()));
 
         mockMvc.perform(get("/profile").cookie(accessTokenCookie(7L)))
                 .andExpect(status().isOk())
@@ -68,7 +68,7 @@ class ProfilControllerTest extends ControllerTestSupport {
 
     @Test
     void patch_validRequest_returnsUpdatedProfile() throws Exception {
-        when(profilService.updateProfil(eq(7L), any())).thenReturn(new ProfileResponse("New Name", "john@mail.com", List.of()));
+        when(profileService.updateProfile(eq(7L), any())).thenReturn(new ProfileResponse("New Name", "john@mail.com", List.of()));
 
         String body = """
                 {"name":"New Name","currentPassword":"Passw0rd!"}
@@ -85,7 +85,7 @@ class ProfilControllerTest extends ControllerTestSupport {
 
     @Test
     void patch_onlyCurrentPassword_returns200() throws Exception {
-        when(profilService.updateProfil(eq(7L), any())).thenReturn(new ProfileResponse("john", "john@mail.com", List.of()));
+        when(profileService.updateProfile(eq(7L), any())).thenReturn(new ProfileResponse("john", "john@mail.com", List.of()));
 
         String body = """
                 {"currentPassword":"Passw0rd!"}
@@ -136,7 +136,7 @@ class ProfilControllerTest extends ControllerTestSupport {
         // valeurs vides/nulles) : contrairement à `name`, une chaîne vide sur
         // `email` n'est donc PAS rejetée par la validation et atteint le
         // service, qui reçoit alors une valeur vide à traiter.
-        when(profilService.updateProfil(eq(7L), any())).thenReturn(new ProfileResponse("john", "", List.of()));
+        when(profileService.updateProfile(eq(7L), any())).thenReturn(new ProfileResponse("john", "", List.of()));
 
         String body = """
                 {"email":"","currentPassword":"Passw0rd!"}
@@ -213,7 +213,7 @@ class ProfilControllerTest extends ControllerTestSupport {
 
     @Test
     void patch_invalidCurrentPassword_returns400WithFieldError() throws Exception {
-        when(profilService.updateProfil(eq(7L), any())).thenThrow(new InvalidCurrentPasswordException());
+        when(profileService.updateProfile(eq(7L), any())).thenThrow(new InvalidCurrentPasswordException());
 
         String body = """
                 {"currentPassword":"wrong"}

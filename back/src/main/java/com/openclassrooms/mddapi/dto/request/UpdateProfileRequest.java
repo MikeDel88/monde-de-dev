@@ -16,7 +16,7 @@ import jakarta.validation.constraints.Size;
  * @param newPassword
  * @param currentPassword
  */
-public record UpdateProfilRequest(
+public record UpdateProfileRequest(
 
         @Size(min = 1, max = 255, message = ErrorCodes.NAME_INVALID)
         @Schema(nullable = true, minLength = 1, maxLength = 255, description = "Nouveau nom, laisser vide/absent pour ne pas le modifier", example = "John")

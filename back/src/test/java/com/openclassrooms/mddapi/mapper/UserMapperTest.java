@@ -31,8 +31,8 @@ class UserMapperTest {
     }
 
     @Test
-    void toProfilResponse_nullUser_returnsResponseWithNullFields() {
-        ProfileResponse response = userMapper.toProfilResponse(null, List.of());
+    void toProfileResponse_nullUser_returnsResponseWithNullFields() {
+        ProfileResponse response = userMapper.toProfileResponse(null, List.of());
 
         assertThat(response.name()).isNull();
         assertThat(response.email()).isNull();
@@ -40,21 +40,21 @@ class UserMapperTest {
     }
 
     @Test
-    void toProfilResponse_nullTopics_returnsResponseWithNullTopics() {
+    void toProfileResponse_nullTopics_returnsResponseWithNullTopics() {
         User user = new User("john", "john@mail.com", "hashed");
 
-        ProfileResponse response = userMapper.toProfilResponse(user, null);
+        ProfileResponse response = userMapper.toProfileResponse(user, null);
 
         assertThat(response.name()).isEqualTo("john");
         assertThat(response.topics()).isNull();
     }
 
     @Test
-    void toProfilResponse_mapsUserAndTopics() {
+    void toProfileResponse_mapsUserAndTopics() {
         User user = new User("john", "john@mail.com", "hashed");
         List<TopicResponse> topics = List.of(new TopicResponse(1L, "Java", "desc", true));
 
-        ProfileResponse response = userMapper.toProfilResponse(user, topics);
+        ProfileResponse response = userMapper.toProfileResponse(user, topics);
 
         assertThat(response.name()).isEqualTo("john");
         assertThat(response.email()).isEqualTo("john@mail.com");

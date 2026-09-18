@@ -30,7 +30,7 @@ public interface TopicMapper {
      * Convertit une liste de topics en liste de réponses pour l'utilisateur donné.
      * @param topics la liste des topics source.
      * @param userId l'identifiant de l'utilisateur courant.
-     * @return List TopicReponse; la liste des réponses mappées.
+     * @return {@code List<TopicResponse>} la liste des réponses mappées.
      */
     List<TopicResponse> toTopicResponse(List<Topic> topics, @Context Long userId);
 
