@@ -117,7 +117,7 @@ export class Profile {
       .subscribe({
         next: (value) => {
           this.profile.set(value);
-          this.profileForm.password().reset("");
+          this.profileForm().reset({name: value.name, email: value.email, password: ''});
           this.onUpdateProfilSuccess("Le profil a bien été mis à jour!");
         },
         error: (err: AppError) => {
