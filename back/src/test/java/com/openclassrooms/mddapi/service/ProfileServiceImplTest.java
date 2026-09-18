@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -71,7 +72,7 @@ class ProfileServiceImplTest {
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         List<TopicResponse> topicResponses = List.of(new TopicResponse(1L, "Android", "desc", true));
-        when(topicMapper.toTopicResponse(anyList(), eq(1L))).thenReturn(topicResponses);
+        when(topicMapper.toTopicResponse(anyList(), eq(Set.of(1L, 2L)))).thenReturn(topicResponses);
         ProfileResponse expected = new ProfileResponse("john", "john@mail.com", topicResponses);
         when(userMapper.toProfileResponse(user, topicResponses)).thenReturn(expected);
 
@@ -108,7 +109,7 @@ class ProfileServiceImplTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("current", "hashed")).thenReturn(true);
         when(passwordEncoder.encode("NewPassw0rd!")).thenReturn("newHashed");
-        when(topicMapper.toTopicResponse(anyList(), eq(1L))).thenReturn(List.of());
+        when(topicMapper.toTopicResponse(anyList(), eq(Set.of()))).thenReturn(List.of());
         ProfileResponse expected = new ProfileResponse("New Name", "new@mail.com", List.of());
         when(userMapper.toProfileResponse(any(User.class), anyList())).thenReturn(expected);
 
@@ -128,7 +129,7 @@ class ProfileServiceImplTest {
         setId(user, 1L);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("current", "hashed")).thenReturn(true);
-        when(topicMapper.toTopicResponse(anyList(), eq(1L))).thenReturn(List.of());
+        when(topicMapper.toTopicResponse(anyList(), eq(Set.of()))).thenReturn(List.of());
         when(userMapper.toProfileResponse(any(User.class), anyList()))
                 .thenReturn(new ProfileResponse("john", "john@mail.com", List.of()));
 

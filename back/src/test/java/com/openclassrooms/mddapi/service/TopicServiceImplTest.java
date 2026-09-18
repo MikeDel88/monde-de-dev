@@ -18,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -47,8 +48,9 @@ class TopicServiceImplTest {
         Topic topic = new Topic("Java", "desc");
         List<Topic> topics = List.of(topic);
         when(topicRepository.findAll(Sort.by("title"))).thenReturn(topics);
+        when(userRepository.findSubscribedTopicIds(5L)).thenReturn(Set.of());
         List<TopicResponse> expected = List.of(new TopicResponse(1L, "Java", "desc", false));
-        when(topicMapper.toTopicResponse(topics, 5L)).thenReturn(expected);
+        when(topicMapper.toTopicResponse(topics, Set.of())).thenReturn(expected);
 
         List<TopicResponse> result = topicService.getTopics(5L);
 

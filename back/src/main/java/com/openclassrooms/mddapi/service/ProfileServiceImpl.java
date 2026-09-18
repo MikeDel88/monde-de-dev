@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Implémentation de {@link ProfileService} : construit le profil de l'utilisateur connecté
@@ -63,12 +65,11 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     private ProfileResponse toProfileResponse(User user) {
-        List<TopicResponse> topics = topicMapper
-                .toTopicResponse(user
-                        .getTopics()
-                        .stream()
-                        .sorted(Comparator.comparing(Topic::getTitle))
-                        .toList(), user.getId());
+        List<Topic> sortedTopics = user.getTopics().stream()
+                .sorted(Comparator.comparing(Topic::getTitle))
+                .toList();
+        Set<Long> subscribedTopicIds = sortedTopics.stream().map(Topic::getId).collect(Collectors.toSet());
+        List<TopicResponse> topics = topicMapper.toTopicResponse(sortedTopics, subscribedTopicIds);
         return userMapper.toProfileResponse(user, topics);
     }
 }

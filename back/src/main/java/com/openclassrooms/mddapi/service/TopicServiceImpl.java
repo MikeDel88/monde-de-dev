@@ -1,6 +1,7 @@
 package com.openclassrooms.mddapi.service;
 
 import java.util.List;
+import java.util.Set;
 
 import com.openclassrooms.mddapi.dto.response.TopicResponse;
 import com.openclassrooms.mddapi.exception.TopicNotFoundException;
@@ -38,7 +39,8 @@ public class TopicServiceImpl implements TopicService {
         List<Topic> topics = topicRepository.findAll(Sort.by("title"));
         log.info("topics: {}", topics.size());
 
-        return topicMapper.toTopicResponse(topics, userId);
+        Set<Long> subscribedTopicIds = userRepository.findSubscribedTopicIds(userId);
+        return topicMapper.toTopicResponse(topics, subscribedTopicIds);
     }
 
     @Override

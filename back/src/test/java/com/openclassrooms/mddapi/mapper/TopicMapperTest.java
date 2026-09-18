@@ -2,11 +2,11 @@ package com.openclassrooms.mddapi.mapper;
 
 import com.openclassrooms.mddapi.dto.response.TopicResponse;
 import com.openclassrooms.mddapi.model.Topic;
-import com.openclassrooms.mddapi.model.User;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,23 +22,20 @@ class TopicMapperTest {
 
     @Test
     void toTopicResponse_nullTopic_returnsNull() {
-        assertThat(topicMapper.toTopicResponse((Topic) null, 5L)).isNull();
+        assertThat(topicMapper.toTopicResponse((Topic) null, Set.of(5L))).isNull();
     }
 
     @Test
     void toTopicResponseList_nullList_returnsNull() {
-        assertThat(topicMapper.toTopicResponse((List<Topic>) null, 5L)).isNull();
+        assertThat(topicMapper.toTopicResponse((List<Topic>) null, Set.of(5L))).isNull();
     }
 
     @Test
     void toTopicResponse_subscribedUser_returnsTrue() throws Exception {
         Topic topic = new Topic("Java", "desc");
         setId(topic, 1L);
-        User user = new User("john", "john@mail.com", "hashed");
-        setId(user, 5L);
-        user.subscribeTo(topic);
 
-        TopicResponse response = topicMapper.toTopicResponse(topic, 5L);
+        TopicResponse response = topicMapper.toTopicResponse(topic, Set.of(1L));
 
         assertThat(response.id()).isEqualTo(1L);
         assertThat(response.title()).isEqualTo("Java");
@@ -50,7 +47,7 @@ class TopicMapperTest {
         Topic topic = new Topic("Java", "desc");
         setId(topic, 1L);
 
-        TopicResponse response = topicMapper.toTopicResponse(topic, 99L);
+        TopicResponse response = topicMapper.toTopicResponse(topic, Set.of(99L));
 
         assertThat(response.subscribed()).isFalse();
     }
@@ -60,20 +57,18 @@ class TopicMapperTest {
         Topic topic = new Topic("Java", "desc");
         setId(topic, 1L);
 
-        List<TopicResponse> responses = topicMapper.toTopicResponse(List.of(topic), 5L);
+        List<TopicResponse> responses = topicMapper.toTopicResponse(List.of(topic), Set.of(5L));
 
         assertThat(responses).hasSize(1);
         assertThat(responses.get(0).title()).isEqualTo("Java");
     }
 
     @Test
-    void isSubscribed_delegatesToTopicUsers() throws Exception {
+    void isSubscribed_checksIdMembership() throws Exception {
         Topic topic = new Topic("Java", "desc");
-        User user = new User("john", "john@mail.com", "hashed");
-        setId(user, 5L);
-        user.subscribeTo(topic);
+        setId(topic, 1L);
 
-        assertThat(topicMapper.isSubscribed(topic, 5L)).isTrue();
-        assertThat(topicMapper.isSubscribed(topic, 6L)).isFalse();
+        assertThat(topicMapper.isSubscribed(topic, Set.of(1L))).isTrue();
+        assertThat(topicMapper.isSubscribed(topic, Set.of(2L))).isFalse();
     }
 }
