@@ -19,6 +19,7 @@ import {SessionService} from "../../../../core/services/session-service";
 import {CursorPage} from "../../../../shared/models/cursor-page";
 import {PostFeed} from "../../../feed/models/post-feed";
 import {ToastService} from "../../../../core/services/toast-service";
+import {AppError} from "../../../../core/models/app-error";
 
 const EMPTY_PAGE: CursorPage<PostFeed> = { content: [], hasNext: false, nextCursor: null };
 
@@ -84,22 +85,23 @@ describe('Register', () => {
     });
 
     describe('Error display form validation', () => {
-      it('should display the error message in the DOM when error is true', () => {
-        component.error.set('Cet email ou ce nom est déjà utilisé');
-        fixture.detectChanges();
+      it('should report the error to ToastService when an error occurs', () => {
+        const toastService = TestBed.inject(ToastService);
 
-        const errorElement = fixture.debugElement.query(By.css('[data-test="error"]'));
-        expect(errorElement).toBeTruthy();
+        toastService.showError(new AppError('Cet email ou ce nom est déjà utilisé', 409));
+
+        expect(toastService.visible()).toBe(true);
+        expect(toastService.message()).toBe('Cet email ou ce nom est déjà utilisé');
       });
 
-      it('should clear the error message on focusin', () => {
-        component.error.set('Cet email ou ce nom est déjà utilisé');
-        fixture.detectChanges();
+      it('should clear the toast on focusin', () => {
+        const toastService = TestBed.inject(ToastService);
+        toastService.showError(new AppError('Cet email ou ce nom est déjà utilisé', 409));
 
         const form = fixture.nativeElement.querySelector('form') as HTMLFormElement;
         form.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
 
-        expect(component.error()).toBeUndefined();
+        expect(toastService.visible()).toBe(false);
       });
     });
 
@@ -210,18 +212,16 @@ describe('Register', () => {
         expectFormWasReset();
       });
 
-      it('should display the error message and not report a success when authService.register$ fails', () => {
+      it('should report the error to ToastService with the "error" type when authService.register$ fails', () => {
         const toastService = TestBed.inject(ToastService);
         mockAuthService.register$.mockReturnValue(throwError(() => new Error('Cet email ou ce nom est déjà utilisé')));
         fillForm(VALID_REGISTER_DATA.name, VALID_REGISTER_DATA.email, VALID_REGISTER_DATA.password);
 
         submit();
 
-        expect(component.error()).toBe('Cet email ou ce nom est déjà utilisé');
-        expect(toastService.visible()).toBe(false);
-
-        const errorElement = fixture.debugElement.query(By.css('[data-test="error"]'));
-        expect(errorElement.nativeElement.textContent).toContain('Cet email ou ce nom est déjà utilisé');
+        expect(toastService.message()).toBe('Cet email ou ce nom est déjà utilisé');
+        expect(toastService.type()).toBe('error');
+        expect(toastService.visible()).toBe(true);
       });
     });
   });
@@ -283,7 +283,7 @@ describe('Register', () => {
       );
       fixture.detectChanges();
 
-      expect(component.error()).toBe('Email déjà utilisé, Nom déjà pris');
+      expect(TestBed.inject(ToastService).message()).toBe('Email déjà utilisé, Nom déjà pris');
     });
 
     it('should fall back to a generic message on a 400 response without field errors', () => {
@@ -292,25 +292,25 @@ describe('Register', () => {
       req.flush({ status: 400 }, { status: 400, statusText: 'Bad Request' });
       fixture.detectChanges();
 
-      expect(component.error()).toBe('Formulaire invalide');
+      expect(TestBed.inject(ToastService).message()).toBe('Formulaire invalide');
     });
 
-    it('should display the "already registered" message on a 409 response', () => {
+    it('should report the "already registered" message on a 409 response', () => {
       const req = submitAndExpectRegisterRequest();
 
       req.flush(null, { status: 409, statusText: 'Conflict' });
       fixture.detectChanges();
 
-      expect(component.error()).toBe('Un conflit est survenu.');
+      expect(TestBed.inject(ToastService).message()).toBe('Un conflit est survenu.');
     });
 
-    it('should display a generic error message on a server error (500)', () => {
+    it('should report a generic error message on a server error (500)', () => {
       const req = submitAndExpectRegisterRequest();
 
       req.flush(null, { status: 500, statusText: 'Internal Server Error' });
       fixture.detectChanges();
 
-      expect(component.error()).toBe('Une erreur est survenue, veuillez réessayer plus tard.');
+      expect(TestBed.inject(ToastService).message()).toBe('Une erreur est survenue, veuillez réessayer plus tard.');
     });
   });
 

@@ -18,6 +18,8 @@ import {RouterTestingHarness} from "@angular/router/testing";
 import {SessionService} from "../../../../core/services/session-service";
 import {CursorPage} from "../../../../shared/models/cursor-page";
 import {PostFeed} from "../../../feed/models/post-feed";
+import {ToastService} from "../../../../core/services/toast-service";
+import {AppError} from "../../../../core/models/app-error";
 
 const EMPTY_PAGE: CursorPage<PostFeed> = { content: [], hasNext: false, nextCursor: null };
 
@@ -86,23 +88,23 @@ describe('Login', () => {
     });
 
     describe("Error display form validation", () => {
-      it('should display the error message in the DOM when error is true', () => {
-        component.error.set('Invalid credentials');
-        fixture.detectChanges();
+      it('should report the error to ToastService when an error occurs', () => {
+        const toastService = TestBed.inject(ToastService);
 
-        const errorElement = fixture.debugElement.query(By.css('[data-test="error"]'));
-        expect(errorElement).toBeTruthy();
+        toastService.showError(new AppError('Invalid credentials', 401));
+
+        expect(toastService.visible()).toBe(true);
+        expect(toastService.message()).toBe('Invalid credentials');
       });
 
-      it('should not display the error message in the DOM when field is focused', () => {
-        component.error.set('Invalid credentials');
-        fixture.detectChanges();
+      it('should clear the toast when a field is focused', () => {
+        const toastService = TestBed.inject(ToastService);
+        toastService.showError(new AppError('Invalid credentials', 401));
 
         component.loginForm.password().focusBoundControl();
         fixture.detectChanges();
 
-        const errorElement = fixture.debugElement.query(By.css('p[data-test="error"]'));
-        expect(errorElement).toBeFalsy();
+        expect(toastService.visible()).toBe(false);
       });
     });
 
@@ -200,17 +202,16 @@ describe('Login', () => {
         expectFormWasReset();
       });
 
-      it('should display the error message and not navigate when authService.login$ fails', () => {
+      it('should report the error to ToastService and not navigate when authService.login$ fails', () => {
+        const toastService = TestBed.inject(ToastService);
         mockAuthService.login$.mockReturnValue(throwError(() => new Error('Invalid credentials')));
         fillForm(VALID_CREDENTIALS.emailOrName, VALID_CREDENTIALS.password);
 
         submit();
 
-        expect(component.error()).toBe('Invalid credentials');
+        expect(toastService.message()).toBe('Invalid credentials');
+        expect(toastService.visible()).toBe(true);
         expect(router.navigate).not.toHaveBeenCalled();
-
-        const errorElement = fixture.debugElement.query(By.css('[data-test="error"]'));
-        expect(errorElement.nativeElement.textContent).toContain('Invalid credentials');
       });
     });
   });
@@ -256,30 +257,24 @@ describe('Login', () => {
       expect(router.navigate).toHaveBeenCalledWith(['/feed']);
     });
 
-    it('should display the "invalid credentials" message and not navigate on a 401 response', () => {
+    it('should report the "invalid credentials" message and not navigate on a 401 response', () => {
       const req = submitAndExpectLoginRequest();
 
       req.flush(null, { status: 401, statusText: 'Unauthorized' });
       fixture.detectChanges();
 
-      expect(component.error()).toBe('Session expirée ou identifiants invalides.');
+      expect(TestBed.inject(ToastService).message()).toBe('Session expirée ou identifiants invalides.');
       expect(router.navigate).not.toHaveBeenCalled();
-
-      const errorElement = fixture.debugElement.query(By.css('[data-test="error"]'));
-      expect(errorElement.nativeElement.textContent).toContain('Session expirée ou identifiants invalides.');
     });
 
-    it('should display a generic error message and not navigate on a server error (500)', () => {
+    it('should report a generic error message and not navigate on a server error (500)', () => {
       const req = submitAndExpectLoginRequest();
 
       req.flush(null, { status: 500, statusText: 'Internal Server Error' });
       fixture.detectChanges();
 
-      expect(component.error()).toBe('Une erreur est survenue, veuillez réessayer plus tard.');
+      expect(TestBed.inject(ToastService).message()).toBe('Une erreur est survenue, veuillez réessayer plus tard.');
       expect(router.navigate).not.toHaveBeenCalled();
-
-      const errorElement = fixture.debugElement.query(By.css('[data-test="error"]'));
-      expect(errorElement.nativeElement.textContent).toContain('Une erreur est survenue, veuillez réessayer plus tard.');
     });
 
     it('should persist the session (isAuthenticated) after a successful login', () => {

@@ -5,8 +5,8 @@ import {Router} from "@angular/router";
 import {LoginData} from "../../models/login-data";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Button} from "../../../../shared/components/button/button";
-import {Error as AppError} from "../../../../shared/components/error/error";
 import {Input} from "../../../../shared/components/input/input";
+import {ToastService} from "../../../../core/services/toast-service";
 
 const initialLoginData: LoginData = {
   emailOrName: "",
@@ -21,7 +21,7 @@ const validationLoginForm = (schemaPath: SchemaPathTree<LoginData>) => {
 @Component({
   selector: 'app-login',
   templateUrl: './login.html',
-  imports: [FormField, Button, AppError, Input]
+  imports: [FormField, Button, Input]
 })
 export class Login {
 
@@ -32,13 +32,13 @@ export class Login {
   private readonly destroyRef: DestroyRef = inject(DestroyRef);
   private readonly router: Router = inject(Router);
   private readonly authService: AuthService = inject(AuthService);
-  error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
+  private readonly toastService = inject(ToastService);
 
   private readonly loginModel: WritableSignal<LoginData> = signal<LoginData>(initialLoginData);
   loginForm: FieldTree<LoginData> = form(this.loginModel, validationLoginForm);
 
   onFocus(): void {
-    this.error.set(undefined);
+    this.toastService.clear();
   }
 
   onSubmit(event: Event): void {
@@ -57,7 +57,7 @@ export class Login {
             this.router.navigate(['/feed']);
           }
         },
-        error: (error: Error) => this.error.set(error.message),
+        error: (error) => this.toastService.showError(error),
       });
   }
 }
