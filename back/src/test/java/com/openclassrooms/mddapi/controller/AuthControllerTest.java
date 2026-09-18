@@ -9,7 +9,6 @@ import com.openclassrooms.mddapi.config.security.JwtAuthenticationEntryPoint;
 import com.openclassrooms.mddapi.config.security.KeyConfig;
 import com.openclassrooms.mddapi.config.security.SecurityConfig;
 import com.openclassrooms.mddapi.controller.support.ControllerTestSupport;
-import com.openclassrooms.mddapi.controller.support.PasswordCases;
 import com.openclassrooms.mddapi.exception.ErrorCodes;
 import com.openclassrooms.mddapi.exception.InvalidCredentialsException;
 import com.openclassrooms.mddapi.exception.RateLimitExceededException;
