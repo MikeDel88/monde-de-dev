@@ -1,4 +1,4 @@
-import {Component, DestroyRef, inject, signal, WritableSignal} from '@angular/core';
+import {Component, computed, DestroyRef, inject, signal, WritableSignal} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {PostService} from "../../services/post-service";
 import {httpResource, HttpResourceRef} from "@angular/common/http";
@@ -13,6 +13,7 @@ import {Loader} from "../../../../shared/components/loader/loader";
 import {Post} from "../../models/post";
 import {FirstUpperPipe} from "../../../../shared/pipes/first-upper";
 import {ToastService} from "../../../../core/services/toast-service";
+import {AppError} from "../../../../core/models/app-error";
 
 export interface CreateComment {
   content: string

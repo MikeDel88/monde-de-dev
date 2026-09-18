@@ -39,7 +39,7 @@
     } @else if (post.isLoading()) {
       <app-loader data-test="loader"/>
     } @else if (post.error()) {
-      <app-error data-test="error" [message]="post.error()?.message"/>
+      <app-error class="mx-auto" data-test="error" [message]="post.error()?.message"/>
     }
   </div>
 </div>

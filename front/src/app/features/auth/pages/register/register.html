@@ -1,7 +1,7 @@
 <form (submit)="onSubmit($event)" (focusin)="onFocus()" class="flex flex-col gap-2 w-full lg:w-1/2 2xl:w-1/6 mx-auto items-center p-6">
-  <app-input [label]="labelName" type="text" data-test="name" errorDataTest="error-name" [formField]="registerForm.name" />
-  <app-input [label]="labelEmail" type="email" data-test="email" errorDataTest="error-email" [formField]="registerForm.email" />
-  <app-input [label]="labelPassword" type="password" data-test="password" errorDataTest="error-password" [formField]="registerForm.password" />
+  <app-input class="w-62.5 sm:w-70" [label]="labelName" type="text" data-test="name" errorDataTest="error-name" [formField]="registerForm.name" />
+  <app-input class="w-62.5 sm:w-70" [label]="labelEmail" type="email" data-test="email" errorDataTest="error-email" [formField]="registerForm.email" />
+  <app-input class="w-62.5 sm:w-70" [label]="labelPassword" type="password" data-test="password" errorDataTest="error-password" [formField]="registerForm.password" />
   <app-button
     type="submit"
     class="self-center"

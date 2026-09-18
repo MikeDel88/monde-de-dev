@@ -1,5 +1,4 @@
 import {Service, Signal} from '@angular/core';
-import {AppError} from '../models/app-error';
 import {createToastState, ToastState, ToastType} from '../../shared/utils/toast-state';
 
 const SUCCESS_AUTO_CLOSE_MS = 2000;
@@ -19,7 +18,7 @@ export class ToastService {
     this.state.show(message, 'success', SUCCESS_AUTO_CLOSE_MS);
   }
 
-  showError(err: AppError): void {
+  showError(err: Error): void {
     this.state.show(err.message, 'error', ERROR_AUTO_CLOSE_MS);
   }
 
