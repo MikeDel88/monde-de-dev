@@ -56,10 +56,10 @@ describe('AuthService', () => {
     req.flush(null, { status: 201, statusText: 'Created' });
   });
 
-  it('should build a message from field errors on 400', (done) => {
+  it('should build a translated message from field errors on 400 (real backend shape: field + code)', (done) => {
     service.register$(registerData).subscribe({
       error: (error: Error) => {
-        expect(error.message).toBe('Email invalide, Mot de passe trop court');
+        expect(error.message).toBe("L'email est invalide., Le mot de passe doit contenir au moins 8 caractères.");
         done();
       },
     });
@@ -69,8 +69,8 @@ describe('AuthService', () => {
       {
         status: 400,
         errors: [
-          { field: 'email', message: 'Email invalide' },
-          { field: 'password', message: 'Mot de passe trop court' },
+          { field: 'email', code: 'EMAIL_INVALID' },
+          { field: 'password', code: 'PASSWORD_TOO_SHORT' },
         ],
       },
       { status: 400, statusText: 'Bad Request' }
@@ -89,16 +89,28 @@ describe('AuthService', () => {
     req.flush({ status: 409 }, { status: 409, statusText: 'Conflict' });
   });
 
-  it('should use the server-provided detail on 500 when present', (done) => {
+  it('should translate the server-provided detail code on 500 when known', (done) => {
     service.register$(registerData).subscribe({
       error: (error: Error) => {
-        expect(error.message).toBe('Internal server error');
+        expect(error.message).toBe('Une erreur est survenue, veuillez réessayer plus tard.');
         done();
       },
     });
 
     const req = httpMock.expectOne(`${environment.apiUrl}/auth/register`);
-    req.flush({ status: 500, detail: 'Internal server error' }, { status: 500, statusText: 'Internal Server Error' });
+    req.flush({ status: 500, detail: 'INTERNAL_SERVER_ERROR' }, { status: 500, statusText: 'Internal Server Error' });
+  });
+
+  it('should fall back to the generic message on 500 when the detail is not a known code', (done) => {
+    service.register$(registerData).subscribe({
+      error: (error: Error) => {
+        expect(error.message).toBe('Une erreur est survenue, veuillez réessayer plus tard.');
+        done();
+      },
+    });
+
+    const req = httpMock.expectOne(`${environment.apiUrl}/auth/register`);
+    req.flush({ status: 500, detail: 'some-unexpected-detail' }, { status: 500, statusText: 'Internal Server Error' });
   });
 
   it('should return the generic fallback message when no detail is available', (done) => {

@@ -274,16 +274,16 @@ describe('Register', () => {
       expectFormWasReset();
     });
 
-    it('should aggregate field error messages on a 400 response with field errors', () => {
+    it('should aggregate translated field error messages on a 400 response with field errors (real backend shape: field + code)', () => {
       const req = submitAndExpectRegisterRequest();
 
       req.flush(
-        { status: 400, errors: [{ field: 'email', message: 'Email déjà utilisé' }, { field: 'name', message: "Nom déjà pris" }] },
+        { status: 400, errors: [{ field: 'email', code: 'EMAIL_INVALID' }, { field: 'name', code: 'NAME_TOO_LONG' }] },
         { status: 400, statusText: 'Bad Request' }
       );
       fixture.detectChanges();
 
-      expect(TestBed.inject(ToastService).message()).toBe('Email déjà utilisé, Nom déjà pris');
+      expect(TestBed.inject(ToastService).message()).toBe("L'email est invalide., Le nom est trop long.");
     });
 
     it('should fall back to a generic message on a 400 response without field errors', () => {
