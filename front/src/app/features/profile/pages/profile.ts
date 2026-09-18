@@ -1,4 +1,4 @@
-import {Component, DestroyRef, effect, inject, signal, WritableSignal} from '@angular/core';
+import {Component, DestroyRef, effect, inject, signal, Signal, WritableSignal} from '@angular/core';
 import {httpResource, HttpResourceRef} from "@angular/common/http";
 import {ProfileService} from "../services/profile-service";
 import {ProfileResponse} from "../models/profile-response";
@@ -17,11 +17,11 @@ import {Button} from "../../../shared/components/button/button";
 import {Dividers} from "../../../shared/components/divider/dividers";
 import {Error} from "../../../shared/components/error/error";
 import {Input} from "../../../shared/components/input/input";
-import {AppError} from "../../../core/models/app-error";
 import {Title} from "../../../shared/components/title/title";
 import {Loader} from "../../../shared/components/loader/loader";
 import {validatePasswordStrength} from "../../../shared/validators/password-strength-validator";
 import {Toast} from "../../../shared/components/toast/toast";
+import {createErrorState} from "../../../shared/utils/error-state";
 
 
 export interface ProfileData {
@@ -63,7 +63,8 @@ export class Profile {
   readonly placeholderPassword: string = "Nouveau mot de passe"
 
   showToastSuccess = signal({message: "", visible: false})
-  error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
+  private readonly errorState = createErrorState();
+  error: Signal<string | undefined> = this.errorState.error;
   showPasswordModal: WritableSignal<boolean> = signal(false);
   profileModel: WritableSignal<ProfileData> = signal<ProfileData>(initialProfileData);
   profileForm: FieldTree<ProfileData> = form(this.profileModel, validationProfileForm);
@@ -82,7 +83,7 @@ export class Profile {
   }
 
   onUpdateProfilSuccess(message: string) {
-    this.error.set(undefined);
+    this.errorState.clear();
     this.showToastSuccess.set({message, visible: true});
     setTimeout(() => {
       this.showToastSuccess.set({message: "", visible: false});
@@ -90,7 +91,7 @@ export class Profile {
   }
 
   onFocus(): void {
-    this.error.set(undefined);
+    this.errorState.clear();
   }
 
   onSubmit(event: Event): void {
@@ -118,9 +119,9 @@ export class Profile {
           this.profileForm().reset({name: value.name, email: value.email, password: ''});
           this.onUpdateProfilSuccess("Le profil a bien été mis à jour!");
         },
-        error: (err: AppError) => {
+        error: (err) => {
           this.profile.reload();
-          this.error.set(err.message);
+          this.errorState.setFromError(err);
         }
       });
   }
@@ -130,10 +131,10 @@ export class Profile {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         complete: () => {
-          this.error.set(undefined);
+          this.errorState.clear();
           this.profile.reload();
         },
-        error: (err: AppError) => this.error.set(err.message),
+        error: (err) => this.errorState.setFromError(err),
       })
   }
 }

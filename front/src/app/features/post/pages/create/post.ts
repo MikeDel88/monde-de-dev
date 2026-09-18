@@ -11,9 +11,9 @@ import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Button} from "../../../../shared/components/button/button";
 import {Error} from "../../../../shared/components/error/error";
 import {Input} from "../../../../shared/components/input/input";
-import {AppError} from "../../../../core/models/app-error";
 import {Title} from "../../../../shared/components/title/title";
 import {Back} from "../../../../shared/components/back/back";
+import {createErrorState} from "../../../../shared/utils/error-state";
 
 export interface CreatePost {
   topicId: string,
@@ -58,7 +58,8 @@ export class Post {
   private destroyRef = inject(DestroyRef);
   private readonly profileService = inject(ProfileService);
   private readonly postService = inject(PostService);
-  error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
+  private readonly errorState = createErrorState();
+  error: Signal<string | undefined> = this.errorState.error;
   topics: Signal<Topic[] | undefined> = computed(() => {
       if(this.profile.hasValue()) {
         return this.profile.value().topics;
@@ -78,7 +79,7 @@ export class Post {
   }
 
   onFocus(): void {
-    this.error.set(undefined);
+    this.errorState.clear();
   }
 
   onSubmit(event: Event): void {
@@ -94,8 +95,8 @@ export class Post {
           this.postForm().reset(initialPostData);
           this.router.navigate(['/feed']);
         },
-        error: (err: AppError) => {
-          this.error.set(err.message);
+        error: (err) => {
+          this.errorState.setFromError(err);
         }
       });
   }

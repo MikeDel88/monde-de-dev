@@ -1,4 +1,4 @@
-import {Component, DestroyRef, inject, signal, WritableSignal} from '@angular/core';
+import {Component, DestroyRef, inject, signal, Signal, WritableSignal} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {PostService} from "../../services/post-service";
 import {httpResource, HttpResourceRef} from "@angular/common/http";
@@ -8,11 +8,11 @@ import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Dividers} from "../../../../shared/components/divider/dividers";
 import {Error} from "../../../../shared/components/error/error";
 import {Title} from "../../../../shared/components/title/title";
-import {AppError} from "../../../../core/models/app-error";
 import {Back} from "../../../../shared/components/back/back";
 import {Loader} from "../../../../shared/components/loader/loader";
 import {Post} from "../../models/post";
 import {FirstUpperPipe} from "../../../../shared/pipes/first-upper";
+import {createErrorState} from "../../../../shared/utils/error-state";
 
 export interface CreateComment {
   content: string
@@ -54,7 +54,8 @@ export class PostDetail {
     const id: string = this.postId;
     return id ? { url: `${this.postService.path}/${id}` } : undefined;
   });
-  error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
+  private readonly errorState = createErrorState();
+  error: Signal<string | undefined> = this.errorState.error;
 
   createCommentModel: WritableSignal<CreateComment> = signal<CreateComment>(commentInitialData);
   commentForm: FieldTree<CreateComment> = form(this.createCommentModel, validationCreateCommentForm);
@@ -76,8 +77,8 @@ export class PostDetail {
           this.commentForm().reset(commentInitialData);
           this.post.reload();
         },
-        error: (err: AppError) => {
-          this.error.set(err.message);
+        error: (err) => {
+          this.errorState.setFromError(err);
         }
       });
   }
