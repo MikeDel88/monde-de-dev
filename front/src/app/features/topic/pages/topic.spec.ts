@@ -10,7 +10,7 @@ import {Topic} from "./topic";
 import {By} from "@angular/platform-browser";
 import {TopicCard} from "../../../shared/components/topic-card/topic-card";
 import {environment} from "../../../../environments/environment";
-import {ErrorToastService} from "../../../core/services/error-toast-service";
+import {ToastService} from "../../../core/services/toast-service";
 
 const MOCK_TOPICS: TopicModel[] = [
   { id: 1, title: "Topic 1", description: "Topic 1", subscribed: true },
@@ -100,19 +100,19 @@ describe('Topic', () => {
       expect(topicCard).toBeFalsy();
     });
 
-    it("should report the error to ErrorToastService when subscribe$ fails", async () => {
+    it("should report the error to ToastService when subscribe$ fails", async () => {
       httpMock.expectOne(`${environment.apiUrl}/topics`).flush(MOCK_TOPICS);
       await flushMicrotasks();
       fixture.detectChanges();
 
-      const errorToastService = TestBed.inject(ErrorToastService);
+      const toastService = TestBed.inject(ToastService);
       mockTopicService.subscribe$.mockReturnValue(throwError(() => new Error('fail')));
 
       component.onSubscribe(MOCK_TOPICS[1].id);
       fixture.detectChanges();
 
-      expect(errorToastService.message()).toBe('fail');
-      expect(errorToastService.visible()).toBe(true);
+      expect(toastService.message()).toBe('fail');
+      expect(toastService.visible()).toBe(true);
     });
   });
 

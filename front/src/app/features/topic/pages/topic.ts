@@ -6,7 +6,7 @@ import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {TopicCard} from "../../../shared/components/topic-card/topic-card";
 import {Error} from "../../../shared/components/error/error";
 import {Loader} from "../../../shared/components/loader/loader";
-import {ErrorToastService} from "../../../core/services/error-toast-service";
+import {ToastService} from "../../../core/services/toast-service";
 
 @Component({
   selector: 'app-topic',
@@ -21,7 +21,7 @@ export class Topic {
 
   private topicService = inject(TopicService);
   private destroyRef = inject(DestroyRef);
-  private errorToastService = inject(ErrorToastService);
+  private toastService = inject(ToastService);
   topics: HttpResourceRef<TopicModel[] | undefined> = httpResource<TopicModel[]>(() => this.topicService.path);
 
   onSubscribe(topicId: number) {
@@ -29,10 +29,10 @@ export class Topic {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         complete: () => {
-          this.errorToastService.clear();
+          this.toastService.clear();
           this.topics.reload();
         },
-        error: (err) => this.errorToastService.showError(err),
+        error: (err) => this.toastService.showError(err),
       });
   }
 }

@@ -11,7 +11,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideHttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 import { Post } from '../../models/post';
-import { ErrorToastService } from '../../../../core/services/error-toast-service';
+import { ToastService } from '../../../../core/services/toast-service';
 
 const MOCK_POST: Post = {
   id: 1,
@@ -194,16 +194,16 @@ describe('PostDetail', () => {
         httpMock.expectOne(`${environment.apiUrl}/posts/1`).flush(MOCK_POST);
       });
 
-      it('should report the error to ErrorToastService when comment creation fails', async () => {
-        const errorToastService = TestBed.inject(ErrorToastService);
+      it('should report the error to ToastService when comment creation fails', async () => {
+        const toastService = TestBed.inject(ToastService);
         await flushPost();
         mockPostService.createComment$.mockReturnValue(throwError(() => new Error('fail')));
         component.commentForm.content().value.set('Nice article');
 
         submitComment();
 
-        expect(errorToastService.message()).toBe('fail');
-        expect(errorToastService.visible()).toBe(true);
+        expect(toastService.message()).toBe('fail');
+        expect(toastService.visible()).toBe(true);
       });
     });
   });
@@ -277,8 +277,8 @@ describe('PostDetail', () => {
       await flushPost();
     });
 
-    it('should report the error to ErrorToastService when comment creation fails (500)', async () => {
-      const errorToastService = TestBed.inject(ErrorToastService);
+    it('should report the error to ToastService when comment creation fails (500)', async () => {
+      const toastService = TestBed.inject(ToastService);
       await flushPost();
       component.commentForm.content().value.set('Nice article');
 
@@ -288,8 +288,8 @@ describe('PostDetail', () => {
       req.flush(null, { status: 500, statusText: 'Internal Server Error' });
       fixture.detectChanges();
 
-      expect(errorToastService.message()?.trim().length).toBeGreaterThan(0);
-      expect(errorToastService.visible()).toBe(true);
+      expect(toastService.message()?.trim().length).toBeGreaterThan(0);
+      expect(toastService.visible()).toBe(true);
     });
   });
 });

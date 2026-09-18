@@ -12,7 +12,7 @@ import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@a
 import { provideHttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 import { ProfileResponse } from '../../../profile/models/profile-response';
-import { ErrorToastService } from '../../../../core/services/error-toast-service';
+import { ToastService } from '../../../../core/services/toast-service';
 
 const MOCK_TOPIC = { id: 1, title: 'Topic A', description: '', subscribed: false };
 
@@ -222,15 +222,15 @@ describe('Post', () => {
         expect(component.postForm.content().value()).toBe('');
       });
 
-      it('should report the error to ErrorToastService and not navigate when createPost$ fails', () => {
-        const errorToastService = TestBed.inject(ErrorToastService);
+      it('should report the error to ToastService and not navigate when createPost$ fails', () => {
+        const toastService = TestBed.inject(ToastService);
         mockPostService.createPost$.mockReturnValue(throwError(() => new Error('server error')));
         fillForm(VALID_POST_DATA.topicId, VALID_POST_DATA.title, VALID_POST_DATA.content);
 
         submit();
 
-        expect(errorToastService.message()).toBe('server error');
-        expect(errorToastService.visible()).toBe(true);
+        expect(toastService.message()).toBe('server error');
+        expect(toastService.visible()).toBe(true);
         expect(router.navigate).not.toHaveBeenCalled();
       });
     });
@@ -283,8 +283,8 @@ describe('Post', () => {
       expect(component.postForm.title().value()).toBe('');
     });
 
-    it('should report the error to ErrorToastService when the create request fails (500)', async () => {
-      const errorToastService = TestBed.inject(ErrorToastService);
+    it('should report the error to ToastService when the create request fails (500)', async () => {
+      const toastService = TestBed.inject(ToastService);
       await flushProfile();
       fillForm(VALID_POST_DATA.topicId, VALID_POST_DATA.title, VALID_POST_DATA.content);
 
@@ -294,8 +294,8 @@ describe('Post', () => {
       req.flush(null, { status: 500, statusText: 'Internal Server Error' });
       fixture.detectChanges();
 
-      expect(errorToastService.message()).toBeTruthy();
-      expect(errorToastService.visible()).toBe(true);
+      expect(toastService.message()).toBeTruthy();
+      expect(toastService.visible()).toBe(true);
       expect(router.navigate).not.toHaveBeenCalled();
     });
 

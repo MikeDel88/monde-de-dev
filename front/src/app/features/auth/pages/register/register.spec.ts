@@ -18,6 +18,7 @@ import {RouterTestingHarness} from "@angular/router/testing";
 import {SessionService} from "../../../../core/services/session-service";
 import {CursorPage} from "../../../../shared/models/cursor-page";
 import {PostFeed} from "../../../feed/models/post-feed";
+import {ToastService} from "../../../../core/services/toast-service";
 
 const EMPTY_PAGE: CursorPage<PostFeed> = { content: [], hasNext: false, nextCursor: null };
 
@@ -196,46 +197,31 @@ describe('Register', () => {
         expect(preventDefaultSpy).toHaveBeenCalled();
       });
 
-      it('should reset the form and show the success toast on successful registration', () => {
+      it('should reset the form and report the success to ToastService on successful registration', () => {
+        const toastService = TestBed.inject(ToastService);
         mockAuthService.register$.mockReturnValue(of(undefined));
         fillForm(VALID_REGISTER_DATA.name, VALID_REGISTER_DATA.email, VALID_REGISTER_DATA.password);
 
         submit();
 
-        expect(component.showToastSuccessfully()).toBe(true);
+        expect(toastService.visible()).toBe(true);
+        expect(toastService.type()).toBe('success');
+        expect(toastService.message()).toBe('Utilisateur enregistré');
         expectFormWasReset();
-
-        const toastAlert = fixture.debugElement.query(By.css('[data-test="toast"] [role="alert"]'));
-        expect(toastAlert).toBeTruthy();
       });
 
-      it('should display the error message and not show the toast when authService.register$ fails', () => {
+      it('should display the error message and not report a success when authService.register$ fails', () => {
+        const toastService = TestBed.inject(ToastService);
         mockAuthService.register$.mockReturnValue(throwError(() => new Error('Cet email ou ce nom est déjà utilisé')));
         fillForm(VALID_REGISTER_DATA.name, VALID_REGISTER_DATA.email, VALID_REGISTER_DATA.password);
 
         submit();
 
         expect(component.error()).toBe('Cet email ou ce nom est déjà utilisé');
-        expect(component.showToastSuccessfully()).toBe(false);
+        expect(toastService.visible()).toBe(false);
 
         const errorElement = fixture.debugElement.query(By.css('[data-test="error"]'));
         expect(errorElement.nativeElement.textContent).toContain('Cet email ou ce nom est déjà utilisé');
-
-        const toastAlert = fixture.debugElement.query(By.css('[data-test="toast"] [role="alert"]'));
-        expect(toastAlert).toBeFalsy();
-      });
-
-      it('should hide the toast and clear the error when onReset is triggered', () => {
-        mockAuthService.register$.mockReturnValue(of(undefined));
-        fillForm(VALID_REGISTER_DATA.name, VALID_REGISTER_DATA.email, VALID_REGISTER_DATA.password);
-        submit();
-        expect(component.showToastSuccessfully()).toBe(true);
-
-        component.onReset();
-        fixture.detectChanges();
-
-        expect(component.showToastSuccessfully()).toBe(false);
-        expect(component.error()).toBeUndefined();
       });
     });
   });
@@ -277,13 +263,14 @@ describe('Register', () => {
       httpMock.expectNone({ url: `${environment.apiUrl}/auth/register` });
     });
 
-    it('should show the success toast and reset the form on successful registration', () => {
+    it('should report the success to ToastService and reset the form on successful registration', () => {
       const req = submitAndExpectRegisterRequest();
 
       req.flush(null, { status: 204, statusText: 'No Content' });
       fixture.detectChanges();
 
-      expect(component.showToastSuccessfully()).toBe(true);
+      expect(TestBed.inject(ToastService).visible()).toBe(true);
+      expect(TestBed.inject(ToastService).type()).toBe('success');
       expectFormWasReset();
     });
 

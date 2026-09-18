@@ -12,7 +12,7 @@ import {Back} from "../../../../shared/components/back/back";
 import {Loader} from "../../../../shared/components/loader/loader";
 import {Post} from "../../models/post";
 import {FirstUpperPipe} from "../../../../shared/pipes/first-upper";
-import {ErrorToastService} from "../../../../core/services/error-toast-service";
+import {ToastService} from "../../../../core/services/toast-service";
 
 export interface CreateComment {
   content: string
@@ -54,7 +54,7 @@ export class PostDetail {
     const id: string = this.postId;
     return id ? { url: `${this.postService.path}/${id}` } : undefined;
   });
-  private readonly errorToastService = inject(ErrorToastService);
+  private readonly toastService = inject(ToastService);
 
   createCommentModel: WritableSignal<CreateComment> = signal<CreateComment>(commentInitialData);
   commentForm: FieldTree<CreateComment> = form(this.createCommentModel, validationCreateCommentForm);
@@ -77,7 +77,7 @@ export class PostDetail {
           this.post.reload();
         },
         error: (err) => {
-          this.errorToastService.showError(err);
+          this.toastService.showError(err);
         }
       });
   }

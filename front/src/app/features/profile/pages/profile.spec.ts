@@ -13,7 +13,7 @@ import { TopicService } from '../../topic/services/topic-service';
 import { Topic } from '../../topic/models/topic';
 import { TopicCard } from '../../../shared/components/topic-card/topic-card';
 import { environment } from '../../../../environments/environment';
-import { ErrorToastService } from '../../../core/services/error-toast-service';
+import { ToastService } from '../../../core/services/toast-service';
 
 const MOCK_TOPIC: Topic = {
   id: 1,
@@ -213,11 +213,12 @@ describe('Profile', () => {
         component.onConfirmPassword('CurrentPass1!');
 
         expect(component.profile.value()).toEqual(updated);
-        expect(TestBed.inject(ErrorToastService).message()).toBeUndefined();
+        expect(TestBed.inject(ToastService).type()).toBe('success');
+        expect(TestBed.inject(ToastService).message()).toBe('Le profil a bien été mis à jour!');
       });
 
-      it('should report the error to ErrorToastService when updateProfile$ fails', async () => {
-        const errorToastService = TestBed.inject(ErrorToastService);
+      it('should report the error to ToastService when updateProfile$ fails', async () => {
+        const toastService = TestBed.inject(ToastService);
         mockProfileService.updateProfile$.mockReturnValue(throwError(() => new Error('fail')));
         setDirtyValue(component.profileForm.name, 'Jane');
 
@@ -225,8 +226,8 @@ describe('Profile', () => {
         component.onConfirmPassword('CurrentPass1!');
         fixture.detectChanges();
 
-        expect(errorToastService.message()).toBe('fail');
-        expect(errorToastService.visible()).toBe(true);
+        expect(toastService.message()).toBe('fail');
+        expect(toastService.visible()).toBe(true);
 
         await flushProfile();
       });
@@ -270,8 +271,8 @@ describe('Profile', () => {
         expect(component.profileForm.password().value()).toBe('');
       });
 
-      it('should report the error to ErrorToastService when updateProfile$ fails', async () => {
-        const errorToastService = TestBed.inject(ErrorToastService);
+      it('should report the error to ToastService when updateProfile$ fails', async () => {
+        const toastService = TestBed.inject(ToastService);
         mockProfileService.updateProfile$.mockReturnValue(throwError(() => new Error('fail')));
         setDirtyValue(component.profileForm.password, 'ValidPass1!');
         submit();
@@ -279,8 +280,8 @@ describe('Profile', () => {
         component.onConfirmPassword('CurrentPass1!');
         fixture.detectChanges();
 
-        expect(errorToastService.message()).toBe('fail');
-        expect(errorToastService.visible()).toBe(true);
+        expect(toastService.message()).toBe('fail');
+        expect(toastService.visible()).toBe(true);
 
         await flushProfile();
       });
@@ -319,15 +320,15 @@ describe('Profile', () => {
         expect(fixture.debugElement.query(By.directive(TopicCard))).toBeFalsy();
       });
 
-      it('should report the error to ErrorToastService when unsubscribe$ fails', () => {
-        const errorToastService = TestBed.inject(ErrorToastService);
+      it('should report the error to ToastService when unsubscribe$ fails', () => {
+        const toastService = TestBed.inject(ToastService);
         mockTopicService.unsubscribe$.mockReturnValue(throwError(() => new Error('fail')));
 
         component.onUnsubscribe(MOCK_TOPIC.id);
         fixture.detectChanges();
 
-        expect(errorToastService.message()).toBe('fail');
-        expect(errorToastService.visible()).toBe(true);
+        expect(toastService.message()).toBe('fail');
+        expect(toastService.visible()).toBe(true);
       });
     });
   });

@@ -1,7 +1,7 @@
 import {Component, inject} from '@angular/core';
 import {RouterOutlet} from "@angular/router";
 import {Toast} from "./shared/components/toast/toast";
-import {ErrorToastService} from "./core/services/error-toast-service";
+import {ToastService} from "./core/services/toast-service";
 
 @Component({
   selector: 'app-root',
@@ -9,5 +9,5 @@ import {ErrorToastService} from "./core/services/error-toast-service";
   imports: [RouterOutlet, Toast]
 })
 export class AppComponent {
-  readonly errorToastService = inject(ErrorToastService);
+  readonly toastService = inject(ToastService);
 }

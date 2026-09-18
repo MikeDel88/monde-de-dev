@@ -1,8 +1,8 @@
 <app-toast
-  data-test="error-toast"
-  type="error"
-  [message]="errorToastService.message() ?? ''"
-  [visible]="errorToastService.visible()"
-  (buttonClick)="errorToastService.clear()"
+  data-test="app-toast"
+  [type]="toastService.type()"
+  [message]="toastService.message() ?? ''"
+  [visible]="toastService.visible()"
+  (buttonClick)="toastService.clear()"
 />
 <router-outlet></router-outlet>

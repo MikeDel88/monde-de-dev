@@ -20,8 +20,7 @@ import {Input} from "../../../shared/components/input/input";
 import {Title} from "../../../shared/components/title/title";
 import {Loader} from "../../../shared/components/loader/loader";
 import {validatePasswordStrength} from "../../../shared/validators/password-strength-validator";
-import {Toast} from "../../../shared/components/toast/toast";
-import {ErrorToastService} from "../../../core/services/error-toast-service";
+import {ToastService} from "../../../core/services/toast-service";
 
 
 export interface ProfileData {
@@ -43,7 +42,7 @@ const validationProfileForm = (schemaPath: SchemaPathTree<ProfileData>) => {
 
 @Component({
   selector: 'app-profile',
-  imports: [TopicCard, FormField, ConfirmPasswordModal, Button, Dividers, Error, Input, Title, Loader, Toast],
+  imports: [TopicCard, FormField, ConfirmPasswordModal, Button, Dividers, Error, Input, Title, Loader],
   templateUrl: './profile.html',
 })
 export class Profile {
@@ -62,8 +61,7 @@ export class Profile {
   readonly btnSaveProfilUser: string = "Sauvegarder";
   readonly placeholderPassword: string = "Nouveau mot de passe"
 
-  showToastSuccess = signal({message: "", visible: false})
-  private readonly errorToastService = inject(ErrorToastService);
+  private readonly toastService = inject(ToastService);
   showPasswordModal: WritableSignal<boolean> = signal(false);
   profileModel: WritableSignal<ProfileData> = signal<ProfileData>(initialProfileData);
   profileForm: FieldTree<ProfileData> = form(this.profileModel, validationProfileForm);
@@ -77,20 +75,12 @@ export class Profile {
     });
   }
 
-  onCloseToastSuccessed() {
-    this.showToastSuccess.set({message: "", visible: false});
-  }
-
   onUpdateProfilSuccess(message: string) {
-    this.errorToastService.clear();
-    this.showToastSuccess.set({message, visible: true});
-    setTimeout(() => {
-      this.showToastSuccess.set({message: "", visible: false});
-    }, 2000)
+    this.toastService.showSuccess(message);
   }
 
   onFocus(): void {
-    this.errorToastService.clear();
+    this.toastService.clear();
   }
 
   onSubmit(event: Event): void {
@@ -120,7 +110,7 @@ export class Profile {
         },
         error: (err) => {
           this.profile.reload();
-          this.errorToastService.showError(err);
+          this.toastService.showError(err);
         }
       });
   }
@@ -130,10 +120,10 @@ export class Profile {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         complete: () => {
-          this.errorToastService.clear();
+          this.toastService.clear();
           this.profile.reload();
         },
-        error: (err) => this.errorToastService.showError(err),
+        error: (err) => this.toastService.showError(err),
       })
   }
 }
