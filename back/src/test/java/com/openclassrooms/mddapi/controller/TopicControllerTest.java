@@ -42,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         JwtAccessDeniedHandler.class, JwtAuthenticationEntryPoint.class})
 @EnableConfigurationProperties({AppConfigProperties.class, RsaConfigProperties.class, RateLimitConfigProperties.class})
 @ActiveProfiles("test")
-class TopicControllerIT extends ControllerTestSupport {
+class TopicControllerTest extends ControllerTestSupport {
 
     @MockitoBean
     private TopicService topicService;
@@ -99,7 +99,7 @@ class TopicControllerIT extends ControllerTestSupport {
     }
 
     @Test
-    void subscribe_missingTopicId_returns400() throws Exception {
+    void subscribe_missingTopicId_returns400WithTopicRequired() throws Exception {
         String body = """
                 {}
                 """;
@@ -109,7 +109,23 @@ class TopicControllerIT extends ControllerTestSupport {
                         .cookie(accessTokenCookie(7L))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[?(@.field=='topicId')].code").value(ErrorCodes.TOPIC_REQUIRED));
+    }
+
+    @Test
+    void subscribe_zeroTopicId_returns400WithTopicPositive() throws Exception {
+        String body = """
+                {"topicId":0}
+                """;
+
+        mockMvc.perform(post("/topics/subscribe")
+                        .with(csrf())
+                        .cookie(accessTokenCookie(7L))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[?(@.field=='topicId')].code").value(ErrorCodes.TOPIC_POSITIVE));
     }
 
     @Test
@@ -123,10 +139,11 @@ class TopicControllerIT extends ControllerTestSupport {
     }
 
     @Test
-    void unsubscribe_negativeId_returns400() throws Exception {
+    void unsubscribe_negativeId_returns400WithTopicPositive() throws Exception {
         mockMvc.perform(delete("/topics/-1/subscribe")
                         .with(csrf())
                         .cookie(accessTokenCookie(7L)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[?(@.field=='topicId')].code").value(ErrorCodes.TOPIC_POSITIVE));
     }
 }

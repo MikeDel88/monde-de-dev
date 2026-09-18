@@ -24,11 +24,17 @@ L'API est alors prête pour les tests **Cypress e2e** du front (`front/`, qui at
 cd ../front && npx cypress run
 ```
 
-### Lancer les tests backend (`mvn test`) contre cette base
+### Lancer les tests backend (`mvn verify`) contre cette base
 
 ```bash
 docker compose --env-file src/main/resources/.env.test.properties --profile test run --rm backend-test
 ```
+
+Ce runner exécute `mvn verify`, qui lance à la fois :
+- les tests unitaires et `@WebMvcTest` (couche contrôleur, mockée), via Surefire (phase `test`) — ne nécessitent pas de base ;
+- la suite d'intégration bout-en-bout `src/test/java/.../integration/*IT.java` (niveau 3 : contexte Spring complet, parcours complets contre la vraie base, sans mock des services — dont le smoke test `MddApiApplicationIT`), via Failsafe (phases `integration-test`/`verify`) — nécessite la base `db` démarrée.
+
+`mvn test` seul (sans `verify`) n'exécute que les tests unitaires/`@WebMvcTest` : aucun test ne nécessite de base, il fonctionne donc hors ligne, sans Docker.
 
 ### Réinitialiser l'environnement (base vidée + reseedée)
 
@@ -40,7 +46,7 @@ Aucun volume n'est monté pour les données MySQL : `down` (ou la recréation du
 
 ### Alternative : MySQL seul, tests lancés sur l'hôte
 
-Sans passer par le container `api`, `mvn test` / `mvn clean test` / `mvn verify` fonctionnent aussi directement sur l'hôte, à condition d'avoir un MySQL accessible sur `localhost:3307` (mêmes identifiants que `.env.test.properties`). Sans cette base, seul `MddApiApplicationTests` échoue (`Unable to obtain connection from database`) : c'est le seul test à charger le contexte Spring complet (datasource/JPA/Flyway réels) ; les autres (unitaires services/config/mappers, `@WebMvcTest` des contrôleurs) n'en dépendent pas.
+Sans passer par le container `api`, `mvn test` / `mvn clean test` fonctionnent directement sur l'hôte sans aucune base. `mvn verify` nécessite en plus un MySQL accessible sur `localhost:3307` (mêmes identifiants que `.env.test.properties`) : sans cette base, la suite `*IT` de `src/test/java/.../integration/` échoue (`Unable to obtain connection from database`) — ce sont les seuls tests à charger le contexte Spring complet (datasource/JPA/Flyway réels) ; les autres (unitaires services/config/mappers, `@WebMvcTest` des contrôleurs) n'en dépendent pas.
 
 ```bash
 docker run --rm -d --name mdd-mysql-test -p 3307:3306 \
