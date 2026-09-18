@@ -1,6 +1,7 @@
-import {Component, effect, ElementRef, inject, viewChild} from '@angular/core';
+import {Component, DestroyRef, effect, ElementRef, inject, viewChild} from '@angular/core';
 import {NgTemplateOutlet} from "@angular/common";
 import {Router, RouterLink, RouterLinkActive, RouterOutlet} from "@angular/router";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {AuthService} from "../../../features/auth/services/auth-service";
 import {MenuBehavior} from "../../directives/menu-behavior";
 import {Logo} from "../../components/logo/logo";
@@ -24,6 +25,7 @@ export class MainLayout {
 
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly menu = inject(MenuBehavior, {self: true});
 
@@ -40,10 +42,12 @@ export class MainLayout {
 
   onLogout(): void {
     this.menu.close();
-    this.authService.logout$().subscribe({
-      complete: () => this.router.navigateByUrl('/login'),
-      error: () => this.router.navigateByUrl('/login'),
-    });
+    this.authService.logout$()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        complete: () => this.router.navigateByUrl('/login'),
+        error: () => this.router.navigateByUrl('/login'),
+      });
   }
 
   onMobileMenuDialogClick(event: MouseEvent): void {
