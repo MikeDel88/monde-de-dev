@@ -49,6 +49,7 @@ export class ConfirmPasswordModal {
 
   onSubmit(event: Event): void {
     event.preventDefault();
+    this.passwordForm().markAsTouched();
     if (this.passwordForm().invalid()) return;
     this.confirmPassword.emit(this.passwordForm.currentPassword().value());
     this.model.set(initialData);
