@@ -2,11 +2,10 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { describe, beforeEach, expect, it } from '@jest/globals';
 
-import { GuestGuard } from './guest-guard';
+import { guestGuard } from './guest-guard';
 import { SessionService } from '../services/session-service';
 
-describe('GuestGuard', () => {
-  let guard: GuestGuard;
+describe('guestGuard', () => {
   let sessionService: SessionService;
   let router: Router;
 
@@ -15,18 +14,21 @@ describe('GuestGuard', () => {
       providers: [provideRouter([])],
     });
 
-    guard = TestBed.inject(GuestGuard);
     sessionService = TestBed.inject(SessionService);
     router = TestBed.inject(Router);
   });
 
+  function canActivate() {
+    return TestBed.runInInjectionContext(() => guestGuard(null as never, null as never));
+  }
+
   it('should allow activation when the user is not authenticated', () => {
-    expect(guard.canActivate()).toBe(true);
+    expect(canActivate()).toBe(true);
   });
 
   it('should redirect to /feed when the user is authenticated', () => {
     sessionService.logIn();
 
-    expect(guard.canActivate()).toEqual(router.parseUrl('/feed'));
+    expect(canActivate()).toEqual(router.parseUrl('/feed'));
   });
 });
