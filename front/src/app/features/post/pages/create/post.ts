@@ -5,7 +5,6 @@ import {ProfileResponse} from "../../../profile/models/profile-response";
 import {Topic} from "../../../topic/models/topic";
 import {Router} from "@angular/router";
 import {FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
-import {FormsModule} from "@angular/forms";
 import {PostService} from "../../services/post-service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Button} from "../../../../shared/components/button/button";
@@ -36,7 +35,6 @@ const validationCreatePostForm = (schemaPath: SchemaPathTree<CreatePost>) => {
 @Component({
   selector: 'app-post',
   imports: [
-    FormsModule,
     FormField,
     Button,
     ErrorMessage,
