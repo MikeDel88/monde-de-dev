@@ -11,6 +11,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideHttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 import { Post } from '../../models/post';
+import { ErrorToastService } from '../../../../core/services/error-toast-service';
 
 const MOCK_POST: Post = {
   id: 1,
@@ -193,15 +194,16 @@ describe('PostDetail', () => {
         httpMock.expectOne(`${environment.apiUrl}/posts/1`).flush(MOCK_POST);
       });
 
-      it('should display an error message when comment creation fails', async () => {
+      it('should report the error to ErrorToastService when comment creation fails', async () => {
+        const errorToastService = TestBed.inject(ErrorToastService);
         await flushPost();
         mockPostService.createComment$.mockReturnValue(throwError(() => new Error('fail')));
         component.commentForm.content().value.set('Nice article');
 
         submitComment();
 
-        const errorElement = fixture.debugElement.query(By.css('[data-test="error"]'));
-        expect(errorElement.nativeElement.textContent).toContain('fail');
+        expect(errorToastService.message()).toBe('fail');
+        expect(errorToastService.visible()).toBe(true);
       });
     });
   });
@@ -275,7 +277,8 @@ describe('PostDetail', () => {
       await flushPost();
     });
 
-    it('should display an error message when comment creation fails (500)', async () => {
+    it('should report the error to ErrorToastService when comment creation fails (500)', async () => {
+      const errorToastService = TestBed.inject(ErrorToastService);
       await flushPost();
       component.commentForm.content().value.set('Nice article');
 
@@ -285,8 +288,8 @@ describe('PostDetail', () => {
       req.flush(null, { status: 500, statusText: 'Internal Server Error' });
       fixture.detectChanges();
 
-      const errorElement = fixture.debugElement.query(By.css('[data-test="error"]'));
-      expect(errorElement.nativeElement.textContent.trim().length).toBeGreaterThan(0);
+      expect(errorToastService.message()?.trim().length).toBeGreaterThan(0);
+      expect(errorToastService.visible()).toBe(true);
     });
   });
 });

@@ -12,6 +12,7 @@ import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@a
 import { provideHttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 import { ProfileResponse } from '../../../profile/models/profile-response';
+import { ErrorToastService } from '../../../../core/services/error-toast-service';
 
 const MOCK_TOPIC = { id: 1, title: 'Topic A', description: '', subscribed: false };
 
@@ -221,17 +222,16 @@ describe('Post', () => {
         expect(component.postForm.content().value()).toBe('');
       });
 
-      it('should display an error message and not navigate when createPost$ fails', () => {
+      it('should report the error to ErrorToastService and not navigate when createPost$ fails', () => {
+        const errorToastService = TestBed.inject(ErrorToastService);
         mockPostService.createPost$.mockReturnValue(throwError(() => new Error('server error')));
         fillForm(VALID_POST_DATA.topicId, VALID_POST_DATA.title, VALID_POST_DATA.content);
 
         submit();
 
-        expect(component.error()).toBe('server error');
+        expect(errorToastService.message()).toBe('server error');
+        expect(errorToastService.visible()).toBe(true);
         expect(router.navigate).not.toHaveBeenCalled();
-
-        const errorElement = fixture.debugElement.query(By.css('[data-test="error"]'));
-        expect(errorElement.nativeElement.textContent).toContain('server error');
       });
     });
   });
@@ -283,7 +283,8 @@ describe('Post', () => {
       expect(component.postForm.title().value()).toBe('');
     });
 
-    it('should display an error message when the create request fails (500)', async () => {
+    it('should report the error to ErrorToastService when the create request fails (500)', async () => {
+      const errorToastService = TestBed.inject(ErrorToastService);
       await flushProfile();
       fillForm(VALID_POST_DATA.topicId, VALID_POST_DATA.title, VALID_POST_DATA.content);
 
@@ -293,11 +294,9 @@ describe('Post', () => {
       req.flush(null, { status: 500, statusText: 'Internal Server Error' });
       fixture.detectChanges();
 
-      expect(component.error()).toBeTruthy();
+      expect(errorToastService.message()).toBeTruthy();
+      expect(errorToastService.visible()).toBe(true);
       expect(router.navigate).not.toHaveBeenCalled();
-
-      const errorElement = fixture.debugElement.query(By.css('[data-test="error"]'));
-      expect(errorElement.nativeElement.textContent.trim().length).toBeGreaterThan(0);
     });
 
     it('should not call the API when the form is invalid on submit', async () => {

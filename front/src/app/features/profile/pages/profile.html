@@ -1,5 +1,6 @@
 <div class="flex flex-col p-4 gap-4 items-center">
   <app-toast
+    data-test="success-toast"
     [message]="showToastSuccess().message"
     [visible]="showToastSuccess().visible"
     (buttonClick)="onCloseToastSuccessed()"
@@ -14,7 +15,6 @@
       <app-input type="password" data-test="password" errorDataTest="error-password" ariaLabel="Mot de passe"
                  [formField]="profileForm.password"
                  [placeholder]="placeholderPassword"/>
-      <app-error data-test="error" [message]="error()" />
       <app-button
         type="submit"
         data-test="btn-submit"

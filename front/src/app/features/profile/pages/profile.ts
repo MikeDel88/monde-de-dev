@@ -1,4 +1,4 @@
-import {Component, DestroyRef, effect, inject, signal, Signal, WritableSignal} from '@angular/core';
+import {Component, DestroyRef, effect, inject, signal, WritableSignal} from '@angular/core';
 import {httpResource, HttpResourceRef} from "@angular/common/http";
 import {ProfileService} from "../services/profile-service";
 import {ProfileResponse} from "../models/profile-response";
@@ -21,7 +21,7 @@ import {Title} from "../../../shared/components/title/title";
 import {Loader} from "../../../shared/components/loader/loader";
 import {validatePasswordStrength} from "../../../shared/validators/password-strength-validator";
 import {Toast} from "../../../shared/components/toast/toast";
-import {createErrorState} from "../../../shared/utils/error-state";
+import {ErrorToastService} from "../../../core/services/error-toast-service";
 
 
 export interface ProfileData {
@@ -63,8 +63,7 @@ export class Profile {
   readonly placeholderPassword: string = "Nouveau mot de passe"
 
   showToastSuccess = signal({message: "", visible: false})
-  private readonly errorState = createErrorState();
-  error: Signal<string | undefined> = this.errorState.error;
+  private readonly errorToastService = inject(ErrorToastService);
   showPasswordModal: WritableSignal<boolean> = signal(false);
   profileModel: WritableSignal<ProfileData> = signal<ProfileData>(initialProfileData);
   profileForm: FieldTree<ProfileData> = form(this.profileModel, validationProfileForm);
@@ -83,7 +82,7 @@ export class Profile {
   }
 
   onUpdateProfilSuccess(message: string) {
-    this.errorState.clear();
+    this.errorToastService.clear();
     this.showToastSuccess.set({message, visible: true});
     setTimeout(() => {
       this.showToastSuccess.set({message: "", visible: false});
@@ -91,7 +90,7 @@ export class Profile {
   }
 
   onFocus(): void {
-    this.errorState.clear();
+    this.errorToastService.clear();
   }
 
   onSubmit(event: Event): void {
@@ -121,7 +120,7 @@ export class Profile {
         },
         error: (err) => {
           this.profile.reload();
-          this.errorState.setFromError(err);
+          this.errorToastService.showError(err);
         }
       });
   }
@@ -131,10 +130,10 @@ export class Profile {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         complete: () => {
-          this.errorState.clear();
+          this.errorToastService.clear();
           this.profile.reload();
         },
-        error: (err) => this.errorState.setFromError(err),
+        error: (err) => this.errorToastService.showError(err),
       })
   }
 }

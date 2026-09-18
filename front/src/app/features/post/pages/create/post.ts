@@ -13,7 +13,7 @@ import {Error} from "../../../../shared/components/error/error";
 import {Input} from "../../../../shared/components/input/input";
 import {Title} from "../../../../shared/components/title/title";
 import {Back} from "../../../../shared/components/back/back";
-import {createErrorState} from "../../../../shared/utils/error-state";
+import {ErrorToastService} from "../../../../core/services/error-toast-service";
 
 export interface CreatePost {
   topicId: string,
@@ -58,8 +58,7 @@ export class Post {
   private destroyRef = inject(DestroyRef);
   private readonly profileService = inject(ProfileService);
   private readonly postService = inject(PostService);
-  private readonly errorState = createErrorState();
-  error: Signal<string | undefined> = this.errorState.error;
+  private readonly errorToastService = inject(ErrorToastService);
   topics: Signal<Topic[] | undefined> = computed(() => {
       if(this.profile.hasValue()) {
         return this.profile.value().topics;
@@ -79,7 +78,7 @@ export class Post {
   }
 
   onFocus(): void {
-    this.errorState.clear();
+    this.errorToastService.clear();
   }
 
   onSubmit(event: Event): void {
@@ -96,7 +95,7 @@ export class Post {
           this.router.navigate(['/feed']);
         },
         error: (err) => {
-          this.errorState.setFromError(err);
+          this.errorToastService.showError(err);
         }
       });
   }
