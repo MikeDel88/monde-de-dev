@@ -73,10 +73,6 @@ export class Post {
   createPostModel: WritableSignal<CreatePost> = signal<CreatePost>(initialPostData);
   postForm: FieldTree<CreatePost> = form(this.createPostModel, validationCreatePostForm);
 
-  constructor() {
-    this.profile.reload();
-  }
-
   onBack(): void {
     this.router.navigate(['/feed']);
   }

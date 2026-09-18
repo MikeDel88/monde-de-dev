@@ -69,8 +69,6 @@ export class Profile {
   profileForm: FieldTree<ProfileData> = form(this.profileModel, validationProfileForm);
 
   constructor() {
-    this.profile.reload();
-
     effect(() => {
       if (this.profile.hasValue()) {
         const value = this.profile.value();

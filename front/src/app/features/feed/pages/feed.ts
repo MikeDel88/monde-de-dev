@@ -41,7 +41,6 @@ export class Feed {
   }));
 
   constructor() {
-    this.posts.reload();
     effect(() => {
       if (!this.posts.hasValue()) {
         return;

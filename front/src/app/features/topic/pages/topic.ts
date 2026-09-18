@@ -24,10 +24,6 @@ export class Topic {
   topics: HttpResourceRef<TopicModel[] | undefined> = httpResource<TopicModel[]>(() => this.topicService.path);
   error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
 
-  constructor() {
-    this.topics.reload();
-  }
-
   onSubscribe(topicId: number) {
     this.topicService.subscribe$(topicId)
       .pipe(takeUntilDestroyed(this.destroyRef))
