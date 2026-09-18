@@ -8,5 +8,6 @@ import { Logo } from '../../../shared/components/logo/logo';
   templateUrl: './error.html',
 })
 export class Error {
-
+  readonly btnText = "Retour à l'accueil"
+  readonly errorMessage = "Page introuvable"
 }
