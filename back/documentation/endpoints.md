@@ -6,16 +6,78 @@ Liste des routes de l'API, toutes relatives au préfixe suivant.
 api/v1/
 
 ## AUTH
-POST /auth/register
-POST /auth/login
-POST /auth/logout
+
+Le JWT n'est jamais renvoyé en JSON : il voyage dans un cookie `access_token` (HttpOnly, SameSite=Lax, durée configurable), posé via l'en-tête `Set-Cookie`.
+
+### POST /auth/register
+Requête (`RegisterRequest`) :
+```json
+{
+  "name": "Camille Dubois",
+  "email": "camille.dubois@example.com",
+  "password": "Passw0rd!"
+}
+```
+Réponse : `201 Created`, corps vide. En-tête `Set-Cookie: access_token=…; HttpOnly; SameSite=Lax`.
+
+### POST /auth/login
+Requête (`LoginRequest`) :
+```json
+{
+  "emailOrName": "camille.dubois@example.com",
+  "password": "Passw0rd!"
+}
+```
+Réponse : `200 OK`, corps vide. En-tête `Set-Cookie: access_token=…; HttpOnly; SameSite=Lax`.
+
+### POST /auth/logout
+Requête : aucun corps.
+Réponse : `200 OK`, corps vide. `Set-Cookie` renvoie `access_token` expiré (`Max-Age=0`), invalidant le cookie côté client.
 
 ## PROFIL USER
 # charge le profil de l'utilisateur connecté avec la liste des topics abonnées.
 GET /profile
-PUT /profile
-# Changement du mot de passe (nécessite le mot de passe actuel).
-PATCH /profile/password
+# Changement du mot de passe ou de l'email ou du nom (nécessite le mot de passe actuel).
+PATCH /profile
+
+Les deux routes renvoient la même forme `ProfileResponse`, incluant la liste des topics avec le drapeau d'abonnement de l'utilisateur courant.
+
+### GET /profile
+Requête : aucun corps (authentification requise).
+Réponse (`ProfileResponse`) :
+```json
+{
+  "name": "Camille Dubois",
+  "email": "camille.dubois@example.com",
+  "topics": [
+    { "id": 3, "title": "Spring Boot", "description": "Actualités et bonnes pratiques Spring Boot", "subscribed": true },
+    { "id": 5, "title": "Angular", "description": "Composants, signaux et écosystème Angular", "subscribed": true }
+  ]
+}
+```
+
+### PATCH /profile
+Requête (`UpdateProfileRequest`) — `name`/`email`/`newPassword` optionnels (absent ou `null` = inchangé), `currentPassword` toujours requis :
+```json
+{
+  "name": "Camille D.",
+  "email": null,
+  "newPassword": null,
+  "currentPassword": "Passw0rd!"
+}
+```
+Réponse (`ProfileResponse`) :
+```json
+{
+  "name": "Camille D.",
+  "email": "camille.dubois@example.com",
+  "topics": [
+    { "id": 3, "title": "Spring Boot", "description": "Actualités et bonnes pratiques Spring Boot", "subscribed": true }
+  ]
+}
+```
+409 si l'email est déjà pris par un autre compte ; 400 (`CURRENT_PASSWORD_INVALID`) si `currentPassword` est erroné.
+
 
 ## TOPICS
 # Liste des thèmes (attention il faudra regarder si l'utilisateur est abonné ou non).
@@ -25,10 +87,43 @@ POST /topics/subscribe
 # Désabonnement d'un utilisateur
 DELETE /topics/:id/subscribe
 
+### GET /topics
+Réponse (`TopicResponse[]`) :
+```json
+[
+  { "id": 1, "title": "Java", "description": "Langage, JVM, écosystème", "subscribed": false },
+  { "id": 3, "title": "Spring Boot", "description": "Actualités et bonnes pratiques Spring Boot", "subscribed": true }
+]
+```
+
+### POST /topics/subscribe
+Requête (`SubscribeRequest`) :
+```json
+{ "topicId": 3 }
+```
+Réponse : `200 OK`, corps vide.
+
+### DELETE /topics/:id/subscribe
+Requête : aucun corps. `:id` (topicId) doit être un entier positif.
+Réponse : `200 OK`, corps vide.
+
 ## FEED
 # Liste du fil d'actualité (posts des topics auxquels l'utilisateur est abonné), triée par id (ordre de création).
 # Pagination par curseur : cursor (id du dernier post reçu, absent pour la 1ère page), direction=asc|desc (défaut : desc).
 GET /posts?cursor=123&direction=desc
+
+Réponse (`CursorPageResponse<PostFeedResponse>`) :
+```json
+{
+  "content": [
+    { "id": 42, "title": "Découverte de Spring Boot", "date": "2026-09-18T09:32:00", "author": "Camille Dubois", "preview": "Dans cet article nous allons voir comment structurer un projet…" },
+    { "id": 41, "title": "Les signaux Angular en pratique", "date": "2026-09-17T14:05:00", "author": "Farid Bennani", "preview": "Retour d'expérience sur la migration vers les signaux…" }
+  ],
+  "hasNext": true,
+  "nextCursor": 37
+}
+```
+Renommages JSON côté DTO : `postDate`→`date`, `name`→`author`, `content`→`preview`.
 
 ## POSTS
 # Détail d'un article avec ses commentaires.
@@ -36,8 +131,42 @@ GET /posts/:id
 # Création d'un article.
 POST /posts
 
+### GET /posts/:id
+Réponse (`PostResponse`) :
+```json
+{
+  "id": 42,
+  "title": "Découverte de Spring Boot",
+  "date": "2026-09-18T09:32:00",
+  "author": "Camille Dubois",
+  "topicName": "Spring Boot",
+  "content": "Dans cet article nous allons voir comment structurer un projet Spring Boot pas à pas…",
+  "comments": [
+    { "author": "Farid Bennani", "content": "Merci pour cet article, très clair !" }
+  ]
+}
+```
+403 si le post est introuvable **ou** si l'utilisateur n'est pas abonné au topic (symptômes volontairement identiques).
+
+### POST /posts
+Requête (`PostRequest`) :
+```json
+{
+  "topicId": 3,
+  "title": "Découverte de Spring Boot",
+  "content": "Dans cet article nous allons voir…"
+}
+```
+Réponse : `201 Created`, corps vide. 403 si non abonné au topic ; 404 si l'utilisateur est introuvable.
+
 ## COMMENTS
 POST /posts/:id/comments
+
+Requête (`CommentRequest`) :
+```json
+{ "content": "Merci pour cet article, très clair !" }
+```
+Réponse : `201 Created`, corps vide. 403 si post introuvable ou non abonné ; 404 si l'utilisateur est introuvable.
 
 ## CODES D'ERREUR
 
@@ -49,6 +178,32 @@ POST /posts/:id/comments
 # 429 Too Many Requests   : trop de tentatives (limite par IP ou par compte visé), uniquement sur POST /auth/register et POST /auth/login
 # 500 Internal Server Error : fallback générique
 # Toutes les réponses d'erreur (400/401/403/404/409/429/500) suivent le format ProblemDetail (RFC 7807).
+
+Exemple `ProblemDetail` (401/403/404/409/429/500, sans détail de champ) :
+```json
+{
+  "type": "about:blank",
+  "title": "Unauthorized",
+  "status": 401,
+  "detail": "INVALID_CREDENTIALS",
+  "instance": "/api/v1/auth/login"
+}
+```
+
+Exemple `BodyProblemDetail` (400, échec de validation `@Valid`, avec `errors[]`) :
+```json
+{
+  "type": "about:blank",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "Validation failed",
+  "instance": "/api/v1/auth/register",
+  "errors": [
+    { "field": "password", "code": "PASSWORD_TOO_SHORT" },
+    { "field": "password", "code": "PASSWORD_MISSING_DIGIT" }
+  ]
+}
+```
 
 | Endpoint | Codes | Déclencheur spécifique |
 |---|---|---|
