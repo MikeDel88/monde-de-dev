@@ -1,10 +1,12 @@
 import {Service, Signal} from '@angular/core';
 import {createToastState, ToastState, ToastType} from '../../shared/utils/toast-state';
 
+/** Délais de fermeture automatique (ms) par type de toast : plus long pour les erreurs, à laisser le temps de les lire. */
 const SUCCESS_AUTO_CLOSE_MS = 2000;
 const ERROR_AUTO_CLOSE_MS = 5000;
 const WARNING_AUTO_CLOSE_MS = 4000;
 
+/** API applicative au-dessus de {@link ToastState} : fixe un délai de fermeture par type de message. */
 @Service()
 export class ToastService {
 
@@ -18,6 +20,7 @@ export class ToastService {
     this.state.show(message, 'success', SUCCESS_AUTO_CLOSE_MS);
   }
 
+  /** Affiche le message d'une erreur (typiquement une {@link AppError} déjà traduite en français). */
   showError(err: Error): void {
     this.state.show(err.message, 'error', ERROR_AUTO_CLOSE_MS);
   }

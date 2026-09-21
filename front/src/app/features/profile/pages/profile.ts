@@ -83,6 +83,10 @@ export class Profile {
     this.toastService.clear();
   }
 
+  /**
+   * Valide le formulaire puis ouvre la modale de confirmation par mot de passe actuel :
+   * toute modification du profil doit être confirmée avant d'être envoyée (voir {@link onConfirmPassword}).
+   */
   onSubmit(event: Event): void {
     event.preventDefault();
     this.profileForm().markAsTouched()
@@ -92,6 +96,13 @@ export class Profile {
     this.showPasswordModal.set(true);
   }
 
+  /**
+   * Envoie la mise à jour du profil une fois le mot de passe actuel confirmé.
+   * Seuls les champs modifiés (`dirty()`) sont transmis, les autres valant `null` :
+   * c'est le contrat de {@link ProfileService.updateProfile$}, où `null` signifie
+   * "ne pas modifier ce champ" plutôt que "vider ce champ".
+   * @param currentPassword Mot de passe actuel saisi dans la modale, requis pour toute modification.
+   */
   onConfirmPassword(currentPassword: string): void {
     this.showPasswordModal.set(false);
     if(this.profileForm().invalid()) {

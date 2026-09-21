@@ -6,6 +6,16 @@ import {translateErrorCode} from "./error-code-messages";
 export const GENERIC_FALLBACK_MESSAGE = 'Une erreur est survenue, veuillez réessayer plus tard.';
 const GENERIC_FIELD_ERROR_MESSAGE = 'Champ invalide.';
 
+/**
+ * Traduit une erreur HTTP brute en message utilisateur affichable, en français.
+ * Le corps de la réponse est supposé suivre le format `ApiProblemDetail` du backend
+ * (`detail` pour un code d'erreur métier, `errors` pour une liste d'erreurs de champs).
+ * Chaque code d'erreur métier est traduit via `translateErrorCode` ; si le code est
+ * inconnu ou absent, un message générique par statut HTTP (ou {@link GENERIC_FALLBACK_MESSAGE}
+ * en dernier recours) est renvoyé pour ne jamais exposer une erreur technique brute.
+ * @param err Erreur HTTP interceptée (typiquement dans `error-interceptor`).
+ * @returns Message d'erreur prêt à être affiché à l'utilisateur.
+ */
 export function mapHttpErrorToMessage(err: HttpErrorResponse): string {
   const body = err.error as ApiProblemDetail | null;
 

@@ -63,6 +63,10 @@ export class PostDetail {
     this.router.navigate(['/feed']);
   }
 
+  /**
+   * Soumet le commentaire du post courant. En cas de succès, réinitialise le formulaire
+   * et recharge le post pour afficher le nouveau commentaire (pas de mise à jour optimiste locale).
+   */
   onSubmitComment(event: Event) {
     event.preventDefault();
     this.commentForm().markAsTouched();

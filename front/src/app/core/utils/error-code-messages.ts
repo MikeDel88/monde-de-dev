@@ -51,6 +51,12 @@ export const ERROR_CODE_MESSAGES: Record<string, string> = {
   INTERNAL_SERVER_ERROR: "Une erreur est survenue, veuillez réessayer plus tard.",
 };
 
+/**
+ * Traduit un code d'erreur backend en message français via {@link ERROR_CODE_MESSAGES}.
+ * @param code Code d'erreur métier, ou `undefined` si le backend n'en a pas fourni.
+ * @returns Le message traduit, ou `undefined` si `code` est absent ou inconnu (à charge
+ * de l'appelant de retomber sur un message générique).
+ */
 export function translateErrorCode(code: string | undefined): string | undefined {
   return code ? ERROR_CODE_MESSAGES[code] : undefined;
 }

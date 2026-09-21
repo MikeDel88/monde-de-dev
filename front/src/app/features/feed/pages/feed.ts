@@ -40,6 +40,12 @@ export class Feed {
     }
   }));
 
+  /**
+   * Accumule les pages de posts reçues au fil de la pagination par curseur.
+   * Quand `cursor` vaut `undefined` (premier chargement, ou tri changé via {@link onToggle}),
+   * la page reçue remplace la liste accumulée au lieu de s'y ajouter : c'est ce qui permet
+   * de repartir de zéro sans recharger la page.
+   */
   constructor() {
     effect(() => {
       if (!this.posts.hasValue()) {
@@ -54,11 +60,13 @@ export class Feed {
     });
   }
 
+  /** Inverse le sens de tri et réinitialise la pagination (le curseur n'a plus de sens dans l'autre ordre). */
   onToggle(): void {
     this.sortByAsc.set(!this.sortByAsc());
     this.cursor.set(undefined);
   }
 
+  /** Charge la page suivante en avançant le curseur, sauf si un chargement est déjà en cours ou qu'il n'y a plus de page. */
   onLoadMore(): void {
     if (this.posts.isLoading() || !this.hasMore()) {
       return;
