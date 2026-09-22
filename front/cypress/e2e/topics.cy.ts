@@ -20,7 +20,7 @@ describe('Page Topics', () => {
   });
 
   describe('Subscribe Topic', () => {
-    it("should subscribe to topic", () => {
+    it("should subscribe to topic without showing a toast", () => {
       cy.getBySelector("topic")
         .first()
         .find('[data-test=btn-subscribe] button')
@@ -33,6 +33,22 @@ describe('Page Topics', () => {
         .find('[data-test=btn-subscribe] button')
         .should('be.disabled')
         .and('contain.text', "Déjà abonné")
+
+      cy.getBySelector('app-toast').should('not.be.visible')
+    })
+
+    it('should show an error toast when the subscription fails', () => {
+      cy.env(['apiUrl']).then(({ apiUrl }) => {
+        cy.intercept('POST', `${apiUrl}/topics/subscribe`, { statusCode: 500, body: { message: 'Erreur serveur' } }).as('subscribeFail')
+      })
+
+      cy.getBySelector("topic")
+        .eq(1)
+        .find('[data-test=btn-subscribe] button')
+        .click()
+
+      cy.wait('@subscribeFail')
+      cy.getBySelector('app-toast').should('be.visible')
     })
   })
 });

@@ -16,6 +16,10 @@ describe('Auth Login', () => {
     cy.getBySelector("btn-submit").should('exist');
   });
 
+  it('shows no toast on initial load', () => {
+    cy.getBySelector('app-toast').should('not.be.visible')
+  })
+
 
   describe('Form', () => {
     it('shoud password must to be type password', () => {
@@ -30,21 +34,21 @@ describe('Auth Login', () => {
       cy.getCookie('access_token').should('exist').its('value').should('not.be.empty')
     })
 
-    it('should display an error message on invalid credentials', () => {
+    it('should show an error toast on invalid credentials', () => {
       cy.getBySelector('name').type('test')
       cy.getBySelector('password').type('WrongPassword1!')
       cy.getBySelector('btn-submit').click()
-      cy.getBySelector('error').should('be.visible')
+      cy.getBySelector('app-toast').should('be.visible')
       cy.url().should('include', '/login')
     })
 
-    it('should clear the error message on field focus', () => {
+    it('should clear the error toast on field focus', () => {
       cy.getBySelector('name').type('test')
       cy.getBySelector('password').type('WrongPassword1!')
       cy.getBySelector('btn-submit').click()
-      cy.findBySelector("error", "error").should('be.visible')
+      cy.getBySelector('app-toast').should('be.visible')
       cy.findBySelector('name', "input").focus()
-      cy.findBySelector("error", "error").should('not.be.exist')
+      cy.getBySelector('app-toast').should('not.be.visible')
     })
   })
 

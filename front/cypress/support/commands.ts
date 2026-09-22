@@ -96,7 +96,7 @@ Cypress.Commands.add('registerUniqueUser', () => {
   cy.intercept('POST', '**/auth/register').as('register')
   cy.register(user.name, user.email, user.password)
   cy.wait("@register")
-  cy.findBySelector("toast", "toast-success").should('exist')
+  cy.getBySelector("app-toast").should('be.visible')
 
   return cy.wrap(user)
 })

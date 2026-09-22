@@ -57,6 +57,8 @@ describe('Page Profile', () => {
         expect(body.email).to.be.null;
         expect(body.currentPassword).to.eq(user.password);
       });
+
+      cy.getBySelector('app-toast').should('be.visible');
     });
 
     it('updates the email after confirming the current password, without sending a new password', () => {
@@ -75,6 +77,22 @@ describe('Page Profile', () => {
         expect(body.name).to.be.null;
         expect(body.currentPassword).to.eq(user.password);
       });
+
+      cy.getBySelector('app-toast').should('be.visible');
+    });
+
+    it('shows an error toast when the profile update request fails', () => {
+      const newName = `Updated-${Date.now()}`;
+      cy.intercept('PATCH', '**/profile', { statusCode: 500, body: { message: 'Erreur serveur' } }).as('updateProfileFail');
+
+      cy.findBySelector('name', 'input').clear().type(newName);
+      cy.getBySelector('btn-submit').click();
+
+      cy.findBySelector('current-password', 'input').type(user.password);
+      cy.getBySelector('btn-confirm').click();
+
+      cy.wait('@updateProfileFail');
+      cy.getBySelector('app-toast').should('be.visible');
     });
   })
 
@@ -122,6 +140,7 @@ describe('Page Profile', () => {
       cy.wait('@getProfile');
 
       cy.getBySelector('topic').should('not.exist');
+      cy.getBySelector('app-toast').should('not.be.visible');
     });
   })
 });

@@ -9,6 +9,10 @@ describe('Auth Register', () => {
     cy.getBySelector("btn-submit").should('exist');
   });
 
+  it('shows no toast on initial load', () => {
+    cy.getBySelector('app-toast').should('not.be.visible')
+  })
+
   describe('Form', () => {
     it('shoud password must to be type password', () => {
       cy.getBySelector('password').type('test')
@@ -27,8 +31,16 @@ describe('Auth Register', () => {
   })
 
   describe('Submit Form', () => {
-    it("should show a success toast on successful register", () => {
+    it("should show a success toast on successful register, closable manually and auto-dismissed", () => {
       cy.registerUniqueUser()
+      cy.getBySelector('app-toast').should('be.visible')
+      cy.findBySelector('app-toast', 'btn-close').click()
+      cy.getBySelector('app-toast').should('not.be.visible')
+    })
+
+    it('should auto-dismiss the success toast after a delay', () => {
+      cy.registerUniqueUser()
+      cy.getBySelector('app-toast').should('not.be.visible')
     })
 
     it('should display an error message on invalid credentials', () => {
@@ -39,15 +51,15 @@ describe('Auth Register', () => {
       cy.findBySelector("password", 'error-password').should('be.visible')
     })
 
-    it('should clear the error message on field focus', () => {
+    it('should show an error toast on duplicate registration and clear it on field focus', () => {
       cy.registerUniqueUser().then((registeredUser) => {
         cy.getBySelector('name').type(registeredUser.name)
         cy.getBySelector('email').type(registeredUser.email)
         cy.getBySelector('password').type('WrongPassword1!')
         cy.getBySelector('btn-submit').click()
-        cy.findBySelector("error", "error").should('exist')
+        cy.getBySelector('app-toast').should('be.visible')
         cy.findBySelector('name', "input").focus()
-        cy.findBySelector("error", "error").should('not.exist')
+        cy.getBySelector('app-toast').should('not.be.visible')
       })
     })
   })
