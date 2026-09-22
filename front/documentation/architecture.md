@@ -33,6 +33,8 @@ Cette section justifie les décisions structurantes prises sur le projet : le ch
 
 ## 3. Structure des dossiers
 
+**Légende** : l'indentation indique l'imbrication des dossiers, le commentaire en fin de ligne (`#`) précise le rôle de chacun. Les trois dossiers racine de `src/app/` — `core`, `shared`, `features` — sont une convention structurante du projet, pas un simple regroupement thématique : `core` ne doit contenir que de l'injectable (aucun composant UI), `shared` que du présentationnel réutilisable (aucun accès HTTP direct), et chaque sous-dossier de `features` doit rester autonome (pas d'import croisé entre domaines métier). À l'intérieur de chaque `features/<domaine>`, le sous-motif `{models,pages,services[,components]}` est répété à l'identique sur tous les domaines (auth, feed, post, profile, topic...), pour qu'un nouveau domaine métier s'intègre sans inventer une organisation ad hoc. Les fichiers eux-mêmes suivent une convention de nommage systématique : kebab-case, suffixé par rôle (`*-guard.ts`, `*-interceptor.ts`, `*-service.ts`, `*-validator.ts`...), ce qui permet d'identifier la nature d'un fichier sans l'ouvrir ; chaque fichier a son `*.spec.ts` co-localisé juste à côté (pas de dossier `__tests__` séparé) ; et tous les composants/directives portent un sélecteur préfixé `app-`/`app` (`app-button`, `app-error`, `appMenuBehavior`...).
+
 ```
 src/app/
 ├── core/       # singletons injectables, rien d'UI

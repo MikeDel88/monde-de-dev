@@ -20,6 +20,8 @@ L'API est un **monolithe Spring Boot** organisé en couches classiques (Controll
 
 ## Architecture en couches
 
+**Légende** : le schéma ci-dessous se lit du haut vers le bas, dans le sens d'appel d'une requête HTTP (`Controller` appelle `Service`, qui appelle `Repository`, qui manipule `Model`) — les « couches transverses » listées juste après (dto, mapper, exception, validation, documentation, config) ne font pas partie de ce flux vertical : elles sont utilisées ponctuellement par plusieurs couches. Chaque package sous `com.openclassrooms.mddapi.*` correspond à une seule couche, jamais mélangée avec une autre (détail dans « Rôle de chaque package » ci-dessous). Les classes suivent des conventions de suffixage systématiques : `*Impl` pour l'implémentation d'une interface de service (ex. `AuthServiceImpl` implémente `AuthService`), `*Repository` pour une interface Spring Data JPA, `*Controller` pour un point d'entrée HTTP, `*Mapper` pour un convertisseur MapStruct, `*Request`/`*Response` pour un DTO d'entrée/sortie, et `*IT.java` pour un test d'intégration niveau 3 (contexte Spring complet, contre une vraie base — voir `../README.md`).
+
 ```
 HTTP request
      │
@@ -43,6 +45,30 @@ Couches transverses, utilisées à plusieurs niveaux :
 - **validation** : contraintes Bean Validation custom, appliquées sur les DTO reçus par les contrôleurs.
 - **documentation** : annotations OpenAPI composées, posées sur les méthodes de contrôleur.
 - **config** : configuration applicative (sécurité, propriétés typées, Flyway), appliquée en amont ou en support de tous les contrôleurs.
+
+## Arborescence des packages
+
+**Légende** : l'indentation indique l'imbrication des packages sous `com.openclassrooms.mddapi`, le commentaire en fin de ligne (`#`) liste les classes principales de chaque package. Cette arborescence reflète la même séparation que le schéma de la section précédente : les quatre premiers packages (`controller`, `service`, `repository`, `model`) correspondent au flux vertical d'appel d'une requête HTTP, les suivants sont les couches transverses (détail package par package dans « Rôle de chaque package » ci-dessous).
+
+```
+com/openclassrooms/mddapi/
+├── controller/         # AuthController, PostController, ProfileController, TopicController
+├── service/            # AuthService(+Impl), JwtService(+Impl), PostService(+Impl), ProfileService(+Impl), TopicService(+Impl), RateLimiterService
+├── repository/         # CommentRepository, PostRepository, TopicRepository, UserRepository
+├── model/              # BaseEntity, User, Topic, Post, Comment, Role (enum)
+├── mapper/             # UserMapper, TopicMapper, PostMapper, CommentMapper
+├── dto/
+│   ├── request/        # RegisterRequest, LoginRequest, PostRequest, CommentRequest, SubscribeRequest, UpdateProfileRequest
+│   └── response/       # PostFeedResponse, PostResponse, CommentResponse, ProfileResponse, TopicResponse, CursorPageResponse
+├── exception/          # GlobalExceptionHandler, BodyProblemDetail, FieldError, ErrorCodes, *NotFoundException, InvalidCredentialsException, RateLimitExceededException
+├── validation/         # ValidPassword
+├── documentation/      # annotations OpenAPI par fonctionnalité : login, register, post, comment, topic, profile, user, database, ratelimit
+├── config/
+│   ├── properties/     # RsaConfigProperties, AppConfigProperties, RateLimitConfigProperties
+│   ├── security/       # SecurityConfig, KeyConfig, AuthenticatedUser, CookieBearerTokenResolver, CsrfCookieFilter, JwtAuthenticationEntryPoint/AccessDeniedHandler, JwtClaimsConstants, PrincipalUtils
+│   └── FlywayConfig     # actif uniquement sous le profil test
+└── MddApiApplication.java   # point d'entrée Spring Boot
+```
 
 ## Rôle de chaque package
 
