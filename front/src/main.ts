@@ -1,19 +1,14 @@
-import { enableProdMode, provideZoneChangeDetection, provideAppInitializer } from '@angular/core';
+import { provideZoneChangeDetection, provideAppInitializer } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import {provideHttpClient, withInterceptors} from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 
-import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
 import {authInterceptor} from "./app/core/interceptors/http-interceptor";
 import {errorInterceptor} from "./app/core/interceptors/error-interceptor";
 import {xsrfInterceptor} from "./app/core/interceptors/xsrf-interceptor";
 import {initSession} from "./app/core/services/session-initializer";
-
-if (environment.production) {
-  enableProdMode();
-}
 
 bootstrapApplication(AppComponent, {
   providers: [
