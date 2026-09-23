@@ -56,7 +56,7 @@ public abstract class BaseEntity {
      * entités transitoires (id {@code null}, jamais égales entre elles).
      */
     @Override
-    public final boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null) return false;
         if (Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
@@ -70,7 +70,7 @@ public abstract class BaseEntity {
      * (id passant de {@code null} à une valeur générée).
      */
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         return Hibernate.getClass(this).hashCode();
     }
 }

@@ -17,6 +17,7 @@ import java.lang.reflect.Field;
 import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,7 +47,7 @@ class JwtServiceImplTest {
         assertThat(token).isEqualTo("signed-token");
 
         ArgumentCaptor<JwtEncoderParameters> captor = ArgumentCaptor.forClass(JwtEncoderParameters.class);
-        org.mockito.Mockito.verify(jwtEncoder).encode(captor.capture());
+        verify(jwtEncoder).encode(captor.capture());
         JwtEncoderParameters params = captor.getValue();
 
         assertThat(params.getClaims().getSubject()).isEqualTo("7");

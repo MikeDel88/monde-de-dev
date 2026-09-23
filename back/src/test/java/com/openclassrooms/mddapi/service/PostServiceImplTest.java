@@ -171,7 +171,7 @@ class PostServiceImplTest {
     void getPostById_postNotFoundOrNotSubscribed_throws() throws Exception {
         User user = userWithTopics(1L);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(postRepository.findByIdAndTopicIn(eq(5L), eq(user.getTopics()))).thenReturn(Optional.empty());
+        when(postRepository.findByIdAndTopicIn(5L, eq(user.getTopics()))).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> postService.getPostById(5L, 1L))
                 .isInstanceOf(TopicNotSubscribedException.class);
@@ -184,7 +184,7 @@ class PostServiceImplTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         Post post = new Post("title", "content", topic, user);
         setId(post, 5L);
-        when(postRepository.findByIdAndTopicIn(eq(5L), eq(user.getTopics()))).thenReturn(Optional.of(post));
+        when(postRepository.findByIdAndTopicIn(5L, eq(user.getTopics()))).thenReturn(Optional.of(post));
         List<CommentResponse> comments = List.of(new CommentResponse("john", "hi"));
         when(commentMapper.toCommentResponseList(post.getComments())).thenReturn(comments);
         PostResponse expected = new PostResponse(5L, "title", null, "john", "Java", "content", comments);
@@ -208,7 +208,7 @@ class PostServiceImplTest {
     void createComment_postNotFoundOrNotSubscribed_throws() throws Exception {
         User user = userWithTopics(1L);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(postRepository.findByIdAndTopicIn(eq(5L), eq(user.getTopics()))).thenReturn(Optional.empty());
+        when(postRepository.findByIdAndTopicIn(5L, user.getTopics())).thenReturn(Optional.empty());
         CommentRequest request = new CommentRequest("hi");
 
         assertThatThrownBy(() -> postService.createComment(5L, request, 1L))
@@ -222,7 +222,7 @@ class PostServiceImplTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         Post post = new Post("title", "content", topic, user);
         setId(post, 5L);
-        when(postRepository.findByIdAndTopicIn(eq(5L), eq(user.getTopics()))).thenReturn(Optional.of(post));
+        when(postRepository.findByIdAndTopicIn(5L, user.getTopics())).thenReturn(Optional.of(post));
         CommentRequest request = new CommentRequest("hi");
         Comment comment = new Comment("hi", post, user);
         when(commentMapper.toComment(request, user, post)).thenReturn(comment);

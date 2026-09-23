@@ -57,7 +57,7 @@ public class TopicServiceImpl implements TopicService {
         addOrRemoveSubscription(topicId, userId, false);
     }
 
-    private void addOrRemoveSubscription(Long topicId, Long userId, Boolean addSubscription) {
+    private void addOrRemoveSubscription(Long topicId, Long userId, boolean addSubscription) {
         Topic topic = topicRepository.findById(topicId).orElseThrow(TopicNotFoundException::new);
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 

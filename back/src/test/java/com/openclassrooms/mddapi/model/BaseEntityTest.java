@@ -78,6 +78,6 @@ class BaseEntityTest {
         Topic topic1 = new Topic("Java", "desc");
         Topic topic2 = new Topic("Web", "desc");
 
-        assertThat(topic1.hashCode()).isEqualTo(topic2.hashCode());
+        assertThat(topic1.hashCode()).hasSameHashCodeAs(topic2.hashCode());
     }
 }

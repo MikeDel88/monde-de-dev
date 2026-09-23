@@ -83,7 +83,7 @@ class TopicControllerTest extends ControllerTestSupport {
 
     @Test
     void subscribe_topicNotFound_returns404() throws Exception {
-        doThrow(new TopicNotFoundException()).when(topicService).subscribe(eq(1L), eq(7L));
+        doThrow(new TopicNotFoundException()).when(topicService).subscribe(1L, 7L);
 
         String body = """
                 {"topicId":1}
