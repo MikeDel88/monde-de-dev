@@ -2,6 +2,29 @@
 
 Toutes les modifications notables de ce projet sont documentées dans ce fichier.
 
+## [1.0.0] - 2026-09-23
+
+Version finale du MVP.
+
+### Ajouté
+- Pagination par keyset (curseur) de la liste des posts, avec tri et ordre configurables
+- Rate limiting (bucket4j/Caffeine) sur les endpoints `/auth/login` et `/auth/register`
+- Rôles applicatifs portés par les claims JWT (issuer, audience, rôle)
+- Authentification par cookie `HttpOnly` (JWT) avec protection CSRF (`CsrfCookieFilter`)
+- Restriction d'accès à un post dont le topic n'est pas suivi par l'utilisateur (exception 403 dédiée)
+- Indexes sur les colonnes de clé étrangère (posts, comments, subscriptions)
+
+### Sécurité
+- Comparaison BCrypt systématique au login pour neutraliser les attaques par mesure de temps (timing attack)
+- Suppression d'un log exposant le token JWT
+
+### Technique
+- Tri des commentaires par date directement porté par l'entité `Post`
+- Immutabilité des entités : suppression des setters génériques, mutation via méthodes de domaine, `equals`/`hashCode` propres, suppression du cascade de persistance accidentel
+- Validation renforcée des champs (tailles alignées sur le schéma BDD), normalisation (trim/lowercase) des entrées utilisateur
+- Suite de tests d'intégration (`*IT`, contexte Spring complet contre une vraie base) et relèvement du seuil de couverture Jacoco de 70% à 80%
+- Documentation technique : `endpoints.md`, `architecture.md`, `accessibility.md`, schéma de données, FAQ utilisateur
+
 ## [0.3.0] - 2026-09-07
 
 ### Ajouté
