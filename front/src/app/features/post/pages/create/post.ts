@@ -53,7 +53,7 @@ export class Post {
   readonly selectDefault = "Sélectionner un thème";
 
   readonly router = inject(Router);
-  private destroyRef = inject(DestroyRef);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly profileService = inject(ProfileService);
   private readonly postService = inject(PostService);
   private readonly toastService = inject(ToastService);

@@ -47,13 +47,13 @@ const validationProfileForm = (schemaPath: SchemaPathTree<ProfileData>) => {
 })
 export class Profile {
 
-  private profileService: ProfileService = inject(ProfileService);
+  private readonly profileService: ProfileService = inject(ProfileService);
   profile: HttpResourceRef<ProfileResponse | undefined> = httpResource<ProfileResponse>(() =>
-    ({ url: this.profileService.path })
+    ({url: this.profileService.path})
   );
 
-  private topicService: TopicService = inject(TopicService);
-  private destroyRef: DestroyRef = inject(DestroyRef);
+  private readonly topicService: TopicService = inject(TopicService);
+  private readonly destroyRef: DestroyRef = inject(DestroyRef);
 
   readonly btnUnsubscribed: string = "Se désabonner";
   readonly titleSubscription: string= "Abonnements";

@@ -81,7 +81,7 @@ describe('Input', () => {
     fixture.detectChanges();
 
     const errors = fixture.debugElement.queryAll(By.directive(ErrorMessage));
-    expect(errors.length).toBe(1);
+    expect(errors).toHaveLength(1);
     expect(errors[0].componentInstance.message()).toBe('Champ requis');
   });
 
@@ -90,7 +90,7 @@ describe('Input', () => {
     fixture.componentRef.setInput('errors', [{ kind: 'required', message: 'Champ requis' } as ValidationError]);
     fixture.detectChanges();
 
-    expect(fixture.debugElement.queryAll(By.directive(ErrorMessage)).length).toBe(0);
+    expect(fixture.debugElement.queryAll(By.directive(ErrorMessage))).toHaveLength(0);
   });
 
   it('should focus the native input when focus() is called', () => {

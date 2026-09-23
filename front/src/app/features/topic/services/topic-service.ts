@@ -6,7 +6,7 @@ import {environment} from "../../../../environments/environment";
 @Service()
 export class TopicService {
 
-  private httpClient = inject(HttpClient);
+  private readonly httpClient = inject(HttpClient);
   readonly path = `${environment.apiUrl}/topics`
 
   /** Abonne l'utilisateur connecté au thème `topicId`. */

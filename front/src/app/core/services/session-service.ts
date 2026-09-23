@@ -9,7 +9,7 @@ import {BehaviorSubject} from "rxjs";
 @Service()
 export class SessionService {
 
-  private isLoggedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private readonly isLoggedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   public get isAuthenticated(): boolean {
     return this.isLoggedSubject.value;

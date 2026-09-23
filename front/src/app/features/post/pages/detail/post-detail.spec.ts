@@ -149,7 +149,7 @@ describe('PostDetail', () => {
       await flushPost({ ...MOCK_POST, comments: [] });
 
       const commentItems = fixture.debugElement.queryAll(By.css("[data-test='comments']"));
-      expect(commentItems.length).toBe(0);
+      expect(commentItems).toHaveLength(0);
     });
 
     describe('Comment form validation', () => {

@@ -13,8 +13,8 @@ import {environment} from "../../../../environments/environment";
 @Service()
 export class AuthService {
 
-  private httpClient: HttpClient = inject(HttpClient);
-  private sessionService: SessionService = inject(SessionService);
+  private readonly httpClient: HttpClient = inject(HttpClient);
+  private readonly sessionService: SessionService = inject(SessionService);
 
    /**
     * Crée un nouveau compte utilisateur. Ne modifie pas la session : l'utilisateur

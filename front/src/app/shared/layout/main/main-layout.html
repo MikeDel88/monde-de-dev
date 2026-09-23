@@ -29,7 +29,7 @@
       </li>
     </ng-template>
     @if (!menu.isMobile()) {
-      <nav class="flex flex-col gap-4 not-sm:absolute not-sm:top-16 not-sm:right-4 not-sm:bg-white not-sm:border not-sm:border-black not-sm:p-4 sm:flex-row sm:items-center sm:gap-6" data-test="nav-menu">
+      <nav aria-label="navigation" class="flex flex-col gap-4 not-sm:absolute not-sm:top-16 not-sm:right-4 not-sm:bg-white not-sm:border not-sm:border-black not-sm:p-4 sm:flex-row sm:items-center sm:gap-6" data-test="nav-menu">
         <ul class="contents">
           <ng-container [ngTemplateOutlet]="navLinks" />
           <ng-container [ngTemplateOutlet]="navProfil"/>
@@ -40,7 +40,7 @@
         class="open:block fixed inset-0 z-50 m-0 w-screen h-dvh max-w-none max-h-none border-0 p-0 bg-transparent backdrop:bg-black/40"
         (cancel)="menu.close()"
         (click)="onMobileMenuDialogClick($event)">
-        <nav class="fixed inset-y-0 right-0 z-50 flex h-full w-64 flex-col items-end flex-auto gap-4 bg-white px-6 py-12 shadow-lg" data-test="nav-menu-mobile">
+        <nav aria-label="navigation" class="fixed inset-y-0 right-0 z-50 flex h-full w-64 flex-col items-end flex-auto gap-4 bg-white px-6 py-12 shadow-lg" data-test="nav-menu-mobile">
           <ul class="contents">
             <ng-container [ngTemplateOutlet]="navLinks" />
           </ul>

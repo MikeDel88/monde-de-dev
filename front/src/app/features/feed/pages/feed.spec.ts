@@ -203,7 +203,7 @@ describe('Feed', () => {
       fixture.detectChanges();
 
       const postCards = fixture.nativeElement.querySelectorAll('app-post-card');
-      expect(postCards.length).toBe(3);
+      expect(postCards).toHaveLength(3);
     });
 
   });

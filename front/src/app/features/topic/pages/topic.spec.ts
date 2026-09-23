@@ -72,7 +72,7 @@ describe('Topic', () => {
       fixture.detectChanges();
 
       const topicsCard = fixture.nativeElement.querySelectorAll('app-topic-card');
-      expect(topicsCard.length).toEqual(2);
+      expect(topicsCard).toHaveLength(2);
     });
 
     it("should display loader when topics are loading", () => {
@@ -161,7 +161,7 @@ describe('Topic', () => {
       fixture.detectChanges();
 
       const topicsCard = fixture.nativeElement.querySelectorAll('app-topic-card');
-      expect(topicsCard.length).toEqual(2);
+      expect(topicsCard).toHaveLength(2);
     });
   });
 });

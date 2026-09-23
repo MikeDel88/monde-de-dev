@@ -27,8 +27,8 @@ export class Feed {
 
   private readonly router = inject(Router);
   readonly sortByAsc: WritableSignal<boolean> = signal<boolean>(false);
-  private cursor: WritableSignal<number | undefined> = signal<number | undefined>(undefined);
-  private accumulatedPosts: WritableSignal<PostFeed[]> = signal<PostFeed[]>([]);
+  private readonly cursor: WritableSignal<number | undefined> = signal<number | undefined>(undefined);
+  private readonly accumulatedPosts: WritableSignal<PostFeed[]> = signal<PostFeed[]>([]);
   readonly loadedPosts: Signal<PostFeed[]> = computed(() => this.accumulatedPosts());
   readonly hasMore: Signal<boolean> = computed(() => this.posts.value()?.hasNext ?? false);
 

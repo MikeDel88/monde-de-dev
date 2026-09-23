@@ -33,7 +33,7 @@ export class ConfirmPasswordModal {
   readonly title = "Confirmer le mot de passe";
   readonly description = "Veuillez saisir votre mot de passe actuel pour confirmer la modification.";
 
-  private dialogRef = viewChild<ElementRef<HTMLDialogElement>>('dialog');
+  private readonly dialogRef = viewChild<ElementRef<HTMLDialogElement>>('dialog');
 
   model: WritableSignal<ConfirmPasswordData> = signal(initialData);
   passwordForm: FieldTree<ConfirmPasswordData> = form(this.model, validation);

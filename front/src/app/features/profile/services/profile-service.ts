@@ -7,7 +7,7 @@ import {Observable} from "rxjs";
 @Service()
 export class ProfileService {
 
-  private httpClient = inject(HttpClient);
+  private readonly httpClient = inject(HttpClient);
   readonly path = `${environment.apiUrl}/profile`;
 
   /**

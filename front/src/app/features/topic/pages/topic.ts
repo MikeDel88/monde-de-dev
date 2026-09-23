@@ -19,9 +19,9 @@ import {ToastService} from "../../../core/services/toast-service";
 })
 export class Topic {
 
-  private topicService = inject(TopicService);
-  private destroyRef = inject(DestroyRef);
-  private toastService = inject(ToastService);
+  private readonly topicService = inject(TopicService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly toastService = inject(ToastService);
   topics: HttpResourceRef<TopicModel[] | undefined> = httpResource<TopicModel[]>(() => this.topicService.path);
 
   onSubscribe(topicId: number) {
