@@ -2,6 +2,24 @@
 
 Toutes les modifications notables de ce projet sont documentées dans ce fichier.
 
+## [1.0.0] - 2026-09-23
+
+Version finale du MVP.
+
+### Ajouté
+- Authentification par cookie JWT avec intercepteur XSRF, guards `AuthGuard`/`GuestGuard` en approche fonctionnelle
+- Déconnexion propre avec `takeUntilDestroyed`
+- Gestion d'erreurs unifiée : `AppError`, `ErrorCodes`, `mapHttpErrorToMessage`, `ToastService` (remplace `ErrorToastService`)
+- Page d'erreur 404 dédiée (`NotFoundPage`)
+- Pagination du fil d'actualité avec scroll infini, tri et filtre via signals
+- Mise à jour consolidée du profil (nom, email, mot de passe) avec toasts de succès et réinitialisation du formulaire
+
+### Technique
+- Lazy loading de toutes les routes, y compris les layouts (`loadComponent`/`loadChildren`)
+- Renommage des routes pour cohérence (`/feed` → `/posts`, `/topic` → `/topics`)
+- Passage en revue de l'accessibilité et de l'i18n : aria-labels sur l'ensemble des composants, textes en français, menu mobile
+- Suite de tests étendue (composants, services, guards, intercepteurs) et relèvement du seuil de couverture Jest et Cypress/`nyc` de 70% à 80%
+
 ## [0.3.0] - 2026-09-07
 
 ### Ajouté
