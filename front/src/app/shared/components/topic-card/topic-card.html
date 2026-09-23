@@ -5,6 +5,8 @@
     <app-button
       type="button"
       class="self-center"
+      data-test="btn-subscribe"
+      [ariaLabel]="topic.subscribed ? 'Se désabonner de {{topic.title}}' : 'S\'abonner de {{topic.title}}'"
       (click)="onClick(topic.id)"
       [disabled]="topic.subscribed ? btnUnsubscribed().disabled : false"
       [text]="topic.subscribed ? btnUnsubscribed().text : btnSubscribeText"/>

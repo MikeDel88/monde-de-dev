@@ -1,5 +1,5 @@
 import {inject, Service} from '@angular/core';
-import {HttpClient, httpResource, HttpResourceRef} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../../environments/environment";
 import {ProfileResponse} from "../models/profile-response";
 import {Observable} from "rxjs";
@@ -7,20 +7,19 @@ import {Observable} from "rxjs";
 @Service()
 export class ProfileService {
 
-  private httpClient = inject(HttpClient);
+  private readonly httpClient = inject(HttpClient);
+  readonly path = `${environment.apiUrl}/profile`;
 
-  profile: HttpResourceRef<ProfileResponse | undefined> = httpResource<ProfileResponse>(() => ({
-    url: `${environment.apiUrl}/profile`,
-  }));
-
-  updateProfil$(email: string | null, name: string | null): Observable<ProfileResponse> {
-    return this.httpClient.patch<ProfileResponse>(`${environment.apiUrl}/profile`, {
-      email: email,
-      name: name,
-    });
-  }
-
-  updatePassword$(newPassword: string, currentPassword: string): Observable<void> {
-    return this.httpClient.patch<void>(`${environment.apiUrl}/profile/password`, { newPassword, currentPassword });
+  /**
+   * Met à jour le profil de l'utilisateur connecté. Pour `email`, `name` et `password`,
+   * `null` signifie "ne pas modifier ce champ" (et non "le vider") : seuls les champs
+   * non-`null` sont pris en compte côté backend.
+   * @param email Email de l'utilisateur
+   * @param name Nom de l'utilisateur
+   * @param password Mot de passe à changer
+   * @param currentPassword Mot de passe actuel, requis pour confirmer toute modification.
+   */
+  updateProfile$(email: string | null, name: string | null, password: string | null, currentPassword: string): Observable<ProfileResponse> {
+    return this.httpClient.patch<ProfileResponse>(this.path, {email, name, password, currentPassword});
   }
 }

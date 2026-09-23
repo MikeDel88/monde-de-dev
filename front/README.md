@@ -1,27 +1,62 @@
-# MddClient
+# Monde de Dev — Client
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 20.x.x.
+Application Angular du projet **Monde de Dev**, réseau social communautaire pour les développeurs (fil d'actualité par thèmes, articles, commentaires).
 
-## Development server
+## Prérequis
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- Node.js et npm
+- L'API backend démarrée (voir [`../back/README.md`](../back/README.md)) — par défaut l'app pointe vers `http://localhost:9000/api/v1` en développement
 
-## Code scaffolding
+## Installation
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```bash
+npm install
+```
+
+## Serveur de développement
+
+```bash
+npm start
+```
+
+Navigue vers `http://localhost:4200/`. L'application se recharge automatiquement à chaque modification des sources. La configuration `environment.ts` pointe vers l'API en local (`http://localhost:9000/api/v1`).
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+```bash
+npm run build
+```
 
-## Running unit tests
+Build de production (optimisé, hashing des fichiers de sortie) dans `dist/mdd-client/`, avec `environments/environment.prod.ts` (URL d'API de production) substitué automatiquement via `angular.json`.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Tests unitaires
 
-## Running end-to-end tests
+Les tests unitaires utilisent **Jest** (pas Karma) :
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+```bash
+npm test              # exécution unique
+npm run test:watch    # mode watch
+npm run test:coverage # avec rapport de couverture
+```
 
-## Further help
+Seuil de couverture Jest : 80% (statements/branches/functions/lines), configuré dans `jest.config.js`.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## Tests end-to-end
+
+Les tests e2e utilisent **Cypress** (pas le `ng e2e` par défaut d'Angular CLI) et nécessitent l'API backend démarrée en profil `test` (voir [README racine](../README.md) pour l'environnement Docker complet) :
+
+```bash
+npm run e2e         # build test + lancement de l'API front + Cypress headless
+npm run e2e:open    # idem, en mode interactif
+npm run e2e:coverage # instrumentation nyc + vérification du seuil de couverture (80%)
+```
+
+## Fichiers d'environnement
+
+- `src/environments/environment.ts` — développement (`http://localhost:9000/api/v1`)
+- `src/environments/environment.test.ts` — utilisé pour les tests e2e Cypress (`http://localhost:9001/api/v1`)
+- `src/environments/environment.prod.ts` — production (`https://api.monde-de-dev.com/api/v1`)
+
+## Aller plus loin
+
+Pour plus d'informations sur l'Angular CLI, `ng help` ou la [documentation officielle](https://angular.io/cli).

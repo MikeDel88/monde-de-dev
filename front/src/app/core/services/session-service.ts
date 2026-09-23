@@ -1,32 +1,25 @@
 import { Service } from '@angular/core';
-import {BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject} from "rxjs";
 
+/**
+ * Source de vérité locale (côté client) de l'état d'authentification. Ne détient aucune
+ * information de session à proprement parler : la session réelle est un cookie géré par
+ * le backend, ce service ne fait que refléter localement si l'utilisateur est connu comme connecté.
+ */
 @Service()
 export class SessionService {
 
-  private static readonly TOKEN_KEY: string = 'token';
-
-  private isLoggedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(!!localStorage.getItem(SessionService.TOKEN_KEY));
-
-  public isLogged$(): Observable<boolean> {
-    return this.isLoggedSubject.asObservable();
-  }
+  private readonly isLoggedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   public get isAuthenticated(): boolean {
     return this.isLoggedSubject.value;
   }
 
-  public getToken(): string | null {
-    return localStorage.getItem(SessionService.TOKEN_KEY);
-  }
-
-  public logIn(token: string): void {
-    localStorage.setItem(SessionService.TOKEN_KEY, token);
+  public logIn(): void {
     this.isLoggedSubject.next(true);
   }
 
   public logOut(): void {
-    localStorage.removeItem(SessionService.TOKEN_KEY);
     this.isLoggedSubject.next(false);
   }
 }

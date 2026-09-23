@@ -1,6 +1,7 @@
 package com.openclassrooms.mddapi.documentation.topic;
 
 import com.openclassrooms.mddapi.exception.BodyProblemDetail;
+import com.openclassrooms.mddapi.exception.ErrorCodes;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,7 +15,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponse(
         responseCode = "400",
-        description = "Le champ topicId est invalide : il est requis et doit être un nombre positif.",
+        description = "Le champ topicId est invalide. Codes possibles :\n"
+                + "- " + ErrorCodes.TOPIC_REQUIRED + " : le topicId est requis\n"
+                + "- " + ErrorCodes.TOPIC_POSITIVE + " : le topicId doit être un nombre positif",
         content = @Content(schema = @Schema(implementation = BodyProblemDetail.class))
 )
 public @interface ApiSubscribeValidationErrorResponse {

@@ -1,1 +1,8 @@
+<app-toast
+  data-test="app-toast"
+  [type]="toastService.type()"
+  [message]="toastService.message() ?? ''"
+  [visible]="toastService.visible()"
+  (buttonClick)="toastService.clear()"
+/>
 <router-outlet></router-outlet>

@@ -1,17 +1,18 @@
-import {CanActivate, Router, UrlTree} from "@angular/router";
-import {inject, Service} from "@angular/core";
+import {CanActivateFn, Router, UrlTree} from "@angular/router";
+import {inject} from "@angular/core";
 import {SessionService} from "../services/session-service";
 
-@Service()
-export class GuestGuard implements CanActivate {
+/**
+ * Protège les routes réservées aux visiteurs non connectés (login, register).
+ * Renvoie un `UrlTree` vers `/feed` pour rediriger un utilisateur déjà authentifié
+ * plutôt que de simplement bloquer l'accès à la page.
+ */
+export const guestGuard: CanActivateFn = (): boolean | UrlTree => {
+  const router = inject(Router);
+  const sessionService = inject(SessionService);
 
-  private readonly router = inject(Router);
-  private sessionService = inject(SessionService);
-
-  public canActivate(): boolean | UrlTree {
-    if (this.sessionService.isAuthenticated) {
-      return this.router.parseUrl("/feed");
-    }
-    return true;
+  if (sessionService.isAuthenticated) {
+    return router.parseUrl("/feed");
   }
-}
+  return true;
+};

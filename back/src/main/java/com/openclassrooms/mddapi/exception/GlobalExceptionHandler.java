@@ -7,6 +7,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -35,7 +36,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(exception = MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BodyProblemDetail handleValidation(MethodArgumentNotValidException ex) {
-        log.error("handleValidation : {}", ex.getMessage());
+        log.info("handleValidation : {}", ex.getMessage());
         List<FieldError> errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(fieldError -> new FieldError(fieldError.getField(), fieldError.getDefaultMessage()))
                 .toList();
@@ -73,8 +74,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(UserNotFoundException.class)
     public ProblemDetail handleUserNotFound(UserNotFoundException ex) {
-        log.error("handleUserNotFound : {}", ex.getMessage());
-        return ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        log.info("handleUserNotFound : {}", ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ErrorCodes.USER_NOT_FOUND);
     }
 
     /**
@@ -84,20 +85,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(TopicNotFoundException.class)
     public ProblemDetail handleTopicNotFound(TopicNotFoundException ex) {
-        log.error("handleTopicNotFound : {}", ex.getMessage());
-        return ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-    }
-
-    /**
-     * Gère le cas où le post demandé n'existe pas, ou n'est pas accessible car
-     * l'utilisateur n'est pas abonné à son topic.
-     * @param ex l'exception levée lorsque le post est introuvable.
-     * @return ProblemDetail 404.
-     */
-    @ExceptionHandler(PostNotFoundException.class)
-    public ProblemDetail handlePostNotFound(PostNotFoundException ex) {
-        log.error("handlePostNotFound : {}", ex.getMessage());
-        return ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        log.info("handleTopicNotFound : {}", ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ErrorCodes.TOPIC_NOT_FOUND);
     }
 
     /**
@@ -109,8 +98,33 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(InvalidCredentialsException.class)
     public ProblemDetail handleInvalidCredentials(InvalidCredentialsException ex) {
-        log.error("handleInvalidCredentials : {}", ex.getMessage());
-        return ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
+        log.info("handleInvalidCredentials : {}", ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ErrorCodes.INVALID_CREDENTIALS);
+    }
+
+    /**
+     * Gère les échecs d'authentification levés par Spring Security lors du
+     * login (ex. BadCredentialsException). Volontairement générique pour ne
+     * pas permettre à un client de deviner si c'est le compte ou le mot de
+     * passe qui est en cause.
+     * @param ex l'exception d'authentification levée par l'AuthenticationManager.
+     * @return ProblemDetail 401.
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    public ProblemDetail handleAuthenticationException(AuthenticationException ex) {
+        log.info("handleAuthenticationException : {}", ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ErrorCodes.INVALID_CREDENTIALS);
+    }
+
+    /**
+     * Gère le cas où l'utilisateur n'est pas abonné au thème et qu'il souhaite accéder à un post.
+     * @param ex l'exception levée lorsque l'utilisateur n'est pas abonné.
+     * @return ProblemDetail 403.
+     */
+    @ExceptionHandler(TopicNotSubscribedException.class)
+    public ProblemDetail handleTopicNotSubscribed(TopicNotSubscribedException ex) {
+        log.info("handleTopicNotSubscribed : {}", ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ErrorCodes.TOPIC_NOT_SUBSCRIBED);
     }
 
     /**
@@ -122,12 +136,25 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidCurrentPasswordException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BodyProblemDetail handleInvalidCurrentPassword(InvalidCurrentPasswordException ex) {
-        log.error("handleInvalidCurrentPassword : {}", ex.getMessage());
+        log.info("handleInvalidCurrentPassword : {}", ex.getMessage());
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         BodyProblemDetail bpd = BodyProblemDetail.from(pd);
-        bpd.setErrors(List.of(new FieldError("currentPassword", "CURRENT_PASSWORD_INVALID")));
+        bpd.setErrors(List.of(new FieldError("currentPassword", ErrorCodes.CURRENT_PASSWORD_INVALID)));
 
         return bpd;
+    }
+
+    /**
+     * Gère le dépassement du nombre de tentatives autorisées sur le login ou
+     * l'inscription (par IP ou par compte visé). Volontairement générique pour
+     * ne pas révéler laquelle des deux limites a été atteinte.
+     * @param ex l'exception levée lorsque la limite de tentatives est dépassée.
+     * @return ProblemDetail 429.
+     */
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ProblemDetail handleRateLimitExceeded(RateLimitExceededException ex) {
+        log.info("handleRateLimitExceeded : {}", ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, ErrorCodes.RATE_LIMIT_EXCEEDED);
     }
 
     /**
@@ -139,7 +166,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HandlerMethodValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BodyProblemDetail handleHandlerMethodValidation(HandlerMethodValidationException ex) {
-        log.error("handleHandlerMethodValidation : {}", ex.getMessage());
+        log.info("handleHandlerMethodValidation : {}", ex.getMessage());
         List<FieldError> errors = ex.getParameterValidationResults().stream()
                 .flatMap(result -> result.getResolvableErrors().stream()
                         .map(error -> new FieldError(result.getMethodParameter().getParameterName(), error.getDefaultMessage())))
@@ -161,9 +188,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ProblemDetail handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
-        log.error("handleMethodArgumentTypeMismatch : {}", ex.getMessage());
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
-                "Le paramètre '" + ex.getName() + "' est invalide.");
+        log.info("handleMethodArgumentTypeMismatch : {} ({})", ex.getMessage(), ex.getName());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ErrorCodes.PARAMETER_INVALID);
     }
 
     /**
@@ -174,8 +200,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ProblemDetail handleMessageNotReadable(HttpMessageNotReadableException ex) {
-        log.error("handleMessageNotReadable : {}", ex.getMessage());
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Malformed JSON request");
+        log.info("handleMessageNotReadable : {}", ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ErrorCodes.MALFORMED_JSON);
     }
 
     /**
@@ -188,7 +214,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ProblemDetail handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         log.error("handleDataIntegrityViolation : {}", ex.getMessage());
-        return ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ErrorCodes.DATA_CONFLICT);
     }
 
     /**
@@ -199,7 +225,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleGenericException(Exception ex) {
-        log.error("handleGenericException : {}", ex.getMessage());
-        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,  "Internal server error");
+        log.error("handleGenericException : {}", ex.getMessage(), ex);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_SERVER_ERROR);
     }
 }

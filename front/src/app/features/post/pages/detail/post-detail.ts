@@ -1,17 +1,18 @@
 import {Component, DestroyRef, inject, signal, WritableSignal} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {PostService} from "../../services/post-service";
-import {HttpResourceRef} from "@angular/common/http";
+import {httpResource, HttpResourceRef} from "@angular/common/http";
 import {DatePipe} from "@angular/common";
-import {FieldState, FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
+import {FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {Dividers} from "../../../../shared/components/divider/dividers";
-import {Error} from "../../../../shared/components/error/error";
+import {Dividers} from "../../../../shared/components/dividers/dividers";
+import {ErrorMessage} from "../../../../shared/components/error-message/error-message";
 import {Title} from "../../../../shared/components/title/title";
 import {Back} from "../../../../shared/components/back/back";
 import {Loader} from "../../../../shared/components/loader/loader";
 import {Post} from "../../models/post";
 import {FirstUpperPipe} from "../../../../shared/pipes/first-upper";
+import {ToastService} from "../../../../core/services/toast-service";
 
 export interface CreateComment {
   content: string
@@ -31,7 +32,7 @@ const validationCreateCommentForm = (schemaPath: SchemaPathTree<CreateComment>) 
     DatePipe,
     FormField,
     Dividers,
-    Error,
+    ErrorMessage,
     Title,
     Back,
     Loader,
@@ -47,40 +48,41 @@ export class PostDetail {
   private readonly activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
-  readonly postId: string | null = this.activatedRoute.snapshot.params['id'];
   private readonly postService = inject(PostService);
-  post: HttpResourceRef<Post | undefined> = this.postService.post;
-  error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
+  private readonly postId: string = this.activatedRoute.snapshot.params['id'];
+  post: HttpResourceRef<Post | undefined> = httpResource<Post>(() => {
+    const id: string = this.postId;
+    return id ? { url: `${this.postService.path}/${id}` } : undefined;
+  });
+  private readonly toastService = inject(ToastService);
 
   createCommentModel: WritableSignal<CreateComment> = signal<CreateComment>(commentInitialData);
   commentForm: FieldTree<CreateComment> = form(this.createCommentModel, validationCreateCommentForm);
-
-
-  constructor() {
-    this.postService.postId.set(this.postId);
-  }
 
   onBack() {
     this.router.navigate(['/feed']);
   }
 
+  /**
+   * Soumet le commentaire du post courant. En cas de succès, réinitialise le formulaire
+   * et recharge le post pour afficher le nouveau commentaire (pas de mise à jour optimiste locale).
+   */
   onSubmitComment(event: Event) {
     event.preventDefault();
-    if(this.postId != null) {
-      const commentData: FieldState<CreateComment> = this.commentForm();
-      this.postService.createComment$(commentData.value().content)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe({
-          next: () => {
-            this.commentForm().reset(commentInitialData);
-            this.post.reload();
-          },
-          error: () => {
-            this.error.set('Erreur lors de la création du commentaire.');
-          }
-        });
+    this.commentForm().markAsTouched();
+    if(this.postId == null || this.commentForm().invalid()) {
+      return;
     }
-
+    this.postService.createComment$(Number(this.postId), this.commentForm().value().content)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.commentForm().reset(commentInitialData);
+          this.post.reload();
+        },
+        error: (err) => {
+          this.toastService.showError(err);
+        }
+      });
   }
-
 }

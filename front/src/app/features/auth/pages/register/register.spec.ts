@@ -1,33 +1,351 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { of, throwError } from 'rxjs';
+import { EnvironmentProviders, Provider } from '@angular/core';
 
 import { Register } from './register';
+import {AuthService} from "../../services/auth-service";
+import {provideRouter} from "@angular/router";
+import {routes} from "../../../../app.routes";
+import {By} from "@angular/platform-browser";
+import {RegisterData} from "../../models/register-data";
+import {HttpTestingController, provideHttpClientTesting, TestRequest} from "@angular/common/http/testing";
+import {environment} from "../../../../../environments/environment";
+import {provideHttpClient, withInterceptors} from "@angular/common/http";
+import {errorInterceptor} from "../../../../core/interceptors/error-interceptor";
+import {Location} from "@angular/common";
+import {RouterTestingHarness} from "@angular/router/testing";
+import {SessionService} from "../../../../core/services/session-service";
+import {CursorPage} from "../../../../shared/models/cursor-page";
+import {PostFeed} from "../../../feed/models/post-feed";
+import {ToastService} from "../../../../core/services/toast-service";
+import {AppError} from "../../../../core/models/app-error";
 
+const EMPTY_PAGE: CursorPage<PostFeed> = { content: [], hasNext: false, nextCursor: null };
+
+const VALID_REGISTER_DATA: RegisterData = { name: 'john', email: 'john@test.com', password: 'Azerty123!' };
+
+/**
+ * Plan de test
+ * ● L'inscription
+ * ● La gestion des erreurs
+ * ● L'affichage d'erreur en l'absence d'un champ obligatoire
+ */
 describe('Register', () => {
   let component: Register;
   let fixture: ComponentFixture<Register>;
+  let httpMock: HttpTestingController;
 
-  beforeEach(async () => {
+  const mockAuthService = {
+    register$: jest.fn(),
+  };
+
+  const fillForm = (name: string, email: string, password: string) => {
+    component.registerForm.name().value.set(name);
+    component.registerForm.email().value.set(email);
+    component.registerForm.password().value.set(password);
+  };
+
+  const resetForm = () => component.registerForm().reset({ name: '', email: '', password: '' });
+
+  const submit = () => {
+    fixture.debugElement.query(By.css('form')).triggerEventHandler('submit', new Event('submit'));
+    fixture.detectChanges();
+  };
+
+  const expectFormWasReset = () => {
+    expect(component.registerForm.name().value()).toBe('');
+    expect(component.registerForm.email().value()).toBe('');
+    expect(component.registerForm.password().value()).toBe('');
+  };
+
+  const configureRegister = async (providers: (Provider | EnvironmentProviders)[]): Promise<void> => {
     await TestBed.configureTestingModule({
-      imports: [Register]
-    })
-    .compileComponents();
+      imports: [Register],
+      providers,
+    }).compileComponents();
 
     fixture = TestBed.createComponent(Register);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  };
+
+  beforeEach(async () => {
+    mockAuthService.register$.mockReset();
+
+    await configureRegister([
+      { provide: AuthService, useValue: mockAuthService },
+    ]);
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  describe('Unit Test', () => {
+
+    it('should create', () => {
+      expect(component).toBeTruthy();
+    });
+
+    describe('Error display form validation', () => {
+      it('should report the error to ToastService when an error occurs', () => {
+        const toastService = TestBed.inject(ToastService);
+
+        toastService.showError(new AppError('Cet email ou ce nom est déjà utilisé', 409));
+
+        expect(toastService.visible()).toBe(true);
+        expect(toastService.message()).toBe('Cet email ou ce nom est déjà utilisé');
+      });
+
+      it('should clear the toast on focusin', () => {
+        const toastService = TestBed.inject(ToastService);
+        toastService.showError(new AppError('Cet email ou ce nom est déjà utilisé', 409));
+
+        const form = fixture.nativeElement.querySelector('form') as HTMLFormElement;
+        form.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+
+        expect(toastService.visible()).toBe(false);
+      });
+    });
+
+    describe('Form validation', () => {
+      it.each([
+        ['', false, 'required'],
+        ['john', true, []],
+      ])('name "%s" → valid=%s, error=%s', (value, valid, expectedError: string | string[]) => {
+
+        component.registerForm.name().value.set(value);
+
+        expect(component.registerForm.name().valid()).toBe(valid);
+        if(typeof expectedError === 'string') {
+          expect(component.registerForm.name().errors()).toEqual([expect.objectContaining({kind: expectedError})]);
+        } else {
+          expect(component.registerForm.name().errors()).toEqual([]);
+        }
+      });
+
+      it.each([
+        ['', false, 'required'],
+        ['not-an-email', false, 'email'],
+        ['john@test.com', true, []],
+      ])('email "%s" → valid=%s, error=%s', (value, valid, expectedError: string | string[]) => {
+
+        component.registerForm.email().value.set(value);
+
+        expect(component.registerForm.email().valid()).toBe(valid);
+        if(typeof expectedError === 'string') {
+          expect(component.registerForm.email().errors()).toEqual([expect.objectContaining({kind: expectedError})]);
+        } else {
+          expect(component.registerForm.email().errors()).toEqual([]);
+        }
+      });
+
+      it.each([
+        ['', false, 'required'],
+        ['Az1!', false, 'minLength'],
+        ['azertyuiop', false, 'pattern'],
+        ['Azerty123!', true, []],
+      ])('password "%s" → valid=%s, error=%s', (value, valid, expectedError: string | string[]) => {
+
+        component.registerForm.password().value.set(value);
+
+        expect(component.registerForm.password().valid()).toBe(valid);
+        if(typeof expectedError === 'string') {
+          expect(component.registerForm.password().errors()).toEqual(
+            expect.arrayContaining([expect.objectContaining({kind: expectedError})])
+          );
+        } else {
+          expect(component.registerForm.password().errors()).toEqual([]);
+        }
+      });
+
+      it('should not call authService.register$ when the form is invalid on submit', () => {
+        resetForm();
+        fixture.detectChanges();
+
+        submit();
+
+        expect(mockAuthService.register$).not.toHaveBeenCalled();
+      });
+
+      it('should mark every required field as touched and show its error slot when submitting an empty form', () => {
+        resetForm();
+        fixture.detectChanges();
+
+        submit();
+
+        expect(fixture.debugElement.query(By.css('[data-test="error-name"]'))).toBeTruthy();
+        expect(fixture.debugElement.query(By.css('[data-test="error-email"]'))).toBeTruthy();
+        expect(fixture.debugElement.query(By.css('[data-test="error-password"]'))).toBeTruthy();
+      });
+    });
+
+    describe('Submission', () => {
+
+      it('should call authService.register$ with the form values', () => {
+        mockAuthService.register$.mockReturnValue(of(undefined));
+        fillForm(VALID_REGISTER_DATA.name, VALID_REGISTER_DATA.email, VALID_REGISTER_DATA.password);
+
+        submit();
+
+        expect(mockAuthService.register$).toHaveBeenCalledWith(VALID_REGISTER_DATA);
+      });
+
+      it('should prevent the default form submission behavior', () => {
+        mockAuthService.register$.mockReturnValue(of(undefined));
+        fillForm(VALID_REGISTER_DATA.name, VALID_REGISTER_DATA.email, VALID_REGISTER_DATA.password);
+
+        const event = new Event('submit');
+        const preventDefaultSpy = jest.spyOn(event, 'preventDefault');
+        component.onSubmit(event);
+
+        expect(preventDefaultSpy).toHaveBeenCalled();
+      });
+
+      it('should reset the form and report the success to ToastService on successful registration', () => {
+        const toastService = TestBed.inject(ToastService);
+        mockAuthService.register$.mockReturnValue(of(undefined));
+        fillForm(VALID_REGISTER_DATA.name, VALID_REGISTER_DATA.email, VALID_REGISTER_DATA.password);
+
+        submit();
+
+        expect(toastService.visible()).toBe(true);
+        expect(toastService.type()).toBe('success');
+        expect(toastService.message()).toBe('Utilisateur enregistré');
+        expectFormWasReset();
+      });
+
+      it('should report the error to ToastService with the "error" type when authService.register$ fails', () => {
+        const toastService = TestBed.inject(ToastService);
+        mockAuthService.register$.mockReturnValue(throwError(() => new Error('Cet email ou ce nom est déjà utilisé')));
+        fillForm(VALID_REGISTER_DATA.name, VALID_REGISTER_DATA.email, VALID_REGISTER_DATA.password);
+
+        submit();
+
+        expect(toastService.message()).toBe('Cet email ou ce nom est déjà utilisé');
+        expect(toastService.type()).toBe('error');
+        expect(toastService.visible()).toBe(true);
+      });
+    });
   });
 
-  it('should clear the error message on focusin', () => {
-    component.error.set('Cet email ou ce nom est déjà utilisé');
-    fixture.detectChanges();
+  describe('Integration Test (Component + AuthService + HttpClientTesting)', () => {
 
-    const form = fixture.nativeElement.querySelector('form') as HTMLFormElement;
-    form.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    beforeEach(async () => {
+      TestBed.resetTestingModule();
 
-    expect(component.error()).toBeUndefined();
+      await configureRegister([
+        provideHttpClient(withInterceptors([errorInterceptor])),
+        provideHttpClientTesting(),
+      ]);
+
+      httpMock = TestBed.inject(HttpTestingController);
+    });
+
+    afterEach(() => {
+      httpMock.verify();
+    });
+
+    const submitAndExpectRegisterRequest = (): TestRequest => {
+      fillForm(VALID_REGISTER_DATA.name, VALID_REGISTER_DATA.email, VALID_REGISTER_DATA.password);
+
+      submit();
+
+      const req: TestRequest = httpMock.expectOne({ url: `${environment.apiUrl}/auth/register` });
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(VALID_REGISTER_DATA);
+      return req;
+    };
+
+    it('should not call the API when the form is invalid on submit', () => {
+      resetForm();
+      fixture.detectChanges();
+
+      submit();
+
+      httpMock.expectNone({ url: `${environment.apiUrl}/auth/register` });
+    });
+
+    it('should report the success to ToastService and reset the form on successful registration', () => {
+      const req = submitAndExpectRegisterRequest();
+
+      req.flush(null, { status: 204, statusText: 'No Content' });
+      fixture.detectChanges();
+
+      expect(TestBed.inject(ToastService).visible()).toBe(true);
+      expect(TestBed.inject(ToastService).type()).toBe('success');
+      expectFormWasReset();
+    });
+
+    it('should aggregate translated field error messages on a 400 response with field errors (real backend shape: field + code)', () => {
+      const req = submitAndExpectRegisterRequest();
+
+      req.flush(
+        { status: 400, errors: [{ field: 'email', code: 'EMAIL_INVALID' }, { field: 'name', code: 'NAME_TOO_LONG' }] },
+        { status: 400, statusText: 'Bad Request' }
+      );
+      fixture.detectChanges();
+
+      expect(TestBed.inject(ToastService).message()).toBe("L'email est invalide., Le nom est trop long.");
+    });
+
+    it('should fall back to a generic message on a 400 response without field errors', () => {
+      const req = submitAndExpectRegisterRequest();
+
+      req.flush({ status: 400 }, { status: 400, statusText: 'Bad Request' });
+      fixture.detectChanges();
+
+      expect(TestBed.inject(ToastService).message()).toBe('Formulaire invalide');
+    });
+
+    it('should report the "already registered" message on a 409 response', () => {
+      const req = submitAndExpectRegisterRequest();
+
+      req.flush(null, { status: 409, statusText: 'Conflict' });
+      fixture.detectChanges();
+
+      expect(TestBed.inject(ToastService).message()).toBe('Un conflit est survenu.');
+    });
+
+    it('should report a generic error message on a server error (500)', () => {
+      const req = submitAndExpectRegisterRequest();
+
+      req.flush(null, { status: 500, statusText: 'Internal Server Error' });
+      fixture.detectChanges();
+
+      expect(TestBed.inject(ToastService).message()).toBe('Une erreur est survenue, veuillez réessayer plus tard.');
+    });
+  });
+
+  describe('Routing integration (real Router + GuestGuard)', () => {
+    let routingHttpMock: HttpTestingController;
+
+    beforeEach(async () => {
+      TestBed.resetTestingModule();
+
+      await TestBed.configureTestingModule({
+        providers: [
+          SessionService,
+          provideRouter(routes),
+          provideHttpClient(),
+          provideHttpClientTesting(),
+        ],
+      }).compileComponents();
+
+      routingHttpMock = TestBed.inject(HttpTestingController);
+    });
+
+    afterEach(() => {
+      routingHttpMock.verify();
+      localStorage.clear();
+    });
+
+    it('should redirect an already authenticated user away from /register to /feed via GuestGuard', async () => {
+      TestBed.inject(SessionService).logIn();
+
+      await RouterTestingHarness.create('/register');
+
+      expect(TestBed.inject(Location).path()).toBe('/feed');
+
+      const feedReq = routingHttpMock.expectOne(req => req.url.startsWith(`${environment.apiUrl}/posts`));
+      feedReq.flush(EMPTY_PAGE);
+    });
   });
 });

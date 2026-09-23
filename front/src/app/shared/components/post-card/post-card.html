@@ -2,16 +2,17 @@
 <article class="h-full">
   <button
     type="button"
+    data-test="button"
     (click)="onClick(post.id)"
     [attr.aria-label]="ariaLabel()"
     class="flex flex-col gap-4 bg-card p-4 rounded-lg h-full w-full text-left hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary"
   >
     <h3 class="font-bold text-md">{{ post.title }}</h3>
     <div class="flex flex-row w-1/2 justify-between flex-wrap-reverse">
-      <p class="text-sm">{{ post.date |  date:"dd/MM/yyyy" }}</p>
-      <p class="text-sm">{{ post.author | firstUpper }}</p>
+      <p class="text-sm" data-test="date">{{ post.date |  date:"dd/MM/yyyy" }}</p>
+      <p class="text-sm" data-test="author">{{ post.author | firstUpper }}</p>
     </div>
-    <p class="text-sm line-clamp-5">{{ post.preview | firstUpper }}</p>
+    <p class="text-sm line-clamp-5" data-test="preview">{{ post.preview | firstUpper }}</p>
   </button>
 </article>
 

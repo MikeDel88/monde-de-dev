@@ -23,4 +23,5 @@ public class BodyProblemDetail extends ProblemDetail {
     public static BodyProblemDetail from(ProblemDetail problemDetail) {
         return new BodyProblemDetail(problemDetail);
     }
+
 }

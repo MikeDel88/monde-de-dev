@@ -1,5 +1,7 @@
 package com.openclassrooms.mddapi.service;
 
+import com.openclassrooms.mddapi.config.properties.AppConfigProperties;
+import com.openclassrooms.mddapi.config.security.JwtClaimsConstants;
 import com.openclassrooms.mddapi.model.User;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -12,11 +14,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 /**
  * Implémentation de {@link JwtService} : génère un JWT signé RS256 via
  * {@link JwtEncoder}, avec l'id de l'utilisateur comme subject et une
- * expiration à 30 jours.
+ * expiration définie par la config du projet.
  */
 @Log4j2
 @AllArgsConstructor
@@ -24,6 +27,7 @@ import java.time.temporal.ChronoUnit;
 public class JwtServiceImpl implements JwtService {
 
     private final JwtEncoder jwtEncoder;
+    private final AppConfigProperties appConfigProperties;
 
     @Override
     public String generateAccessToken(User user) {
@@ -32,14 +36,14 @@ public class JwtServiceImpl implements JwtService {
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .subject(String.valueOf(user.getId()))
+                .issuer(JwtClaimsConstants.ISSUER)
+                .audience(List.of(JwtClaimsConstants.AUDIENCE))
                 .issuedAt(now)
-                .expiresAt(now.plus(30, ChronoUnit.DAYS))
+                .expiresAt(now.plus(appConfigProperties.tokenExpiration(), ChronoUnit.DAYS))
+                .claim(JwtClaimsConstants.ROLE_CLAIM, user.getRole().name())
                 .build();
 
         JwsHeader header = JwsHeader.with(SignatureAlgorithm.RS256).build();
-        String token = jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
-
-        log.debug("JWT Service : Token de l'utilisateur {}", token);
-        return token;
+        return jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
     }
 }

@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Mapper MapStruct qui construit l'entité {@link User} à partir de la requête
@@ -20,23 +21,27 @@ public interface UserMapper {
 
     /**
      * Convertit la requête d'inscription en entité User, en hachant le mot de
-     * passe via l'encodeur fourni en contexte. Les champs createdAt/updatedAt
-     * sont ignorés (gérés ailleurs, ex. auditing JPA).
+     * passe via l'encodeur fourni en contexte. Implémentation manuelle (pas
+     * de génération MapStruct) : {@link User} n'expose pas de setters, la
+     * construction passe donc par son constructeur dédié.
      * @param registerRequest la requête d'inscription contenant les données saisies.
      * @param passwordEncoder l'encodeur utilisé pour hacher le mot de passe en clair.
      * @return User l'entité utilisateur mappée.
      */
-    @Mapping(target = "password", expression = "java(passwordEncoder.encode(registerRequest.password()))")
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    User toUser(RegisterRequest registerRequest, @Context PasswordEncoder passwordEncoder);
+    default User toUser(RegisterRequest registerRequest, @Context PasswordEncoder passwordEncoder) {
+        return new User(
+                registerRequest.name().trim(),
+                registerRequest.email().trim().toLowerCase(Locale.ROOT),
+                passwordEncoder.encode(registerRequest.password())
+        );
+    }
 
     /**
      * Construit le DTO de profil à partir de l'entité User et des thèmes déjà mappés.
      * @param user l'entité utilisateur.
      * @param topicsResponses la liste des thèmes déjà mappée (via {@link TopicMapper}).
-     * @return ProfilResponse le profil mappé pour envoyer au client.
+     * @return ProfileResponse le profil mappé pour envoyer au client.
      */
     @Mapping(target = "topics", source = "topicsResponses")
-    ProfileResponse toProfilResponse(User user, List<TopicResponse> topicsResponses);
+    ProfileResponse toProfileResponse(User user, List<TopicResponse> topicsResponses);
 }

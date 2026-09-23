@@ -19,32 +19,36 @@
     <ng-template #navLinks>
       <li><button type="button" class="text-left text-logout hover:cursor-pointer text-sm font-bold" data-test="btn-logout" (click)="onLogout()">{{ logoutText }}</button></li>
       <li><a routerLink="/feed" routerLinkActive="text-primary font-semibold" class="hover:text-primary text-xl" data-test="link-feed" (click)="menu.close()">{{ postsText }}</a></li>
-      <li><a routerLink="/topic" routerLinkActive="text-primary font-semibold" class="hover:text-primary text-xl" data-test="link-topic" (click)="menu.close()">{{ topicsText }}</a></li>
+      <li><a routerLink="/topics" routerLinkActive="text-primary font-semibold" class="hover:text-primary text-xl" data-test="link-topic" (click)="menu.close()">{{ topicsText }}</a></li>
     </ng-template>
     <ng-template #navProfil>
       <li>
-        <a routerLink="/profile" routerLinkActive="text-primary font-semibold" #rla="routerLinkActive" class="hover:text-primary text-xl" data-test="link-feed" (click)="menu.close()">
+        <a routerLink="/profile" routerLinkActive="text-primary font-semibold" #rla="routerLinkActive" class="hover:text-primary text-xl" data-test="link-profile" (click)="menu.close()">
           <img [src]="rla.isActive ? '/assets/user-active.svg' : '/assets/user.svg'" alt="profile">
         </a>
       </li>
     </ng-template>
     @if (!menu.isMobile()) {
-      <nav class="flex flex-col gap-4 not-sm:absolute not-sm:top-16 not-sm:right-4 not-sm:bg-white not-sm:border not-sm:border-black not-sm:p-4 sm:flex-row sm:items-center sm:gap-6" data-test="nav-menu">
+      <nav aria-label="navigation" class="flex flex-col gap-4 not-sm:absolute not-sm:top-16 not-sm:right-4 not-sm:bg-white not-sm:border not-sm:border-black not-sm:p-4 sm:flex-row sm:items-center sm:gap-6" data-test="nav-menu">
         <ul class="contents">
           <ng-container [ngTemplateOutlet]="navLinks" />
           <ng-container [ngTemplateOutlet]="navProfil"/>
         </ul>
       </nav>
-    } @else if (menu.open()) {
-      <button type="button" class="fixed inset-0 z-40 bg-black/40 border-0 p-0 cursor-default" data-test="menu-backdrop" aria-label="Fermer le menu" (click)="menu.close()"></button>
-      <nav class="fixed inset-y-0 right-0 z-50 flex h-full w-64 flex-col items-end flex-auto gap-4 bg-white px-6 py-12 shadow-lg" data-test="nav-menu-mobile">
+    } @else {
+      <dialog #mobileMenuDialog
+        class="open:block fixed inset-0 z-50 m-0 w-screen h-dvh max-w-none max-h-none border-0 p-0 bg-transparent backdrop:bg-black/40"
+        (cancel)="menu.close()"
+        (click)="onMobileMenuDialogClick($event)">
+        <nav aria-label="navigation" class="fixed inset-y-0 right-0 z-50 flex h-full w-64 flex-col items-end flex-auto gap-4 bg-white px-6 py-12 shadow-lg" data-test="nav-menu-mobile">
           <ul class="contents">
             <ng-container [ngTemplateOutlet]="navLinks" />
           </ul>
           <ul class="mt-auto">
             <ng-container [ngTemplateOutlet]="navProfil"/>
           </ul>
-      </nav>
+        </nav>
+      </dialog>
     }
   </header>
   <main id="main-content">

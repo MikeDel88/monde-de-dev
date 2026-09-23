@@ -1,5 +1,6 @@
 package com.openclassrooms.mddapi.dto.request;
 
+import com.openclassrooms.mddapi.exception.ErrorCodes;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
@@ -8,8 +9,8 @@ import jakarta.validation.constraints.Positive;
  * @param topicId
  */
 public record SubscribeRequest(
-        @NotNull(message = "TOPIC_REQUIRED")
-        @Positive(message = "TOPIC_POSITIVE")
+        @NotNull(message = ErrorCodes.TOPIC_REQUIRED)
+        @Positive(message = ErrorCodes.TOPIC_POSITIVE)
         Long topicId
 ) {
 }

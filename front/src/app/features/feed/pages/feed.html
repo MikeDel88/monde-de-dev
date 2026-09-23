@@ -7,29 +7,37 @@
       (click)="onClickCreatePost()"
       [disabled]="false"
       [text]="btnCreatePostText"
-      aria-label="create post"
+      ariaLabel="create post"
     />
-    <button class="flex flex-row items-center gap-1 whitespace-nowrap w-auto hover:cursor-pointer" aria-label="sort posts" (click)="toggle()">
-      <span class="font-bold">{{ sortByAscText }}</span>
-      @if (!sortByAsc()) {
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 shrink-0">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
-        </svg>
-      } @else {
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 shrink-0">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75 12 3m0 0 3.75 3.75M12 3v18" />
-        </svg>
-      }
-    </button>
+    @if (loadedPosts().length > 1) {
+      <button data-test="btn-sort" class="flex flex-row items-center gap-1 whitespace-nowrap w-auto hover:cursor-pointer" aria-label="Tri des posts" (click)="onToggle()">
+        <span class="font-bold">{{ sortByAscText }}</span>
+        @if (!sortByAsc()) {
+          <svg data-test="desc" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 shrink-0">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
+          </svg>
+        } @else {
+          <svg data-test="asc" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 shrink-0">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75 12 3m0 0 3.75 3.75M12 3v18" />
+          </svg>
+        }
+      </button>
+    }
   </div>
-  @if(posts.hasValue()) {
+  @if (loadedPosts().length > 0) {
     <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-11.5 gap-y-5.5 py-8">
-      @for (post of posts.value(); track post.id) {
-        <li>
+      @for (post of loadedPosts(); track post.id) {
+        <li data-test="posts">
           <app-post-card class="hover:cursor-pointer" [post]="post" (clickPost)="onClickPost($event)" [ariaLabel]="post.title"/>
         </li>
       }
     </ul>
+    @if (hasMore()) {
+      <div data-test="infinite-scroll-sentinel" appInfiniteScroll (nearEnd)="onLoadMore()"></div>
+    }
+    @if (posts.isLoading()) {
+      <app-loader data-test="loader-more"/>
+    }
   } @else if (posts.isLoading()) {
     <app-loader data-test="loader"/>
   } @else if (posts.error()) {

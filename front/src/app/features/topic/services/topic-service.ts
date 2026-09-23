@@ -1,21 +1,21 @@
 import {inject, Service} from '@angular/core';
-import {HttpClient, httpResource, HttpResourceRef} from "@angular/common/http";
-import {Topic} from "../models/topic";
+import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {environment} from "../../../../environments/environment";
 
 @Service()
 export class TopicService {
 
-  private httpClient = inject(HttpClient);
+  private readonly httpClient = inject(HttpClient);
+  readonly path = `${environment.apiUrl}/topics`
 
-  topics: HttpResourceRef<Topic[] | undefined> = httpResource<Topic[]>(() => `${environment.apiUrl}/topics`);
-
+  /** Abonne l'utilisateur connecté au thème `topicId`. */
   subscribe$(topicId: number): Observable<void> {
-    return this.httpClient.post<void>(`${environment.apiUrl}/topics/subscribe`, { topicId });
+    return this.httpClient.post<void>(`${this.path}/subscribe`, { topicId });
   }
 
+  /** Désabonne l'utilisateur connecté du thème `topicId`. */
   unsubscribe$(topicId: number): Observable<void> {
-    return this.httpClient.delete<void>(`${environment.apiUrl}/topics/${topicId}/subscribe`,);
+    return this.httpClient.delete<void>(`${this.path}/${topicId}/subscribe`,);
   }
 }

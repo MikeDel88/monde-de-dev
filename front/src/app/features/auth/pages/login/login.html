@@ -1,13 +1,12 @@
-<form (submit)="onSubmit($event)" (focusin)="onFocus()" class="flex flex-col gap-2 w-full lg:w-1/2 2xl:w-1/6 mx-auto p-6">
-  <app-input [label]="labelEmailOrName" type="text" data-test="name" errorDataTest="error-name" [formField]="loginForm.emailOrName" />
-  <app-input [label]="labelPassword" type="password" data-test="password" errorDataTest="error-password" [formField]="loginForm.password"/>
-  <app-error data-test="error" [message]="error()" />
+<form (submit)="onSubmit($event)" (focusin)="onFocus()" class="flex flex-col gap-2 w-full lg:w-1/2 2xl:w-1/6 mx-auto items-center p-6">
+  <app-input class="w-62.5 sm:w-70" [label]="labelEmailOrName" type="text" data-test="name" errorDataTest="error-name" [formField]="loginForm.emailOrName" />
+  <app-input class="w-62.5 sm:w-70" [label]="labelPassword" type="password" data-test="password" errorDataTest="error-password" [formField]="loginForm.password"/>
   <app-button
     type="submit"
     class="self-center"
     data-test="btn-submit"
     [disabled]="false"
     [text]="btnText"
-    aria-label="submit login"
+    ariaLabel="Soumission de la connexion"
   />
 </form>

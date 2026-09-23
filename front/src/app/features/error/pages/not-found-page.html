@@ -1,0 +1,12 @@
+<div class="flex flex-col items-center justify-center h-svh gap-6 py-8 text-center px-4">
+  <h1 class="sr-only">{{ errorMessage }}</h1>
+  <app-logo [width]="206" [height]="119" class="mx-auto h-auto" />
+  <p class="text-6xl font-bold text-primary" data-test="error-code">404</p>
+  <p class="text-lg" data-test="error-message">{{ errorMessage }}</p>
+  <a
+    routerLink="/"
+    class="w-40 text-center border rounded-md px-6 py-1 hover:border-b-primary hover:text-primary"
+    aria-label="retour à l'accueil"
+    data-test="back-home"
+  >{{ btnText }}</a>
+</div>

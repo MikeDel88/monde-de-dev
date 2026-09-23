@@ -12,5 +12,6 @@ export class Button {
     readonly display: InputSignal<'normal' | 'outlined'> = input<'normal' | 'outlined'>('normal');
     readonly type: InputSignal<HTMLButtonElement["type"]> = input.required();
     readonly text: InputSignal<string> = input.required();
+    readonly ariaLabel: InputSignal<string> = input.required();
     readonly disabled: InputSignal<boolean> = input.required();
 }

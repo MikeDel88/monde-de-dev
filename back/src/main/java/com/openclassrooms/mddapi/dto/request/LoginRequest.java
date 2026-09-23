@@ -1,5 +1,6 @@
 package com.openclassrooms.mddapi.dto.request;
 
+import com.openclassrooms.mddapi.exception.ErrorCodes;
 import jakarta.validation.constraints.NotBlank;
 
 /**
@@ -8,9 +9,9 @@ import jakarta.validation.constraints.NotBlank;
  * @param password
  */
 public record LoginRequest(
-        @NotBlank(message = "EMAIL_OR_NAME_REQUIRED")
+        @NotBlank(message = ErrorCodes.EMAIL_OR_NAME_REQUIRED)
         String emailOrName,
-        @NotBlank(message = "PASSWORD_REQUIRED")
+        @NotBlank(message = ErrorCodes.PASSWORD_REQUIRED)
         String password
 ) {
 }

@@ -1,18 +1,18 @@
 import {Component, computed, DestroyRef, inject, signal, Signal, WritableSignal} from '@angular/core';
 import {ProfileService} from "../../../profile/services/profile-service";
-import {HttpResourceRef} from "@angular/common/http";
+import {httpResource, HttpResourceRef} from "@angular/common/http";
 import {ProfileResponse} from "../../../profile/models/profile-response";
 import {Topic} from "../../../topic/models/topic";
 import {Router} from "@angular/router";
-import {FieldState, FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
-import {FormsModule} from "@angular/forms";
+import {FieldTree, form, FormField, required, SchemaPathTree} from "@angular/forms/signals";
 import {PostService} from "../../services/post-service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Button} from "../../../../shared/components/button/button";
-import {Error} from "../../../../shared/components/error/error";
+import {ErrorMessage} from "../../../../shared/components/error-message/error-message";
 import {Input} from "../../../../shared/components/input/input";
 import {Title} from "../../../../shared/components/title/title";
 import {Back} from "../../../../shared/components/back/back";
+import {ToastService} from "../../../../core/services/toast-service";
 
 export interface CreatePost {
   topicId: string,
@@ -35,10 +35,9 @@ const validationCreatePostForm = (schemaPath: SchemaPathTree<CreatePost>) => {
 @Component({
   selector: 'app-post',
   imports: [
-    FormsModule,
     FormField,
     Button,
-    Error,
+    ErrorMessage,
     Input,
     Title,
     Back
@@ -54,10 +53,10 @@ export class Post {
   readonly selectDefault = "Sélectionner un thème";
 
   readonly router = inject(Router);
-  private destroyRef = inject(DestroyRef);
-  private readonly profilService = inject(ProfileService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly profileService = inject(ProfileService);
   private readonly postService = inject(PostService);
-  error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
+  private readonly toastService = inject(ToastService);
   topics: Signal<Topic[] | undefined> = computed(() => {
       if(this.profile.hasValue()) {
         return this.profile.value().topics;
@@ -65,36 +64,36 @@ export class Post {
         return undefined;
       }
   });
-  profile!: HttpResourceRef<ProfileResponse | undefined>;
+  profile: HttpResourceRef<ProfileResponse | undefined> = httpResource<ProfileResponse>(() =>
+    ({ url: this.profileService.path })
+  );
 
   createPostModel: WritableSignal<CreatePost> = signal<CreatePost>(initialPostData);
   postForm: FieldTree<CreatePost> = form(this.createPostModel, validationCreatePostForm);
-
-  constructor() {
-    this.profile = this.profilService.profile;
-    this.profile.reload();
-  }
 
   onBack(): void {
     this.router.navigate(['/feed']);
   }
 
   onFocus(): void {
-    this.error.set(undefined);
+    this.toastService.clear();
   }
 
   onSubmit(event: Event): void {
     event.preventDefault();
-    const postData: FieldState<CreatePost> = this.postForm();
-    this.postService.createPost$(postData.value().topicId, postData.value().title, postData.value().content)
+    this.postForm().markAsTouched();
+    if(this.postForm().invalid() || this.postForm().value().topicId.trim() === "") {
+      return;
+    }
+    this.postService.createPost$(Number(this.postForm().value().topicId), this.postForm().value().title, this.postForm().value().content)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.postForm().reset(initialPostData);
           this.router.navigate(['/feed']);
         },
-        error: () => {
-          this.error.set('Erreur lors de la création du post.');
+        error: (err) => {
+          this.toastService.showError(err);
         }
       });
   }

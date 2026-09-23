@@ -1,5 +1,5 @@
 import {Component, DestroyRef, effect, inject, signal, WritableSignal} from '@angular/core';
-import {HttpResourceRef} from "@angular/common/http";
+import {httpResource, HttpResourceRef} from "@angular/common/http";
 import {ProfileService} from "../services/profile-service";
 import {ProfileResponse} from "../models/profile-response";
 import {TopicCard} from "../../../shared/components/topic-card/topic-card";
@@ -14,12 +14,13 @@ import {
 import {TopicService} from "../../topic/services/topic-service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Button} from "../../../shared/components/button/button";
-import {Dividers} from "../../../shared/components/divider/dividers";
-import {Error} from "../../../shared/components/error/error";
+import {Dividers} from "../../../shared/components/dividers/dividers";
+import {ErrorMessage} from "../../../shared/components/error-message/error-message";
 import {Input} from "../../../shared/components/input/input";
 import {Title} from "../../../shared/components/title/title";
 import {Loader} from "../../../shared/components/loader/loader";
 import {validatePasswordStrength} from "../../../shared/validators/password-strength-validator";
+import {ToastService} from "../../../core/services/toast-service";
 
 
 export interface ProfileData {
@@ -41,34 +42,31 @@ const validationProfileForm = (schemaPath: SchemaPathTree<ProfileData>) => {
 
 @Component({
   selector: 'app-profile',
-  imports: [TopicCard, FormField, ConfirmPasswordModal, Button, Dividers, Error, Input, Title, Loader],
+  imports: [TopicCard, FormField, ConfirmPasswordModal, Button, Dividers, ErrorMessage, Input, Title, Loader],
   templateUrl: './profile.html',
 })
 export class Profile {
 
-  private profilService: ProfileService = inject(ProfileService);
-  profile!: HttpResourceRef<ProfileResponse | undefined>;
+  private readonly profileService: ProfileService = inject(ProfileService);
+  profile: HttpResourceRef<ProfileResponse | undefined> = httpResource<ProfileResponse>(() =>
+    ({url: this.profileService.path})
+  );
 
-  private topicService: TopicService = inject(TopicService);
-  private destroyRef: DestroyRef = inject(DestroyRef);
+  private readonly topicService: TopicService = inject(TopicService);
+  private readonly destroyRef: DestroyRef = inject(DestroyRef);
 
   readonly btnUnsubscribed: string = "Se désabonner";
   readonly titleSubscription: string= "Abonnements";
-  readonly titleProfilUser: string = "Profil utilisateur";
-  readonly btnSaveProfilUser: string = "Sauvegarder";
+  readonly titleProfileUser: string = "Profil utilisateur";
+  readonly btnSaveProfileUser: string = "Sauvegarder";
   readonly placeholderPassword: string = "Nouveau mot de passe"
 
-  error: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
+  private readonly toastService = inject(ToastService);
   showPasswordModal: WritableSignal<boolean> = signal(false);
-  private pendingNewPassword = '';
-
   profileModel: WritableSignal<ProfileData> = signal<ProfileData>(initialProfileData);
   profileForm: FieldTree<ProfileData> = form(this.profileModel, validationProfileForm);
 
   constructor() {
-    this.profile = this.profilService.profile;
-    this.profile.reload();
-
     effect(() => {
       if (this.profile.hasValue()) {
         const value = this.profile.value();
@@ -77,47 +75,53 @@ export class Profile {
     });
   }
 
-  onFocus(): void {
-    this.error.set(undefined);
+  onUpdateProfileSuccess(message: string) {
+    this.toastService.showSuccess(message);
   }
 
+  onFocus(): void {
+    this.toastService.clear();
+  }
+
+  /**
+   * Valide le formulaire puis ouvre la modale de confirmation par mot de passe actuel :
+   * toute modification du profil doit être confirmée avant d'être envoyée (voir {@link onConfirmPassword}).
+   */
   onSubmit(event: Event): void {
     event.preventDefault();
-
-    const nameDirty = this.profileForm.name().dirty();
-    const emailDirty = this.profileForm.email().dirty();
-
-    if (nameDirty || emailDirty) {
-      const name = nameDirty ? this.profileForm.name().value() : null;
-      const email = emailDirty ? this.profileForm.email().value() : null;
-
-      this.profilService.updateProfil$(email, name)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe({
-          next: value => {
-            this.error.set(undefined);
-            this.profile.set(value);
-          },
-          error: () => {
-            this.error.set("Une erreur est survenue, le profil n'a pas été mis à jour.");
-          }
-        });
+    this.profileForm().markAsTouched()
+    if(this.profileForm().invalid()) {
+      return;
     }
-
-    if (this.checkHasNewPasswordToChange()) {
-      this.pendingNewPassword = this.profileForm.password().value();
-      this.showPasswordModal.set(true);
-    }
+    this.showPasswordModal.set(true);
   }
 
+  /**
+   * Envoie la mise à jour du profil une fois le mot de passe actuel confirmé.
+   * Seuls les champs modifiés (`dirty()`) sont transmis, les autres valant `null` :
+   * c'est le contrat de {@link ProfileService.updateProfile$}, où `null` signifie
+   * "ne pas modifier ce champ" plutôt que "vider ce champ".
+   * @param currentPassword Mot de passe actuel saisi dans la modale, requis pour toute modification.
+   */
   onConfirmPassword(currentPassword: string): void {
     this.showPasswordModal.set(false);
-    this.profilService.updatePassword$(this.pendingNewPassword, currentPassword)
+    if(this.profileForm().invalid()) {
+      return;
+    }
+    const name: string | null = this.profileForm.name().dirty() ? this.profileForm.name().value() : null;
+    const email: string | null = this.profileForm.email().dirty() ? this.profileForm.email().value() : null;
+    const password: string | null = this.profileForm.password().dirty() ? this.profileForm.password().value() : null;
+    this.profileService.updateProfile$(email, name, password, currentPassword)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => { this.profileForm.password().reset("") },
-        error: () => {
-          this.error.set("Une erreur est survenue, le mot de passe n'a pas été mis à jour.");
+        next: (value) => {
+          this.profile.set(value);
+          this.profileForm().reset({name: value.name, email: value.email, password: ''});
+          this.onUpdateProfileSuccess("Le profil a bien été mis à jour!");
+        },
+        error: (err) => {
+          this.profile.reload();
+          this.toastService.showError(err);
         }
       });
   }
@@ -126,14 +130,11 @@ export class Profile {
     this.topicService.unsubscribe$(topicId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        complete: () => this.profile.reload(),
+        complete: () => {
+          this.toastService.clear();
+          this.profile.reload();
+        },
+        error: (err) => this.toastService.showError(err),
       })
   }
-
-  private checkHasNewPasswordToChange(): boolean {
-    return this.profileForm.password().dirty()
-      && this.profileForm.password().valid()
-      && this.profileForm.password().value() !== '';
-  }
-
 }
