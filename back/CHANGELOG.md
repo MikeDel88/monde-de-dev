@@ -2,6 +2,10 @@
 
 Toutes les modifications notables de ce projet sont documentées dans ce fichier.
 
+## [1.0.2] - 2026-09-24
+
+Aucun changement fonctionnel. Version alignée avec la release de fix 1.0.2 du front.
+
 ## [1.0.1] - 2026-09-24
 
 ### Technique

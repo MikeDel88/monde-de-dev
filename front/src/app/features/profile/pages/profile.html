@@ -26,7 +26,7 @@
     />
     @if (profile.value().topics.length > 0) {
       <app-dividers class="w-11/12 mx-auto"/>
-      <app-title data-test="title" class="font-bold" [content]="titleSubscription" />
+      <app-title data-test="title" class="font-bold" [content]="titleSubscription" [level]="2" />
       <ul class="w-full grid grid-cols-1 md:grid-cols-2 gap-y-3.5 gap-1.5">
         @for (topic of profile.value().topics; track topic.id) {
           <li data-test="topic">

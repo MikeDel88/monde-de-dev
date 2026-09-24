@@ -2,6 +2,13 @@
 
 Toutes les modifications notables de ce projet sont documentées dans ce fichier.
 
+## [1.0.2] - 2026-09-24
+
+### Corrigé
+- Bouton "Créer un article" (fil d'actualité) : `aria-label` désormais lié au même texte que le libellé visible, au lieu d'une chaîne statique en anglais incohérente
+- Sélecteur de thème (création d'article) : suppression d'un second `aria-label` en conflit avec celui déjà porté par le composant
+- Hiérarchie des titres de la page profil : le titre "Abonnements" passe de `h6` (niveau par défaut) à `h2`, pour ne plus sauter de niveaux après le `h1` de la page
+
 ## [1.0.1] - 2026-09-24
 
 Aucun changement fonctionnel. Version alignée avec la release de fix 1.0.1 du back.
