@@ -2,6 +2,10 @@
 
 Toutes les modifications notables de ce projet sont documentées dans ce fichier.
 
+## [1.0.1] - 2026-09-24
+
+Aucun changement fonctionnel. Version alignée avec la release de fix 1.0.1 du back.
+
 ## [1.0.0] - 2026-09-23
 
 Version finale du MVP.
