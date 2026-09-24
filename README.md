@@ -1,4 +1,4 @@
-# P6-Full-Stack-reseau-dev
+# Monde de Dev
 
 ## Environnement de test (`back/`)
 

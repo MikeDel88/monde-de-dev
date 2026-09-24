@@ -2,6 +2,12 @@
 
 Toutes les modifications notables de ce projet sont documentées dans ce fichier.
 
+## [1.0.1] - 2026-09-24
+
+### Technique
+- Assouplissement du rate limiting login/register en environnement de test (`application-test.properties`) pour ne plus bloquer la suite Cypress/e2e qui enregistre et connecte de nombreux utilisateurs en rafale
+- Simplification d'un test (`PostServiceImplTest`) : suppression d'un matcher Mockito `eq()` superflu
+
 ## [1.0.0] - 2026-09-23
 
 Version finale du MVP.
