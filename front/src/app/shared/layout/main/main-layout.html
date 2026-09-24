@@ -24,7 +24,7 @@
     <ng-template #navProfil>
       <li>
         <a routerLink="/profile" routerLinkActive="text-primary font-semibold" #rla="routerLinkActive" class="hover:text-primary text-xl" data-test="link-profile" (click)="menu.close()">
-          <img [src]="rla.isActive ? '/assets/user-active.svg' : '/assets/user.svg'" alt="profile">
+          <img [src]="rla.isActive ? '/assets/user-active.svg' : '/assets/user.svg'" alt="profile" width="48" height="48">
         </a>
       </li>
     </ng-template>

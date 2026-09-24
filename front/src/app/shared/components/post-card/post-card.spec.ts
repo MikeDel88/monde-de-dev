@@ -34,7 +34,7 @@ describe('PostCard', () => {
   });
 
   it("should display the title", () => {
-    const title = fixture.debugElement.query(By.css('h3')).nativeElement as HTMLElement;
+    const title = fixture.debugElement.query(By.css('h2')).nativeElement as HTMLElement;
     expect(title.textContent).toBe("Test Post");
   });
 
